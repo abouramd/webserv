@@ -217,6 +217,8 @@ void Location::set_uplode(const std::string &str)
   else
     throw std::string("Error: unknowing option `" + vec[1] + "` in (" + str + ")");
 
+  if (vec[2][0] != '/')
+    throw std::string("Error: uplode Path should start with `/` (" + str + ")");
   // if (!(stat(vec[1].c_str(), &sb) == 0 && S_ISDIR(sb.st_mode)))
   //   throw std::string("Error: uplode Path (" + str + ")");
   
@@ -265,4 +267,12 @@ void Location::set_cgi_path(const std::string &str)
 
 }
 
+void Location::check()
+{
+  if (this->dup[0] == false)
+    throw std::string("Error: The root should be in the location.");
+  if (this->allow_method.empty())
+    this->allow_method.push_back(GET);
+  
+}
 

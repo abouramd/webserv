@@ -267,7 +267,7 @@ void Server::set_location(const std::string &str)
     throw std::string("Error: This location `" + location_name + "` is already used (" + str + ")");
   
   obj.init_data(*this->file);
-
+  // obj.check();
   this->location[location_name] = obj;
 }
 
@@ -305,6 +305,14 @@ std::vector<std::string> Server::getServName() const
   return this->server_name;
 }
 
+void Server::check()
+{
+  if (!this->dup[0])
+    throw std::string("Error: The host should be in the server.");
+
+  if (this->port.empty())
+    throw std::string("Error: it should be atlast one port or more in the server.");
+}
 
 
 

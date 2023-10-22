@@ -46,6 +46,7 @@ class Server
 
     std::string getHost() const;
 
+    void check();
 };
 
 #endif

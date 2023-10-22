@@ -62,7 +62,8 @@ void Config::read_data()
     if (buffer == "server {")
       serv.init_data(this->file);
     else
-      throw "Error: " + buffer; 
+      throw "Error: " + buffer;
+    serv.check();
     this->servers.push_back(serv);
     
     // std::cout << "=> " << this->servers[0].getPort().size() << std::endl;

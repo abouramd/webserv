@@ -69,6 +69,8 @@ class Location
     void set_uplode(const std::string &str);
     void set_cgi(const std::string &str);
     void set_cgi_path(const std::string &str);
+    
+    void check();
 };
 
 int  ft_read(std::ifstream &file, std::string &buff);
