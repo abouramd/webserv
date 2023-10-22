@@ -1,0 +1,155 @@
+#include "Client.hpp"
+#include "Config.hpp"
+#include "Location.hpp"
+#include "Socket.hpp"
+#include <cstdio>
+#include <iostream>
+#include <string>
+#include <sys/select.h>
+#include <sys/socket.h>
+#include <unistd.h>
+#include <vector>
+
+
+
+
+
+
+/* start test multiplix */
+
+std::string get_time() {
+    // Get the current time in GMT
+    std::time_t currentTime = std::time(NULL);
+
+    // Convert the time to a struct tm (timeinfo) in GMT
+    struct std::tm* timeinfo = std::gmtime(&currentTime);
+
+    // Format the time as a string
+    char buffer[200];
+    strftime(buffer, sizeof(buffer), "Date: %a, %d %b %Y %H:%M:%S GMT", timeinfo);
+
+    return std::string(buffer);
+}
+
+void ft_send_header(int client_socket, std::string status, std::string type)
+{
+	std::string head = "HTTP/1.1 " + status + "\r\n";
+	head += get_time() + "\r\n";
+	head += "Server: webserver (abouramd)\r\n";
+	head += "Content-Type: " + type + "\r\n";
+	head += "Transfer-Encoding: chunked\r\n";	
+    head += "\r\n";
+	// std::cout << head << std::endl;
+	send(client_socket, (char *)head.c_str(), head.size(), 0);
+}
+
+void base_trans(std::string& str, int n, const int &base)
+{
+  if (n >= base)
+    base_trans(str, n / base, base);
+  str += "0123456789abcdef"[n % base];
+}
+
+void send_chank(int fd, const char *content, const int size)
+{
+	std::string count;
+	base_trans(count, size, 16);
+	count += "\r\n";
+	send(fd, count.c_str(), count.size(), 0);
+	send(fd, content, size, 0);
+	send(fd, "\r\n", 2, 0);
+}
+
+/* end test multiplix */
+
+
+int get_max_fd( std::vector<Socket> &my_s )
+{
+  int max_fd = -1;
+
+  for (std::vector<Socket>::iterator it_s = my_s.begin(); it_s != my_s.end(); it_s++)
+  {
+    for (std::vector<Client>::iterator it_c = it_s->client.begin(); it_c != it_s->client.end(); it_c++)
+      max_fd = it_c->fd < max_fd ? max_fd : it_c->fd + 1;
+    max_fd = it_s->getFd() < max_fd ? max_fd : it_s->getFd() + 1;
+  }
+  std::cout << "max fd is " << max_fd << std::endl;
+  return max_fd;
+}
+
+int main(int ac, char **av)
+{
+  Config obj;
+  try{
+    obj.pars(ac, av);
+  }
+  catch ( const std::string err)
+  {
+    std::cerr << RED << err << DFL << std::endl;
+    return 1;
+  }
+  
+  std::vector<Socket> &my_s = obj.get_socket();
+  fd_set sread , swrite;
+  FD_ZERO(&sread);
+  FD_ZERO(&swrite);
+  for (std::vector<Socket>::iterator it_s = my_s.begin(); it_s != my_s.end(); it_s++)
+    FD_SET(it_s->getFd(), &sread);
+  while (1)
+  {
+    fd_set tmp_read = sread, tmp_write = swrite;
+    int ready = select(get_max_fd(my_s), &tmp_read, &tmp_write, NULL, NULL);
+    std::cout << "pass select" << std::endl;
+    if (ready == -1)
+    {
+      std::cerr << "select failed" << std::endl;
+      return 1;
+    }
+
+    for (std::vector<Socket>::iterator it_s = my_s.begin(); it_s != my_s.end(); it_s++)
+    {
+      for (int i = it_s->client.size() - 1; i >= 0; i--)
+      {
+        if (FD_ISSET(it_s->client[i].fd, &tmp_write))
+        {
+           std::cout << "hello " << std::endl;
+          ft_send_header(it_s->client[i].fd, "200 OK", "text/html");
+          send_chank(it_s->client[i].fd, "Hello", 5);
+          send_chank(it_s->client[i].fd, "", 0);
+          FD_CLR(it_s->client[i].fd, &swrite);
+          FD_SET(it_s->client[i].fd, &sread);
+        }
+        else if (FD_ISSET(it_s->client[i].fd, &tmp_read))
+        {
+          std::cout << "send responce" << std::endl;
+          char b[1000];
+          int n;
+          if (0 != (n = read(it_s->client[i].fd, b, 1001)))
+          {
+            // b[n] = 0;
+            // std::cout << b << std::endl; 
+            FD_CLR(it_s->client[i].fd, &sread);
+            FD_SET(it_s->client[i].fd, &swrite);
+            std::cout << "get a request" << std::endl;
+          }
+          else {
+            FD_CLR(it_s->client[i].fd, &sread);
+            close(it_s->client[i].fd);
+            std::cout << "remove a client" << std::endl;
+            it_s->client.erase(it_s->client.begin() + i); 
+          }
+        }
+      }
+      if (FD_ISSET(it_s->getFd(), &tmp_read))
+      {
+        Client c;
+        c.fd = accept(it_s->getFd(), NULL, NULL);
+        FD_SET(c.fd, &sread);
+        it_s->client.push_back(c);
+        std::cout << "accept a client" << std::endl;
+      }
+    }
+  }
+
+  return 0;
+}
