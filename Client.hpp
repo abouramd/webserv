@@ -7,10 +7,10 @@
 class Client {
   public:
     int fd;
-    std::ifstream* s;
-    Client(const Client&);
-    Client& operator=(const Client &obj);
-    Client();
+    // std::ifstream* s;
+    // Client(const Client&);
+    // Client& operator=(const Client &obj);
+    // Client();
 };
 
 #endif // !CLIENT_HPP
