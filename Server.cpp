@@ -267,7 +267,7 @@ void Server::set_location(const std::string &str)
     throw std::string("Error: This location `" + location_name + "` is already used (" + str + ")");
   
   obj.init_data(*this->file);
-  // obj.check();
+  obj.check();
   this->location[location_name] = obj;
 }
 
