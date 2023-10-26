@@ -3,12 +3,14 @@
 #include "Location.hpp"
 #include "Socket.hpp"
 #include <cstdio>
+#include <fstream>
 #include <iostream>
 #include <string>
 #include <sys/select.h>
 #include <sys/socket.h>
 #include <unistd.h>
 #include <vector>
+#include <utility>
 
 
 
@@ -73,7 +75,7 @@ int get_max_fd( std::vector<Socket> &my_s )
       max_fd = it_c->fd < max_fd ? max_fd : it_c->fd + 1;
     max_fd = it_s->getFd() < max_fd ? max_fd : it_s->getFd() + 1;
   }
-  std::cout << "max fd is " << max_fd << std::endl;
+  // std::cout << "max fd is " << max_fd << std::endl;
   return max_fd;
 }
 
@@ -88,7 +90,7 @@ int main(int ac, char **av)
     std::cerr << RED << err << DFL << std::endl;
     return 1;
   }
-  
+  std::map<int, std::pair<std::ifstream*, std::ofstream*> > map_files; 
   std::vector<Socket> &my_s = obj.get_socket();
   fd_set sread , swrite;
   FD_ZERO(&sread);
@@ -99,7 +101,7 @@ int main(int ac, char **av)
   {
     fd_set tmp_read = sread, tmp_write = swrite;
     int ready = select(get_max_fd(my_s), &tmp_read, &tmp_write, NULL, NULL);
-    std::cout << "pass select" << std::endl;
+    // std::cout << "pass select" << std::endl;
     if (ready == -1)
     {
       std::cerr << "select failed" << std::endl;
@@ -112,16 +114,16 @@ int main(int ac, char **av)
       {
         if (FD_ISSET(it_s->client[i].fd, &tmp_write))
         {
-           std::cout << "hello " << std::endl;
+          std::cout << GREEN << get_time() << " send responce to "  << it_s->client[i].fd << DFL << std::endl;
           ft_send_header(it_s->client[i].fd, "200 OK", "text/html");
           send_chank(it_s->client[i].fd, "Hello", 5);
           send_chank(it_s->client[i].fd, "", 0);
           FD_CLR(it_s->client[i].fd, &swrite);
           FD_SET(it_s->client[i].fd, &sread);
+
         }
         else if (FD_ISSET(it_s->client[i].fd, &tmp_read))
         {
-          std::cout << "send responce" << std::endl;
           char b[1000];
           int n;
           if (0 != (n = read(it_s->client[i].fd, b, 1001)))
@@ -130,23 +132,26 @@ int main(int ac, char **av)
             // std::cout << b << std::endl; 
             FD_CLR(it_s->client[i].fd, &sread);
             FD_SET(it_s->client[i].fd, &swrite);
-            std::cout << "get a request" << std::endl;
+            std::cout << BLUE << get_time() << " get a request from " << it_s->client[i].fd << DFL << std::endl;
           }
           else {
             FD_CLR(it_s->client[i].fd, &sread);
             close(it_s->client[i].fd);
-            std::cout << "remove a client" << std::endl;
+            delete map_files[it_s->client[i].fd].first;
+            delete map_files[it_s->client[i].fd].second;
+            map_files.erase(it_s->client[i].fd);
+            std::cout << PURPLE << get_time() << " remove a client " << it_s->client[i].fd << DFL << std::endl;
             it_s->client.erase(it_s->client.begin() + i); 
           }
         }
       }
       if (FD_ISSET(it_s->getFd(), &tmp_read))
       {
-        Client c;
-        c.fd = accept(it_s->getFd(), NULL, NULL);
-        FD_SET(c.fd, &sread);
-        it_s->client.push_back(c);
-        std::cout << "accept a client" << std::endl;
+        int fd = accept(it_s->getFd(), NULL, NULL);
+        map_files[fd] = make_pair(new std::ifstream, new std::ofstream);
+        FD_SET(fd, &sread);
+        it_s->client.push_back(Client(fd, map_files[fd].first, map_files[fd].second));
+        std::cout << YELLOW << get_time() << " accept a client " << fd << DFL << std::endl;
       }
     }
   }

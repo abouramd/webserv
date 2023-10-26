@@ -7,8 +7,10 @@
 class Client {
   public:
     int fd;
-    // std::ifstream* s;
-    // Client(const Client&);
+    std::ifstream& is;
+    std::ofstream& os;
+    Client(int fd, std::ifstream* i, std::ofstream* o);
+    Client(const Client &obj);
     // Client& operator=(const Client &obj);
     // Client();
 };
