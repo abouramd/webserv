@@ -36,7 +36,7 @@ location / {
   auto_index on
   uplode on //
   cgi on
-  cgi_path .php /Users/abouramd/Desktop/php-cgi
+  # cgi_path .php /Users/abouramd/Desktop/php-cgi
 }
 location /test {
  return 42.fr
@@ -58,7 +58,7 @@ location / {
   auto_index on
   uplode on //
   cgi on
-  cgi_path .php /Users/abouramd/Desktop/php-cgi
+  # cgi_path .php /Users/abouramd/Desktop/php-cgi
 }
 location /test {
  return 42.fr

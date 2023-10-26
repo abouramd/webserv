@@ -6,7 +6,7 @@
 #include <netinet/in.h>
 #include <string>
 
-class Client;
+// class Client;
 class Socket {
 private:
     int Socket_fd;
