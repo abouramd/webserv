@@ -28,7 +28,7 @@ jobs:
         run: git checkout master
       
       - name: Merge with abouramd
-        run: git merge --no-ff abouramd
+        run: git merge --no-ff --allow-unrelated-histories abouramd
 
       - name: Push to master
         run: git push origin master
