@@ -2,8 +2,7 @@ name: Merge abouramd branch into master
 
 on:
   push:
-    branches:
-      - abouramd
+    branches: [ "abouramd" ]
 
 jobs:
   merge:
