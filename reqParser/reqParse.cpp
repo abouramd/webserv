@@ -99,11 +99,15 @@ void    reqParser(Client & request, int sock) {
             else
                 bodyParser(request);
         }
-        if (request.contentLength <= 0 || (request.state == DONE_WITH_HEADERS && request.method != "POST"))
+        if (request.contentLength <= 0 || (request.state == DONE_WITH_HEADERS && request.method != "POST")) {
+			request.response = generateResponse(200);
+			std::cout << request.response << std::endl;
 			request.state = DONE;
+		}
     }
     catch (int status) {
-        std::cout << "status is >> " << status << std::endl;
+		request.response = generateResponse(status);
+        std::cout << request.response << std::endl;
         request.state = DONE;
     }
 }

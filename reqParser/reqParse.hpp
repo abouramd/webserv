@@ -39,7 +39,7 @@ struct Client {
     int                                 contentLength, fd;
     size_t                              state, chunkSize, buffSize, position;
     char                                buf[BUFF_SIZE + 1];
-    std::string                         method, target, version, host, sizeDept;
+    std::string                         method, target, version, host, sizeDept, response;
     std::map<std::string, std::string>  headers;
     std::ifstream                       &is;
     std::ofstream                       &outfile;
@@ -48,3 +48,4 @@ struct Client {
 void    moveBuf( Client & request, int amount );
 void    bodyParser(Client & req);
 void    reqParser(Client & request, int sock);
+std::string generateResponse(int status);
