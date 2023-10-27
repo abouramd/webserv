@@ -7,7 +7,9 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-#include <endian.h>
+#ifndef __APPLE__
+  #include <endian.h>
+#endif // !__APPLE__
 #include <sys/socket.h>
 #include <vector>
 #include <cstring>
