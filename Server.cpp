@@ -3,14 +3,13 @@
 #include <cctype>
 #include <climits>
 #include <cstddef>
-#include <cstdint>
 #include <cstring>
 #include <netinet/in.h>
 #include <string>
 #include <sys/errno.h>
 #include <sys/stat.h>
 #include <vector>
-
+#define UINT16_MAX 65535
 //set max body size 
 // check duplicate 
 

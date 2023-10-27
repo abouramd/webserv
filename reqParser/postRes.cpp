@@ -75,11 +75,15 @@ void    bodyParser(Client & request) {
     else {
         size_t st = request.position;
 
-        while (st < request.buffSize)
-            request.outfile << request.buf[st++];
-        if (request.contentLength <  static_cast<int>(request.buffSize - request.position))
-            throw 413;
-        request.contentLength -= request.buffSize - request.position;
-        request.position = 0;
+        if (request.contentLength <  static_cast<int>(request.buffSize - st)) {
+			while (request.contentLength > 0)
+				request.outfile << request.buf[st++];
+		}
+		else {
+			while (st < request.buffSize)
+				request.outfile << request.buf[st++];
+			request.contentLength -= request.buffSize - request.position;
+			request.position = 0;
+		}
     }
 }

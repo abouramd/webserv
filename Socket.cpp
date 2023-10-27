@@ -4,7 +4,7 @@
 #include <iostream>
 #include <netinet/in.h>
 #include <string>
-#include <sys/_endian.h>
+#include <endian.h>
 #include <sys/socket.h>
 
 Socket::Socket()

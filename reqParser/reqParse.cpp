@@ -1,12 +1,17 @@
+#include <cstdlib>
 #include "reqParse.hpp"
 
 
 std::string getFileName(Client & request) {
     std::fstream content("content_type.txt");
     std::string     line;
+	std::string		res;
+
     while (getline(content, line)) {
-        if (request.headers["Content-Type"] == line.substr(0, line.find(':')))
-            return "file" + line.substr(line.find(':') + 1);
+        if (request.headers["Content-Type"] == line.substr(0, line.find(':'))) {
+			res = "file" + line.substr(line.find(':') + 1);
+			return res;
+		}
     }
     throw 415;
 }
@@ -39,7 +44,7 @@ void    startHParsing(Client & request) {
         ss.ignore(1);
     std::cout << request.method << ", " << request.target << ", " << request.version << std::endl;
     while (std::getline(ss, header) && !header.empty() && header != "\r") {
-        if (header.back() == '\r')
+        if (header[header.size() - 1] == '\r')
             header = header.substr(0, header.size() - 1);
         std::string key, value;
         key = header.substr(0, header.find(':'));
@@ -61,8 +66,10 @@ void    headersParsing(Client & request) {
             if (request.headers["Transfer-Encoding"] != "chunked" || request.headers.find("Content-length") != request.headers.end())
                 throw 500;
         }
-        else if (request.headers.find("Transfer-Encoding") != request.headers.end())
-        request.contentLength = std::atoi(request.headers["Content-Length"].c_str());
+        else if (request.headers.find("Content-Length") == request.headers.end())
+			throw 500;
+		const char *ptr = request.headers["Content-Length"].c_str();
+        request.contentLength = std::strtol(ptr, NULL, 10);
     }
 }
 
@@ -81,7 +88,7 @@ void    reqParser(Client & request, int sock) {
             headersParsing(request);
         if (request.state == DONE_WITH_HEADERS && request.method == "POST") {
             if (!request.outfile.is_open())
-                request.outfile.open(getFileName(request));
+                request.outfile.open(getFileName(request).c_str());
             if (request.chunkSize >= request.buffSize) {
                 request.outfile.write(request.buf, request.buffSize);
                 request.chunkSize -= request.buffSize;
@@ -91,7 +98,7 @@ void    reqParser(Client & request, int sock) {
                 bodyParser(request);
         }
         if (request.contentLength <= 0 || (request.state == DONE_WITH_HEADERS && request.method != "POST"))
-            request.state = DONE;
+			request.state = DONE;
     }
     catch (int status) {
         std::cout << "status is >> " << status << std::endl;

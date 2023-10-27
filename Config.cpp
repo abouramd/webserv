@@ -7,9 +7,10 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-#include <sys/_endian.h>
+#include <endian.h>
 #include <sys/socket.h>
 #include <vector>
+#include <cstring>
 
 Config::Config()
 {
@@ -104,12 +105,15 @@ void Config::creat_socket()
 void Config::add_socket(sockaddr_in &addr, Server& sev, int& port)
 {
   std::vector<Socket>::iterator it = this->socket.begin();
+  std::stringstream ss;
   while (it != this->socket.end())
   {
     if (it->getSinPort() == addr.sin_port)
     {
-      if (it->getSinAddr().s_addr != addr.sin_addr.s_addr)
-        throw std::string("Error: this port " + std::to_string(port) + " is used with " + inet_ntoa(it->getSinAddr()) + " and " + inet_ntoa(addr.sin_addr));
+      if (it->getSinAddr().s_addr != addr.sin_addr.s_addr) {
+	ss << port;
+	   throw std::string("Error: this port " + ss.str() + " is used with " + inet_ntoa(it->getSinAddr()) + " and " + inet_ntoa(addr.sin_addr));
+      }
       it->serv.push_back(sev);
       return;
     }

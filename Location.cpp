@@ -1,6 +1,7 @@
 #include "Location.hpp"
 #include <algorithm>
 #include <fstream>
+#include <cstring>
 
 // check duplicate 
 
