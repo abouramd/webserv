@@ -30,6 +30,6 @@ jobs:
         run: |
           git clone ${{env.MY_REPO}} my_repo
           cd my_repo
-          git checkout master
-          git merge abouramd
+          git checkout origin master
+          git merge origin/abouramd
           git push origin master
