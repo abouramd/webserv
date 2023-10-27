@@ -20,6 +20,9 @@ jobs:
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
+
+      - name: Fetch master branch
+        run: git fetch origin master
       
       - name: Checkout to master
         run: git checkout master
