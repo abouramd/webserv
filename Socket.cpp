@@ -4,7 +4,11 @@
 #include <iostream>
 #include <netinet/in.h>
 #include <string>
-#include <endian.h>
+
+#ifndef __APPLE__
+  #include <endian.h>
+#endif // !__APPLE__
+
 #include <sys/socket.h>
 
 Socket::Socket()

@@ -1,0 +1,15 @@
+# CLion
+.idea/
+
+# VSCode
+.vscode/
+*.code-workspace
+
+# Neovim
+*.swp
+*.swo
+*.un~
+
+# Build outfiles
+*.o
+a.out
