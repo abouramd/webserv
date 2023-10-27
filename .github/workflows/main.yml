@@ -22,8 +22,10 @@ jobs:
           git config user.email github-actions@github.com
 
       - name: Fetch master branch
-        run: git fetch origin master
-      
+        run: |
+          git clone ${{env.MY_REPO}} my_repo
+          cd my_repo
+          
       - name: Checkout to master
         run: git checkout master
       
