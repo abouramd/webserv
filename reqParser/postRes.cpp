@@ -25,7 +25,7 @@ void    unCh(Client & request) {
     size_t  st;
 
     if (request.chunkSize) {
-        request.outfile.write(request.buf, request.chunkSize);
+        request.outfile->write(request.buf, request.chunkSize);
         request.position = request.chunkSize + 2;
         request.chunkSize = 0;
         if (request.contentLength <  static_cast<int>(request.chunkSize))
@@ -52,7 +52,7 @@ void    unCh(Client & request) {
             break;
         }
         while (request.chunkSize && st < request.buffSize) {
-            request.outfile << request.buf[st];
+            *(request.outfile) << request.buf[st];
             request.chunkSize--;
             request.contentLength--;
             st++;
@@ -77,11 +77,11 @@ void    bodyParser(Client & request) {
 
         if (request.contentLength <  static_cast<int>(request.buffSize - st)) {
 			while (request.contentLength > 0)
-				request.outfile << request.buf[st++];
+				*(request.outfile) << request.buf[st++];
 		}
 		else {
 			while (st < request.buffSize)
-				request.outfile << request.buf[st++];
+				*(request.outfile) << request.buf[st++];
 			request.contentLength -= request.buffSize - request.position;
 			request.position = 0;
 		}

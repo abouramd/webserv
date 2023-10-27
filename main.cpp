@@ -2,6 +2,7 @@
 #include "Config.hpp"
 #include "Location.hpp"
 #include "Socket.hpp"
+#include "reqParser/reqParse.hpp"
 #include <cstdio>
 #include <fstream>
 #include <iostream>
@@ -126,25 +127,21 @@ int main(int ac, char **av)
         else if (FD_ISSET(it_s->client[i].fd, &tmp_read))
         {
           reqParser(it_s->client[i], it_s->client[i].fd);
-          // char b[1000];
-          // int n;
-          // if (0 != (n = read(it_s->client[i].fd, b, 1001)))
-          // {
-          //   // b[n] = 0;
-          //   // std::cout << b << std::endl;
-          //   FD_CLR(it_s->client[i].fd, &sread);
-          //   FD_SET(it_s->client[i].fd, &swrite);
-             std::cout << BLUE << get_time() << " get a request from " << it_s->client[i].fd << DFL << std::endl;
-          // }
-          // else {
-          //   FD_CLR(it_s->client[i].fd, &sread);
-          //   close(it_s->client[i].fd);
-          //   delete map_files[it_s->client[i].fd].first;
-          //   delete map_files[it_s->client[i].fd].second;
-          //   map_files.erase(it_s->client[i].fd);
-          //   std::cout << PURPLE << get_time() << " remove a client " << it_s->client[i].fd << DFL << std::endl;
-          //   it_s->client.erase(it_s->client.begin() + i); 
-          // }
+          if ( it_s->client[i].state == DONE )
+          {
+            FD_CLR(it_s->client[i].fd, &sread);
+            FD_SET(it_s->client[i].fd, &swrite);
+            std::cout << BLUE << get_time() << " end of request and swap " << it_s->client[i].fd << " to responce." << DFL << std::endl;
+          }
+          else if ( it_s->client[i].state == CLOSE ) {
+            FD_CLR(it_s->client[i].fd, &sread);
+            close(it_s->client[i].fd);
+            delete map_files[it_s->client[i].fd].first;
+            delete map_files[it_s->client[i].fd].second;
+            map_files.erase(it_s->client[i].fd);
+            std::cout << PURPLE << get_time() << " remove a client " << it_s->client[i].fd << DFL << std::endl;
+            it_s->client.erase(it_s->client.begin() + i); 
+          }
         }
       }
       if (FD_ISSET(it_s->getFd(), &tmp_read))

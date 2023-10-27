@@ -89,10 +89,10 @@ void    reqParser(Client & request, int sock) {
         if (request.state == NOT_DONE)
             headersParsing(request);
         if (request.state == DONE_WITH_HEADERS && request.method == "POST") {
-            if (!request.outfile.is_open())
-                request.outfile.open(getFileName(request).c_str());
+            if (!request.outfile->is_open())
+                request.outfile->open(getFileName(request).c_str());
             if (request.chunkSize >= request.buffSize) {
-                request.outfile.write(request.buf, request.buffSize);
+                request.outfile->write(request.buf, request.buffSize);
                 request.chunkSize -= request.buffSize;
                 request.position = 2;
             }
