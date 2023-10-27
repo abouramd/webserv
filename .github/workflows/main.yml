@@ -2,7 +2,8 @@ name: Merge abouramd branch into master
 
 on:
   push:
-    branches: [ "abouramd" ]
+    branches:
+      - abouramd
 
 jobs:
   merge:
@@ -21,10 +22,10 @@ jobs:
           git config user.email github-actions@github.com
       
       - name: Checkout to master
-          git checkout master
+        run: git checkout master
       
       - name: Merge with abouramd
-          git merge --no-ff abouramd
+        run: git merge --no-ff abouramd
 
       - name: Push to master
-          git push origin master
+        run: git push origin master
