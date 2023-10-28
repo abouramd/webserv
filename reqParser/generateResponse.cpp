@@ -15,22 +15,24 @@ std::string inHtml( std::string const &title, std::string const & message) {
 std::string generateResponse(int status) {
 	std::string response;
     std::string body;
+    std::ifstream   index("index.html");
 
-	switch (status) {
-		case 200:
+    switch (status) {
+        case 200:
+            getline(index, body, '\0');
 			response = "HTTP/1.1 200 OK\r\n"
-					   "Content-Type: text/plain\r\n"
-                       "Content-Length: 8\r\n"
-					   "\r\n"
-					   "Success!";
+					   "Content-Type: text/html\r\n"
+                       "Content-Length: " + std::to_string(body.size()) + "\r\n"
+					   "\r\n" + body;
 			break;
         case 201:
             body = inHtml("201 Created", "The request has been fulfilled and a new resource has been created.");
             response = "HTTP/1.1 201 Created\r\n"
-                       "Content-Type: text/plain\r\n"
+                       "Content-Type: text/html\r\n"
                        "Location: /file.\r\n"
                        "Content-Length: " + std::to_string(body.size()) + "\r\n"
                        "\r\n" + body;
+            break;
 		case 404:
 			response = "HTTP/1.1 404 Not Found\r\n"
 					   "Content-Type: text/plain\r\n"
@@ -53,6 +55,6 @@ std::string generateResponse(int status) {
 					   "Bad request! or some other hta nzidhome hh !";
 			break;
 	}
-
+    index.close();
 	return response;
 }
