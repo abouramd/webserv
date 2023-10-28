@@ -64,12 +64,12 @@ void    headersParsing(Client & request) {
         request.state = DONE_WITH_HEADERS;
 		if (request.headers.find("Host") == request.headers.end())
 			throw 400;
-        if (request.headers.find("Transfer-Encoding") != request.headers.end()) {
+        if (request.method == "POST" && request.headers.find("Transfer-Encoding") != request.headers.end()) {
             if (request.headers["Transfer-Encoding"] != "chunked" || request.headers.find("Content-Length") != request.headers.end())
                 throw 400;
         }
-        else if (request.headers.find("Content-Length") == request.headers.end())
-			throw 400;
+        else if (request.method == "POST" && request.headers.find("Content-Length") == request.headers.end())
+            throw 400;
         const char *ptr = request.headers["Content-Length"].c_str();
         request.contentLength = std::strtol(ptr, NULL, 10);
     }
