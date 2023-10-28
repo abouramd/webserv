@@ -8,13 +8,13 @@
 #
 # location /illll/ {
 #   index index.php index.html
-#   root /home/lsemlali/Desktop/
+#   root /Users/lsemlali/Desktop/
 #   allow_method GET DELET POST
 #   auto_index on
 #   uplode on /new/
 #   cgi on
-#   cgi_path .php /home/lsemlali/Desktop/php-cgi
-#   cgi_path .py /home/lsemlali/Desktop/php-cgi
+#   cgi_path .php /Users/lsemlali/Desktop/php-cgi
+#   cgi_path .py /Users/lsemlali/Desktop/php-cgi
 # }
 # location /test {
 #  return 42.fr
@@ -31,16 +31,16 @@ max_body_size 10000000
 
 location / {
   index index.php index.html
-  root /home/lsemlali/Desktop/
+  root /Users/lsemlali/Desktop/
   allow_method GET DELET
   auto_index on
   uplode on //
   cgi on
-  # cgi_path .php /home/lsemlali/Desktop/php-cgi
+  # cgi_path .php /Users/lsemlali/Desktop/php-cgi
 }
 location /test {
  return 42.fr
-  root /home/lsemlali/
+  root /Users/lsemlali/
 }
 }
 
@@ -53,16 +53,16 @@ max_body_size 10000000
 
 location / {
   index index.php index.html
-  root /home/lsemlali/Desktop/
+  root /Users/lsemlali/Desktop/
   allow_method GET DELET
   auto_index on
   uplode on //
   cgi on
-  # cgi_path .php /home/lsemlali/Desktop/php-cgi
+  # cgi_path .php /Users/lsemlali/Desktop/php-cgi
 }
 location /test {
  return 42.fr
-  root /home/lsemlali/
+  root /Users/lsemlali/
 }
 }
 

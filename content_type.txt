@@ -9,7 +9,7 @@ text/csv:.csv
 application/x-www-form-urlencoded:N/A
 text/markdown:.md
 application/octet-stream:N/A
-image/jpeg:.jpg, .jpeg
+image/jpeg:.jpeg
 image/png:.png
 image/gif:.gif
 application/pdf:.pdf

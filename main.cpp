@@ -122,7 +122,6 @@ int main(int ac, char **av)
           send_chank(it_s->client[i].fd, "", 0);
           FD_CLR(it_s->client[i].fd, &swrite);
           FD_SET(it_s->client[i].fd, &sread);
-
         }
         else if (FD_ISSET(it_s->client[i].fd, &tmp_read))
         {

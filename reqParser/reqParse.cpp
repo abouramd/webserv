@@ -49,7 +49,7 @@ void    startHParsing(Client & request) {
         std::string key, value;
         key = header.substr(0, header.find(':'));
         value = header.substr(header.find(':') + 2);
-        std::cout << key << ",>>>," << value << std::endl;
+//        std::cout << key << ",>>>," << value << std::endl;
         if (key.empty() || value.empty())
             throw 400;
         request.headers[key] = value;
@@ -70,7 +70,7 @@ void    headersParsing(Client & request) {
         }
         else if (request.headers.find("Content-Length") == request.headers.end())
 			throw 400;
-		const char *ptr = request.headers["Content-Length"].c_str();
+        const char *ptr = request.headers["Content-Length"].c_str();
         request.contentLength = std::strtol(ptr, NULL, 10);
     }
 }
@@ -82,7 +82,7 @@ void    reqParser(Client & request, int sock) {
         amount = read(sock, request.buf, BUFF_SIZE);
         if (amount == 0) {
             request.state = CLOSE;
-            return;
+            throw 200;
         }
         request.buffSize = amount;
         request.buf[request.buffSize] = 0;
@@ -99,15 +99,13 @@ void    reqParser(Client & request, int sock) {
             else
                 bodyParser(request);
         }
-        if (request.contentLength <= 0 || (request.state == DONE_WITH_HEADERS && request.method != "POST")) {
-			request.response = generateResponse(200);
-			std::cout << request.response << std::endl;
-			request.state = DONE;
-		}
+        if (request.state == DONE_WITH_HEADERS && request.method != "POST")
+            throw 200;
     }
     catch (int status) {
 		request.response = generateResponse(status);
         std::cout << request.response << std::endl;
+        request.outfile->close();
         request.state = DONE;
     }
 }
