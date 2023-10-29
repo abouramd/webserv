@@ -23,23 +23,11 @@ struct Client {
         chunkSize = 0;
         state = NOT_DONE;
     }
-    // Client(const Client &obj) : is(obj.is), outfile(obj.outfile) {
-    //     this->fd = obj.fd;
-    //     position = obj.position;
-    //     chunkSize = obj.chunkSize;
-    //     state = obj.state;
-    //     contentLength = obj.contentLength;
-    //     method = obj.method;
-    //     target = obj.target;
-    //     version = obj.version;
-    //     host = obj.host;
-    //     sizeDept = obj.sizeDept;
-    //     headers = obj.headers;
-    // }
+	void	reset();
     int                                 contentLength, fd;
     size_t                              state, chunkSize, buffSize, position;
     char                                buf[BUFF_SIZE + 1];
-    std::string                         method, target, version, host, sizeDept, response;
+    std::string                         method, target, version, host, sizeDept, headersBuf, response;
     std::map<std::string, std::string>  headers;
     std::ifstream                       *is;
     std::ofstream                       *outfile;
