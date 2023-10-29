@@ -4,20 +4,6 @@ on:
   push:
     branches:
       - abouramd
-env:
-  # replace "github_username" with your GitHub username
-  # replace "github.com/username/repo.git" with your GitHub repo path
-  # do NOT replace ${{secrets.GITHUB_TOKEN}}, GitHub will take care of it
-  MY_REPO: https://abouramd:${{secrets.GITHUB_TOKEN}}@github.com/abouramd/webserv.git
-  
-  # replace "long-lived_branch_name" with your branch name
-  MY_BRANCH: abouramd
-
-  # replace it with the path to master repo
-  MASTER_REPO: https://abouramd:${{secrets.GITHUB_TOKEN}}@github.com/abouramd/webserv.git
-
-  # replace "master" with your master branch name
-  MASTER_BRANCH: master
 jobs:
   merge:
     runs-on: macos-latest
@@ -29,12 +15,11 @@ jobs:
       - name: Build and Test
         run: make all fclean
 
-      - name: Fetch master branch
-        run: |
-          git clone ${{env.MY_REPO}} -b ${{env.MY_BRANCH}} tmp
-          cd tmp
-          git config user.name "abouramd"
-          git config user.email "abouramd@gmail.com"
-          git config pull.rebase false
-          git pull ${{env.MASTER_REPO}} ${{env.MASTER_BRANCH}}
-          git push
+      - name: Merge staging -> uat
+        uses: devmasx/merge-branch@master
+        with:
+          type: now
+          from_branch: abouramd
+          target_branch: master
+          message: Merge abouramd into mater
+          github_token: ${{ secrets.GITHUB_TOKEN }}
