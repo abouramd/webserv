@@ -10,6 +10,14 @@ env:
   # do NOT replace ${{secrets.GITHUB_TOKEN}}, GitHub will take care of it
   MY_REPO: https://abouramd:${{secrets.GITHUB_TOKEN}}@github.com/abouramd/webserv.git
 
+  # replace "long-lived_branch_name" with your branch name
+  MY_BRANCH: abouramd
+
+  # replace it with the path to master repo
+  MASTER_REPO: https://github.com/abouramd/webserv.git
+
+  # replace "master" with your master branch name
+  MASTER_BRANCH: master
 jobs:
   merge:
     runs-on: macos-latest
@@ -21,15 +29,12 @@ jobs:
       - name: Build and Test
         run: make all fclean
 
-      - name: Set name and email
-        run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-
       - name: Fetch master branch
         run: |
-          git clone ${{env.MY_REPO}} my_repo
-          cd my_repo
-          git checkout master
-          git merge origin/abouramd
-          git push origin master
+          git clone ${{env.MY_REPO}} -b ${{env.MY_BRANCH}} tmp
+          cd tmp
+          git config user.name "abouramd"
+          git config user.email "abouramd@gmail.com"
+          git config pull.rebase false
+          git pull ${{env.MASTER_REPO}} ${{env.MASTER_BRANCH}}
+          git push
