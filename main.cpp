@@ -129,6 +129,7 @@ int main(int ac, char **av)
           reqParser(it_s->client[i], it_s->client[i].fd);
           if ( it_s->client[i].state == DONE )
           {
+			  it_s->client[i].reset();
             FD_CLR(it_s->client[i].fd, &sread);
             FD_SET(it_s->client[i].fd, &swrite);
             std::cout << BLUE << get_time() << " end of request and swap " << it_s->client[i].fd << " to responce." << DFL << std::endl;
