@@ -2,6 +2,7 @@
 #include "reqParse.hpp"
 
 
+
 std::string getFileName(Client & request) {
     std::fstream content("content_type.txt");
     std::string     line;
@@ -31,8 +32,10 @@ int    endFound( const char *buf ) {
 
 void    startHParsing(Client & request) {
     std::string header;
-    std::stringstream   ss(request.buf);
+    std::stringstream   ss;
 
+	ss << request.headersBuf;
+	ss.write(request.buf, request.buffSize);
     ss >> request.method >> request.target >> request.version;
     if (request.method != "GET" && request.method != "POST" && request.method != "DELETE")
         throw 405;
@@ -73,6 +76,8 @@ void    headersParsing(Client & request) {
         const char *ptr = request.headers["Content-Length"].c_str();
         request.contentLength = std::strtol(ptr, NULL, 10);
     }
+	else
+		request.headersBuf += request.buf;
 }
 
 void    reqParser(Client & request, int sock) {
@@ -105,7 +110,5 @@ void    reqParser(Client & request, int sock) {
     catch (int status) {
 		request.response = generateResponse(status);
         std::cout << request.response << std::endl;
-        request.outfile->close();
-        request.state = DONE;
     }
 }
