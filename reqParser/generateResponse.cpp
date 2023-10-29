@@ -13,24 +13,26 @@ std::string inHtml( std::string const &title, std::string const & message) {
     return htmlMessage;
 }
 std::string generateResponse(int status) {
-	std::string response;
-    std::string body;
-    std::ifstream   index("index.html");
+	std::string			response, body;
+    std::stringstream	ss;
+    std::ifstream		index("index.html");
 
     switch (status) {
         case 200:
             getline(index, body, '\0');
+			ss << body.size();
 			response = "HTTP/1.1 200 OK\r\n"
 					   "Content-Type: text/html\r\n"
-                       "Content-Length: " + std::to_string(body.size()) + "\r\n"
+                       "Content-Length: " + ss.str() + "\r\n"
 					   "\r\n" + body;
 			break;
         case 201:
             body = inHtml("201 Created", "The request has been fulfilled and a new resource has been created.");
+			ss << body.size();
             response = "HTTP/1.1 201 Created\r\n"
                        "Content-Type: text/html\r\n"
                        "Location: /file.\r\n"
-                       "Content-Length: " + std::to_string(body.size()) + "\r\n"
+                       "Content-Length: " + ss.str() + "\r\n"
                        "\r\n" + body;
             break;
 		case 404:
@@ -48,7 +50,8 @@ std::string generateResponse(int status) {
 					   "Internal server error!";
 			break;
 		default:
-			response = "HTTP/1.1 " + std::to_string(status) + " Bad Request\r\n"
+			ss << status;
+			response = "HTTP/1.1 " + ss.str() + " Bad Request\r\n"
 					   "Content-Type: text/plain\r\n"
                        "Content-Length: 44\r\n"
 					   "\r\n"
