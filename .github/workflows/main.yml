@@ -15,7 +15,7 @@ jobs:
       - name: Build and Test
         run: make all fclean
 
-      - name: Merge staging -> uat
+      - name: Merge abouramd -> master
         uses: devmasx/merge-branch@master
         with:
           type: now
