@@ -1,5 +1,5 @@
 
-name: Merge abouramd branch into master
+name: TEST IN Ubuntu and in Macos
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
       - abouramd
 
 jobs:
-  merge-macos:
+  test-macos:
     runs-on: macos-latest
     
     steps:
@@ -18,19 +18,17 @@ jobs:
         run: make all fclean
       
         
-  merge-ubuntu:
+  test-ubuntu:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Merge abouramd -> master
-        uses: devmasx/merge-branch@master
-        with:
-          type: now
-          from_branch: abouramd
-          target_branch: master
-          message: Merge abouramd into master
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      
+      - name: Build and Test
+        run: make all fclean
 
 
