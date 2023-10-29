@@ -17,8 +17,8 @@ jobs:
 
       - name: Merge abouramd branch into master
         run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
+          git config user.name abouramd
+          git config user.email bouramadane2002@gmail.com
           git checkout master
           git merge --no-ff abouramd
           git push origin master
