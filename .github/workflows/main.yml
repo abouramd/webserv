@@ -9,12 +9,12 @@ env:
   # replace "github.com/username/repo.git" with your GitHub repo path
   # do NOT replace ${{secrets.GITHUB_TOKEN}}, GitHub will take care of it
   MY_REPO: https://abouramd:${{secrets.GITHUB_TOKEN}}@github.com/abouramd/webserv.git
-
+  
   # replace "long-lived_branch_name" with your branch name
   MY_BRANCH: abouramd
 
   # replace it with the path to master repo
-  MASTER_REPO: https://github.com/abouramd/webserv.git
+  MASTER_REPO: https://abouramd:${{secrets.GITHUB_TOKEN}}@github.com/abouramd/webserv.git
 
   # replace "master" with your master branch name
   MASTER_BRANCH: master
