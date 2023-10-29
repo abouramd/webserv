@@ -3,8 +3,7 @@ name: TEST IN Ubuntu and in Macos
 
 on:
   push:
-    branches:
-      - abouramd
+    branches: [ "*" ]
 
 jobs:
   test-macos:
