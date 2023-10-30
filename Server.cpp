@@ -21,6 +21,15 @@ Server::Server() {
   for (size_t i = 0; i < 5; i++)
     this->dup[i] = false;
 
+  this->error_page_dfl[201] = "error_pages/201.html";
+  this->error_page_dfl[400] = "error_pages/400.html";
+  this->error_page_dfl[403] = "error_pages/403.html";
+  this->error_page_dfl[404] = "error_pages/404.html";
+  this->error_page_dfl[405] = "error_pages/405.html";
+  this->error_page_dfl[415] = "error_pages/415.html";
+  this->error_page_dfl[500] = "error_pages/500.html";
+  this->error_page_dfl[505] = "error_pages/505.html";
+
   this->key[0] = "host";
   this->key[1] = "listen";
   this->key[2] = "server_name";
@@ -288,7 +297,26 @@ std::vector<std::string> Server::getServName() const {
 }
 
 void Server::set_error_pages(const std::string &str) {
-  (void) str;
+    int nbr = 0;
+    struct stat sb;
+
+    std::vector<std::string> vec = my_split(str);
+
+    if (vec.size() != 3)
+        throw std::string("Error: number of args (" + str + ")");
+
+    nbr = str_to_int(vec[1], UINT16_MAX);
+
+    if (nbr == -1)
+        throw std::string("Error: invalid error number `" + vec[1] + "` in (" + str + ").");
+
+    if (!(stat(vec[2].c_str(), &sb) == 0 && S_ISDIR(sb.st_mode)))
+       throw std::string("Error: error page path (" + str + ")");
+
+    if (!(S_IRUSR & sb.st_mode))
+        throw std::string("Error: error page should have read permissions  (" + vec[2] + ")");
+
+    this->error_page[nbr] = vec[2];
 }
 
 void Server::check() {
@@ -296,8 +324,7 @@ void Server::check() {
     throw std::string("Error: The host should be in the server.");
 
   if (this->port.empty())
-    throw std::string(
-        "Error: it should be atlast one port or more in the server.");
+    throw std::string("Error: it should be at least one port or more in the server.");
 }
 
 
