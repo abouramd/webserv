@@ -38,6 +38,7 @@ class Server
     void set_server_name(const std::string &str);
     void set_location(const std::string &str);
     void set_max_body(const std::string &str);
+    void set_error_pages(const std::string &str);
 
     void find_key(const std::string &str);
 
