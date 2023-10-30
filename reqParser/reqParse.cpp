@@ -1,7 +1,32 @@
 #include <cstdlib>
 #include "reqParse.hpp"
 
-
+//bool    isCgi(Client & request) {
+//    std::stringstream   target(request.target);
+//    std::string         line;
+//
+//    while (getline(target, line, '/'));
+//
+//    for (int i = 0; i < line.size(); i++) {
+//        if (line[i] == '.' && i + 3 == line.size() - 1 && line.substr(i + 1, 3) == "php")
+//            return true;
+//    }
+//    return false;
+//}
+//
+//void    handleCgi(Client & request) {
+//    std::ifstream   cgiFile(request.target);
+//    char            **env;
+//    const char      args[] = {request.target, NULL};
+//    int             pid;
+//
+//    if (!cgiFile.is_open())
+//        throw 404;
+//    env = createEnv(request);
+//    pid = fork();
+//    if (!pid)
+//        execve(request.target, args, env);
+//}
 
 std::string getFileName(Client & request) {
     std::fstream content("content_type.txt");
@@ -94,6 +119,8 @@ void    reqParser(Client & request, int sock) {
         if (request.state == NOT_DONE)
             headersParsing(request);
         if (request.state == DONE_WITH_HEADERS && request.method == "POST") {
+//            if (isCgi(request))
+//                handleCgi;
             if (!request.outfile->is_open())
                 request.outfile->open(getFileName(request).c_str());
             if (request.chunkSize >= request.buffSize) {
