@@ -40,5 +40,3 @@ std::map<std::string, Location>::iterator findServ(unsigned long &max_body_size,
 }
 
 
-
-
