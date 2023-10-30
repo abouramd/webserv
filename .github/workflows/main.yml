@@ -1,24 +1,30 @@
-name: Merge abouramd branch into master
+
+name: TEST IN Ubuntu and in Macos
 
 on:
   push:
-    branches: [ "abouramd" ]
+    branches: [ "*" ]
 
 jobs:
-  merge:
+  test-macos:
     runs-on: macos-latest
-
+    
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-
+      
       - name: Build and Test
         run: make all fclean
+      
+        
+  test-ubuntu:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      
+      - name: Build and Test
+        run: make all fclean
+      
 
-      - name: Merge abouramd branch into master
-        run: |
-          git config user.name abouramd
-          git config user.email bouramadane2002@gmail.com
-          git checkout master
-          git merge --no-ff abouramd
-          git push origin master
