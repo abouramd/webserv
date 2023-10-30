@@ -126,7 +126,7 @@ int main(int ac, char **av)
         }
         else if (FD_ISSET(it_s->client[i].fd, &tmp_read))
         {
-          reqParser(it_s->client[i], it_s->client[i].fd);
+          reqParser(it_s->client[i], it_s->client[i].fd, it_s->serv);
           if ( it_s->client[i].state == DONE )
           {
 			  it_s->client[i].reset();
