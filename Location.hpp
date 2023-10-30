@@ -23,14 +23,6 @@
 #define WHITE "\033[1;3;37m"
 #define DFL "\033[0m"
 
-
-
-typedef enum mtd {
-    GET,
-    POST,
-    DELETE
-} Method;
-
 class Location 
 {
   private:
@@ -44,7 +36,7 @@ class Location
     std::string root;
     std::string redirect; 
     std::vector<std::string> index;
-    std::vector<Method> allow_method;
+    std::vector<std::string> allow_method;
     bool auto_index;
     std::pair<bool, std::string> uplode;
     std::pair<bool, std::map<std::string, std::string> > cgi;
