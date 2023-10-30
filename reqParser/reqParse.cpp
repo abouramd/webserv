@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include <vector>
 #include "reqParse.hpp"
 
 //bool    isCgi(Client & request) {
@@ -105,8 +106,9 @@ void    headersParsing(Client & request) {
 		request.headersBuf += request.buf;
 }
 
-void    reqParser(Client & request, int sock) {
-    try {
+void    reqParser(Client & request, int sock, const std::vector<Server>& serv) {
+  (void) serv;
+  try {
         int amount;
 
         amount = read(sock, request.buf, BUFF_SIZE);
