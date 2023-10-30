@@ -21,6 +21,8 @@ class Server
 
     std::string host;
     std::vector<std::string> port;
+    std::map<int, std::string> error_page;
+    std::map<int, std::string> error_page_dfl;
     std::vector<std::string> server_name;
     std::map<std::string, Location> location;
     size_t max_body_size;
