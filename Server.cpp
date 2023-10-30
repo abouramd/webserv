@@ -288,6 +288,7 @@ std::vector<std::string> Server::getServName() const {
 }
 
 void Server::set_error_pages(const std::string &str) {
+}
 
 void Server::check() {
   if (!this->dup[0])
