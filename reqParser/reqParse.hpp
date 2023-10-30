@@ -9,6 +9,7 @@
 #include <map>
 #include <vector>
 #include <string>
+#include "../Server.hpp"
 
 #define NOT_DONE 0
 #define DONE_WITH_HEADERS 1
@@ -35,5 +36,5 @@ struct Client {
 
 void    moveBuf( Client & request, int amount );
 void    bodyParser(Client & req);
-void    reqParser(Client & request, int sock);
+void    reqParser(Client & request, int sock, const std::vector<Server> &serv);
 std::string generateResponse(int status);
