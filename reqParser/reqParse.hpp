@@ -18,23 +18,21 @@
 #define BUFF_SIZE 1024
 
 struct Client {
-    Client(int fd, std::ifstream* i, std::ofstream* o) : is(i), outfile(o) {
-        this->fd = fd;
-        position = 0;
-        chunkSize = 0;
-        state = NOT_DONE;
-    }
+    Client(int fd, std::ifstream* i, std::ofstream* o);
 	void	reset();
-    int                                 contentLength, fd;
-    size_t                              state, chunkSize, buffSize, position;
-    char                                buf[BUFF_SIZE + 1];
-    std::string                         method, target, version, host, sizeDept, headersBuf, response;
-    std::map<std::string, std::string>  headers;
-    std::ifstream                       *is;
-    std::ofstream                       *outfile;
+
+    std::map<std::string, Location>::iterator   server;
+    unsigned long                               contentLength, maxBodySize;
+    int                                         fd, statusCode;
+    size_t                                      state, chunkSize, buffSize, position;
+    char                                        buf[BUFF_SIZE + 1];
+    std::string                                 method, target, version, host, sizeDept, headersBuf, response;
+    std::map<std::string, std::string>          headers;
+    std::ifstream                               *is;
+    std::ofstream                               *outfile;
 };
 
-void    moveBuf( Client & request, int amount );
-void    bodyParser(Client & req);
-void    reqParser(Client & request, int sock, const std::vector<Server> &serv);
-std::string generateResponse(int status);
+void                                        moveBuf( Client & request, int amount );
+void                                        bodyParser(Client & req);
+void                                        reqParser(Client & request, int sock, std::vector<Server> &serv);
+std::map<std::string, Location>::iterator   findServ(unsigned long &max_body_size, std::vector<Server>& serv, const std::string &host, const std::string &url);
