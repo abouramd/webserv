@@ -47,7 +47,7 @@ Server::Server() {
   ptr[2] = &Server::set_server_name;
   ptr[3] = &Server::set_location;
   ptr[4] = &Server::set_max_body;
-  ptr[4] = &Server::set_error_pages;
+  ptr[5] = &Server::set_error_pages;
   ptr[6] = NULL;
   ptr[7] = NULL;
   ptr[8] = NULL;
@@ -310,7 +310,7 @@ void Server::set_error_pages(const std::string &str) {
     if (nbr == -1)
         throw std::string("Error: invalid error number `" + vec[1] + "` in (" + str + ").");
 
-    if (!(stat(vec[2].c_str(), &sb) == 0 && S_ISDIR(sb.st_mode)))
+    if (!(stat(vec[2].c_str(), &sb) == 0 && S_ISREG(sb.st_mode)))
        throw std::string("Error: error page path (" + str + ")");
 
     if (!(S_IRUSR & sb.st_mode))
