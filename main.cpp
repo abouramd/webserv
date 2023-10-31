@@ -117,10 +117,10 @@ int main(int ac, char **av)
         if (FD_ISSET(it_s->client[i].fd, &tmp_write))
         {
           std::cout << GREEN << get_time() << " send responce to "  << it_s->client[i].fd << DFL << std::endl;
-//          ft_send_header(it_s->client[i].fd, "200 OK", "text/html");
-//          send_chank(it_s->client[i].fd, "Hello", 5);
-//          send_chank(it_s->client[i].fd, "", 0);
-//          send(it_s->client[i].fd, it_s->client[i].response.c_str(), it_s->client[i].response.size(), 0);
+         ft_send_header(it_s->client[i].fd, "200 OK", "text/html");
+         send_chank(it_s->client[i].fd, "Hello", 5);
+         send_chank(it_s->client[i].fd, "", 0);
+         // send(it_s->client[i].fd, it_s->client[i].response.c_str(), it_s->client[i].response.size(), 0);
           FD_CLR(it_s->client[i].fd, &swrite);
           FD_SET(it_s->client[i].fd, &sread);
         }
