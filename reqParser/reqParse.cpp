@@ -152,5 +152,6 @@ void    reqParser(Client & request, int sock, std::vector<Server>& serv) {
     catch (int status) {
         request.statusCode = status;
         std::cout << "status code : " << status << std::endl;
+        request.state = DONE;
     }
 }
