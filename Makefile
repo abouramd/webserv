@@ -13,7 +13,7 @@
 NAME:= webserv
 CXX:= c++
 CXXFLAGS:= -Wall -Wextra -Werror -std=c++98 -fsanitize=address -g3 
-SRC:= findSL.cpp Client.cpp Config.cpp Location.cpp Server.cpp Socket.cpp ft_read_data.cpp ft_split.cpp reqParser/reqParse.cpp reqParser/postRes.cpp reqParser/generateResponse.cpp main.cpp
+SRC:= findSL.cpp Client.cpp Config.cpp Location.cpp Server.cpp Socket.cpp ft_read_data.cpp ft_split.cpp reqParser/reqParse.cpp reqParser/postRes.cpp main.cpp
 OBJ:= $(SRC:.cpp=.o)
 
 all:$(NAME)

@@ -143,7 +143,7 @@ void Location::set_method(const std::string &str)
         throw std::string("Error: The GET method is duplicated `" + str + "`.");
       this->dup[2] = true;
 
-      this->allow_method.push_back(GET);
+      this->allow_method.push_back("GET");
     }
     else if (*it == "POST")
     {
@@ -151,7 +151,7 @@ void Location::set_method(const std::string &str)
         throw std::string("Error: The POST method is duplicated `" + str + "`.");
       this->dup[3] = true;
       
-      this->allow_method.push_back(POST);
+      this->allow_method.push_back("POST");
     }
     else if (*it == "DELET")
     {
@@ -159,7 +159,7 @@ void Location::set_method(const std::string &str)
         throw std::string("Error: The DELET method is duplicated `" + str + "`.");
       this->dup[4] = true;
       
-      this->allow_method.push_back(DELETE);
+      this->allow_method.push_back("DELET");
     }
     else
       throw std::string("Error: unknowing method `" + *it + "` in (" + str + ")");
@@ -273,7 +273,7 @@ void Location::check()
   if (this->dup[0] == false)
     throw std::string("Error: The root should be in the location.");
   if (this->allow_method.empty())
-    this->allow_method.push_back(GET);
+    this->allow_method.push_back("GET");
   
 }
 

@@ -1,7 +1,7 @@
 #include <cstdlib>
 #include <vector>
 #include "reqParse.hpp"
-
+#include <algorithm>
 //bool    isCgi(Client & request) {
 //    std::stringstream   target(request.target);
 //    std::string         line;
@@ -107,10 +107,8 @@ void    headersParsing(Client & request, std::vector<Server>& serv) {
         else if (request.method == "POST" && request.headers.find("Content-Length") == request.headers.end())
             throw 400;
         request.server = findServ(request.maxBodySize, serv, request.host, request.target);
-//        std::string method
-        request.server->second.allow_method.push_back((mtd)0);
-//        if (std::find(request.server->second.allow_method.begin(), request.server->second.allow_method.end(), GET))
-//            throw;
+        if (std::find(request.server->second.allow_method.begin(), request.server->second.allow_method.end(), request.method) == request.server->second.allow_method.end())
+            throw 405;
         request.position = pos;
         request.state = DONE_WITH_HEADERS;
         const char *ptr = request.headers["Content-Length"].c_str();
