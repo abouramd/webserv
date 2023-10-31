@@ -34,7 +34,7 @@ class Location
   public:
 
     std::string root;
-    std::string redirect; 
+    std::string redirect;
     std::vector<std::string> index;
     std::vector<std::string> allow_method;
     bool auto_index;

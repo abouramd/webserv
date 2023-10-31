@@ -92,7 +92,7 @@ int main(int ac, char **av)
     std::cerr << RED << err << DFL << std::endl;
     return 1;
   }
-  std::map<int, std::pair<std::ifstream*, std::ofstream*> > map_files; 
+  std::map<int, std::pair<std::ifstream*, std::ofstream*> > map_files;
   std::vector<Socket> &my_s = obj.get_socket();
   fd_set sread , swrite;
   FD_ZERO(&sread);
@@ -120,7 +120,7 @@ int main(int ac, char **av)
 //          ft_send_header(it_s->client[i].fd, "200 OK", "text/html");
 //          send_chank(it_s->client[i].fd, "Hello", 5);
 //          send_chank(it_s->client[i].fd, "", 0);
-          send(it_s->client[i].fd, it_s->client[i].response.c_str(), it_s->client[i].response.size(), 0);
+//          send(it_s->client[i].fd, it_s->client[i].response.c_str(), it_s->client[i].response.size(), 0);
           FD_CLR(it_s->client[i].fd, &swrite);
           FD_SET(it_s->client[i].fd, &sread);
         }
@@ -129,7 +129,7 @@ int main(int ac, char **av)
           reqParser(it_s->client[i], it_s->client[i].fd, it_s->serv);
           if ( it_s->client[i].state == DONE )
           {
-			  it_s->client[i].reset();
+              it_s->client[i].reset();
             FD_CLR(it_s->client[i].fd, &sread);
             FD_SET(it_s->client[i].fd, &swrite);
             std::cout << BLUE << get_time() << " end of request and swap " << it_s->client[i].fd << " to responce." << DFL << std::endl;

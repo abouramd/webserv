@@ -6,9 +6,9 @@
 # max_body_size 10000000
 #
 #
-# location /illll/ {
+# location /u {
 #   index index.php index.html
-#   root /Users/lsemlali/Desktop/
+#   root /
 #   allow_method GET DELET POST
 #   auto_index on
 #   uplode on /new/
@@ -26,45 +26,24 @@ server {
 host 127.0.0.1
 listen 8080 8083 8082
 server_name 1337.com
-max_body_size 10000000
+#max_body_size 10000000
 
 
 location / {
   index index.php index.html
-  root /Users/lsemlali/Desktop/
+  root /
   allow_method GET DELET
   auto_index on
   uplode on //
   cgi on
-  # cgi_path .php /Users/lsemlali/Desktop/php-cgi
+  # cgi_path .php /php-cgi
 }
 location /test {
  return 42.fr
-  root /Users/lsemlali/
+  root /
 }
 }
 
-server {
-host 127.0.0.1
-listen 8080 8081 
-server_name 1337.com
-max_body_size 10000000
-
-
-location / {
-  index index.php index.html
-  root /Users/lsemlali/Desktop/
-  allow_method GET DELET
-  auto_index on
-  uplode on //
-  cgi on
-  # cgi_path .php /Users/lsemlali/Desktop/php-cgi
-}
-location /test {
- return 42.fr
-  root /Users/lsemlali/
-}
-}
 
 
 
