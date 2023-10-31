@@ -116,8 +116,10 @@ int main(int ac, char **av)
       {
         if (FD_ISSET(it_s->client[i].fd, &tmp_write))
         {
+          std::stringstream ss;
+          ss << it_s->client[i].statusCode;
           std::cout << GREEN << get_time() << " send responce to "  << it_s->client[i].fd << DFL << std::endl;
-          ft_send_header(it_s->client[i].fd, std::to_string(it_s->client[i].statusCode), "text/html");
+          ft_send_header(it_s->client[i].fd, ss.str(), "text/html");
           send_chank(it_s->client[i].fd, "Hello", 5);
           send_chank(it_s->client[i].fd, "", 0);
           FD_CLR(it_s->client[i].fd, &swrite);
