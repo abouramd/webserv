@@ -26,8 +26,8 @@ server {
 host 127.0.0.1
 listen 8080 8083 8082
 server_name 1337.com
-#max_body_size 10000000
-
+max_body_size 10000000
+error_page 404 ./error_pages/404.html
 
 location / {
   index index.php index.html
