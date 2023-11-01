@@ -26,7 +26,7 @@ server {
 host 127.0.0.1
 listen 8080 8083 8082
 server_name 1337.com
-max_body_size 10000000
+# max_body_size 10000000
 
 
 location / {
@@ -47,8 +47,8 @@ location /test {
 server {
 host 127.0.0.1
 listen 8080 8081 
-server_name 1337.com
-max_body_size 10000000
+server_name localhost:8080
+# max_body_size 9999999
 
 
 location / {

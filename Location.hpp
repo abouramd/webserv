@@ -12,6 +12,7 @@
 #include <arpa/inet.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include "FileType.hpp"
 
 #define BLACK "\033[1;3;30m"
 #define RED "\033[1;3;31m"
@@ -22,6 +23,8 @@
 #define CYAN "\033[1;3;36m"
 #define WHITE "\033[1;3;37m"
 #define DFL "\033[0m"
+
+
 
 class Location 
 {
@@ -34,7 +37,7 @@ class Location
   public:
 
     std::string root;
-    std::string redirect; 
+    std::string redirect;
     std::vector<std::string> index;
     std::vector<std::string> allow_method;
     bool auto_index;

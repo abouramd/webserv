@@ -6,7 +6,7 @@
 #include <utility>
 #include <vector>
 
-std::map<std::string, Location>::iterator findLoca(Server& serv, const std::string &url)
+std::map<std::string, Location>::iterator   findLoca(Server& serv, const std::string &url)
 {
   std::map<std::string, Location>::iterator it = serv.location.end();
   while (it-- != serv.location.begin())
@@ -18,13 +18,14 @@ std::map<std::string, Location>::iterator findLoca(Server& serv, const std::stri
   throw 403;
 }
 
-std::map<std::string, Location>::iterator findServ(unsigned long &max_body_size, std::vector<Server>& serv, const std::string &host, const std::string &url)
+std::map<std::string, Location>::iterator   findServ(unsigned long &max_body_size, std::vector<Server>& serv, const std::string &host, const std::string &url)
 {
 
   for (std::vector<Server>::iterator it = serv.begin(); it != serv.end(); it++)
   {
     for (std::vector<std::string>::iterator it_sn = it->server_name.begin(); it_sn != it->server_name.end(); it_sn++)
     {
+      std::cout << host << ", " << *it_sn << std::endl;
       if (host == *it_sn)
       {
         std::cout << BLUE << "found the server" << DFL << std::endl;

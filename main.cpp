@@ -16,9 +16,6 @@
 
 
 
-
-
-
 /* start test multiplix */
 
 std::string get_time() {
@@ -86,13 +83,14 @@ int main(int ac, char **av)
   Config obj;
   try{
     obj.pars(ac, av);
+    FileType::set_mime_type("./mime.types");
   }
   catch ( const std::string err)
   {
     std::cerr << RED << err << DFL << std::endl;
     return 1;
   }
-  std::map<int, std::pair<std::ifstream*, std::ofstream*> > map_files; 
+  std::map<int, std::pair<std::ifstream*, std::ofstream*> > map_files;
   std::vector<Socket> &my_s = obj.get_socket();
   fd_set sread , swrite;
   FD_ZERO(&sread);
@@ -117,24 +115,32 @@ int main(int ac, char **av)
         if (FD_ISSET(it_s->client[i].fd, &tmp_write))
         {
           std::cout << GREEN << get_time() << " send responce to "  << it_s->client[i].fd << DFL << std::endl;
-//          ft_send_header(it_s->client[i].fd, "200 OK", "text/html");
-//          send_chank(it_s->client[i].fd, "Hello", 5);
-//          send_chank(it_s->client[i].fd, "", 0);
-          send(it_s->client[i].fd, it_s->client[i].response.c_str(), it_s->client[i].response.size(), 0);
-          FD_CLR(it_s->client[i].fd, &swrite);
-          FD_SET(it_s->client[i].fd, &sread);
+          ft_send_header(it_s->client[i].fd, "200 OK", "text/html");
+          send_chank(it_s->client[i].fd, "Hello", 5);
+          send_chank(it_s->client[i].fd, "", 0);
+          
+          it_s->client[i].state = CLOSE; 
+          
+          if (it_s->client[i].state == CLOSE ) {
+            FD_CLR(it_s->client[i].fd, &swrite);
+            close(it_s->client[i].fd);
+            delete map_files[it_s->client[i].fd].first;
+            delete map_files[it_s->client[i].fd].second;
+            map_files.erase(it_s->client[i].fd);
+            std::cout << PURPLE << get_time() << " remove a client " << it_s->client[i].fd << DFL << std::endl;
+            it_s->client.erase(it_s->client.begin() + i); 
+          }
         }
         else if (FD_ISSET(it_s->client[i].fd, &tmp_read))
         {
           reqParser(it_s->client[i], it_s->client[i].fd, it_s->serv);
           if ( it_s->client[i].state == DONE )
           {
-			  it_s->client[i].reset();
             FD_CLR(it_s->client[i].fd, &sread);
             FD_SET(it_s->client[i].fd, &swrite);
             std::cout << BLUE << get_time() << " end of request and swap " << it_s->client[i].fd << " to responce." << DFL << std::endl;
           }
-          else if ( it_s->client[i].state == CLOSE ) {
+          else if (it_s->client[i].state == CLOSE ) {
             FD_CLR(it_s->client[i].fd, &sread);
             close(it_s->client[i].fd);
             delete map_files[it_s->client[i].fd].first;
