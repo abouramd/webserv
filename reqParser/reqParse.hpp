@@ -24,6 +24,7 @@ struct Client {
     std::map<std::string, Location>::iterator   server;
     unsigned long                               contentLength, maxBodySize;
     int                                         fd, statusCode;
+	bool										isCgi;
     size_t                                      state, chunkSize, buffSize, position;
     char                                        buf[BUFF_SIZE + 1];
     std::string                                 method, target, version, host, sizeDept, headersBuf, response;

@@ -93,6 +93,34 @@ void    startHParsing(Client & request) {
     }
 }
 
+bool	getExtension(std::string & target, std::string & extension) {
+	std::string::reverse_iterator	it = target.rbegin();
+
+	while (it != target.rend()) {
+		if (*it == '.') {
+			extension.append(it, target.rbegin());
+			return 1;
+		}
+		++it;
+	}
+	return 0;
+}
+
+void	targetChecker( std::pair<bool, std::map<std::string, std::string> > & cgi, Client & request ) {
+	if (request.target[0] != '/')
+		throw 400;
+	if (cgi.first) {
+		std::string extension;
+		getExtension(request.target, extension);
+		if (!extension.empty()) {
+			if (cgi.second.find(extension) != cgi.second.end())
+				std::cout << extension << std::endl;
+			else
+				throw 404;
+		}
+	}
+}
+
 void    headersParsing(Client & request, std::vector<Server>& serv) {
     int pos = endFound(request.buf);
 
@@ -109,6 +137,7 @@ void    headersParsing(Client & request, std::vector<Server>& serv) {
         request.server = findServ(request.maxBodySize, serv, request.host, request.target);
         if (std::find(request.server->second.allow_method.begin(), request.server->second.allow_method.end(), request.method) == request.server->second.allow_method.end())
             throw 405;
+		targetChecker(request.server->second.cgi, request);
         request.position = pos;
         request.state = DONE_WITH_HEADERS;
         const char *ptr = request.headers["Content-Length"].c_str();
