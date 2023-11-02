@@ -58,7 +58,7 @@ location / {
   auto_index on
   uplode on //
   cgi on
-  cgi_path .php /home/lsemlali/Desktop/php-cgi
+  cgi_path .php /usr/bin/php-cgi
 }
 location /test {
  return 42.fr
