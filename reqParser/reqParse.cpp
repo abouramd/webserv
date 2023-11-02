@@ -1,7 +1,13 @@
+#include <cstddef>
+#include <cstdio>
 #include <cstdlib>
+#include <fstream>
+#include <sys/wait.h>
 #include <vector>
 #include "reqParse.hpp"
 #include <algorithm>
+#include <unistd.h>
+#include <wait.h>
 //bool    isCgi(Client & request) {
 //    std::stringstream   target(request.target);
 //    std::string         line;
@@ -93,6 +99,59 @@ void    startHParsing(Client & request) {
     }
 }
 
+void  executeCgi( Client & request ) {
+  int           pid;
+  char          *args[3];
+  FILE          *in;
+  FILE          *out;
+
+  args[0] = &request.cgiScript[0];
+  args[1] = &(request.location->second.root + request.target)[0];
+  pid = fork();
+  if (!pid) {
+    in = freopen(request.cgiFileName.c_str(), "r", stdout);
+    out = freopen("outfile.txt", "w", stdin);
+    (void)in;
+    (void)out;
+    execve(request.cgiScript.c_str(), args, NULL);
+  }
+  else {
+    waitpid(pid, NULL, 0);
+  }
+}
+
+bool	getExtension(std::string & target, std::string & extension) {
+	std::string::reverse_iterator	it = target.rbegin();
+
+	while (it != target.rend()) {
+		if (*it == '.') {
+			extension.append(it, target.rbegin());
+			return 1;
+		}
+		++it;
+	}
+	return 0;
+}
+
+void	targetChecker( Client & request ) {
+	if (request.target[0] != '/')
+		throw 400;
+
+	if (request.location->second.cgi.first) {
+		std::string extension;
+		getExtension(request.target, extension);
+		if (!extension.empty()) {
+      std::map<std::string, std::string>::iterator it = request.location->second.cgi.second.find(extension);
+			if (it != request.location->second.cgi.second.end()) {
+        request.cgiScript = it->second;
+        request.isCgi = true;
+      }
+			else
+				throw 404;
+		}
+	}
+}
+
 void    headersParsing(Client & request, std::vector<Server>& serv) {
     int pos = endFound(request.buf);
 
@@ -106,9 +165,13 @@ void    headersParsing(Client & request, std::vector<Server>& serv) {
         }
         else if (request.method == "POST" && request.headers.find("Content-Length") == request.headers.end())
             throw 400;
-        request.server = findServ(request.maxBodySize, serv, request.host, request.target);
-        if (std::find(request.server->second.allow_method.begin(), request.server->second.allow_method.end(), request.method) == request.server->second.allow_method.end())
+        request.location = findServ(request.maxBodySize, serv, request.host, request.target);
+        if (std::find(request.location->second.allow_method.begin(), request.location->second.allow_method.end(), request.method) == request.location->second.allow_method.end())
+        {
+          std::cout << "hello" << std::endl;
             throw 405;
+        }
+        targetChecker(request);
         request.position = pos;
         request.state = DONE_WITH_HEADERS;
         const char *ptr = request.headers["Content-Length"].c_str();
@@ -116,7 +179,7 @@ void    headersParsing(Client & request, std::vector<Server>& serv) {
         if (request.contentLength > request.maxBodySize)
             request.contentLength = request.maxBodySize;
     }
-	else
+    else
 		request.headersBuf += request.buf;
 }
 
@@ -134,10 +197,14 @@ void    reqParser(Client & request, int sock, std::vector<Server>& serv) {
         if (request.state == NOT_DONE)
             headersParsing(request, serv);
         if (request.state == DONE_WITH_HEADERS && request.method == "POST") {
-//            if (isCgi(request))
-//                handleCgi;
-            if (!request.outfile->is_open())
+            if (!request.outfile->is_open()) {
+              if (request.isCgi) {
+                request.cgiFileName = "cgi_out.txt";
+                request.outfile->open(request.cgiFileName.c_str());
+              }
+              else
                 request.outfile->open(getFileName(request).c_str());
+            }
             if (request.chunkSize >= request.buffSize) {
                 request.outfile->write(request.buf, request.buffSize);
                 request.chunkSize -= request.buffSize;
@@ -152,6 +219,8 @@ void    reqParser(Client & request, int sock, std::vector<Server>& serv) {
     catch (int status) {
         request.statusCode = status;
         std::cout << "status code : " << status << std::endl;
+        if (request.isCgi)
+          executeCgi(request);
         request.state = DONE;
     }
 }
