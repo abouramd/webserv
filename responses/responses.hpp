@@ -20,3 +20,4 @@ void get_target(Client &client, std::string &get_query);
 std::string get_ex(std::string str);
 void get(Client &client, std::string &get_query);
 int is_cgi(Client &client);
+int get_index(Client &client);

@@ -114,3 +114,20 @@ int is_cgi(Client &client)
     }
     return 0;
 }
+
+int get_index(Client &client)
+{
+    int i = 0;
+    std::string index;
+    while(i < (int)client.server->second.index.size())
+    {
+        index = client.target + "/" + client.server->second.index[i];
+        if (access(index.c_str(), F_OK | R_OK) == 0)
+        {
+            client.target = index;
+            return 1;
+        }
+        i++;
+    }
+    return 0;
+}

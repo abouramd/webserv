@@ -39,7 +39,7 @@ location / {
   # cgi_path .php /php-cgi
 }
 location /test {
-  index index.php index.html
+  index index.html index.php 
  return 42.fr
   root www/realtest
   allow_method GET DELET
