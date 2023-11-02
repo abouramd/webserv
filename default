@@ -40,7 +40,7 @@ location / {
 }
 location /test {
  return 42.fr
-  root /
+  root www/realtest
 }
 }
 
@@ -62,7 +62,7 @@ location / {
 }
 location /test {
  return 42.fr
-  root /
+  root www/realtest
 }
 }
 

@@ -44,3 +44,25 @@ void s_chank(int fd, const char *content, const int size)
 	write(fd, content, size);
 	write(fd, "\r\n", 2);
 }
+
+int is_dir(std::string& str)
+{
+    struct stat st;
+
+    stat(str.c_str(), &st);
+    if (access(str.c_str(), F_OK) == 0) {
+        if (S_ISREG(st.st_mode)) {
+            return 0;
+        } else if (S_ISDIR(st.st_mode)) {
+            return 1;
+        }
+    }
+    return 2;
+}
+
+void get_target(Client &client)
+{
+    size_t found = client.target.find(client.server->first);
+    if (found != std::string::npos)
+        client.target.replace(found, client.server->first.length(), client.server->second.root);
+}
