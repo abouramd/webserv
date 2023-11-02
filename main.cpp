@@ -3,6 +3,7 @@
 #include "Location.hpp"
 #include "Socket.hpp"
 #include "reqParser/reqParse.hpp"
+#include "responses/responses.hpp"
 #include <cstdio>
 #include <fstream>
 #include <iostream>
@@ -114,11 +115,7 @@ int main(int ac, char **av)
       {
         if (FD_ISSET(it_s->client[i].fd, &tmp_write))
         {
-          std::cout << GREEN << get_time() << " send responce to "  << it_s->client[i].fd << DFL << std::endl;
-          ft_send_header(it_s->client[i].fd, "200 OK", "text/html");
-          send_chank(it_s->client[i].fd, "Hello", 5);
-          send_chank(it_s->client[i].fd, "", 0);
-          
+          responses(it_s->client[i]);
           it_s->client[i].state = CLOSE; 
           
           if (it_s->client[i].state == CLOSE ) {
