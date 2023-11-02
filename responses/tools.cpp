@@ -66,3 +66,26 @@ void get_target(Client &client)
     if (found != std::string::npos)
         client.target.replace(found, client.server->first.length(), client.server->second.root);
 }
+
+std::string get_ex(std::string str)
+{
+    int i = 0, count = 0, count2 = 0;
+    std::string s = "";
+
+    while(str[i])
+    {
+        if (str[i] == '.')
+            count++;
+        i++;
+    }
+    i = 0;
+    while(str[i])
+    {
+        if (str[i] == '.')
+            count2++;
+        else if (count2 == count)
+            s += str[i];
+        i++;
+    }
+    return s;
+}
