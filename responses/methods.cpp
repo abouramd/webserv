@@ -32,8 +32,16 @@ void get(Client &client, std::string &get_query)
                 client.state = CLOSE;
             }
         }else{
-            std::cout << "auto index" << std::endl; 
-            client.state = CLOSE;
+            if (client.server->second.auto_index)
+            {
+                std::cout << "auto index" << std::endl;
+                client.state = CLOSE;
+            }
+            else
+            {
+                s_header(client.fd, "403 Forbidden", "text/html");
+                client.is->open("error_pages/403.html");
+            }
         }
     }
     else
