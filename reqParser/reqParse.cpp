@@ -106,7 +106,9 @@ void  executeCgi( Client & request ) {
   char          *args[3];
   FILE          *in;
   FILE          *out;
+  std::stringstream	ss;
 
+  ss << "_tmp/" << rand() << "_cgi_out.tmp";
   args[0] = new char[request.cgiScript.size() + 1];
   args[1] = new char[request.location->second.root.size() + request.target.size() + 1];
   bzero(args[0], request.cgiScript.size() + 1);
@@ -114,23 +116,19 @@ void  executeCgi( Client & request ) {
   strcpy(args[0], request.cgiScript.c_str());
   strcpy(args[1], (request.location->second.root + request.target).c_str());
   args[2] = NULL;
-  int inp = dup(0), outp = dup(1);
-  in = freopen(request.cgiFileName.c_str(), "r", stdin);
-  out = freopen("outfile.txt", "w", stdout);
+  request.outfile->close();
   pid = fork();
   if (!pid) {
-    std::cout << args[0] << ",  " << args[1] << std::endl;
-    (void)in;
-    (void)out;
-    execve(request.cgiScript.c_str(), args, NULL);
-    std::cerr << "hhhhh" << std::endl;
+	  std::cerr << args[0] << ", " << args[1] << std::endl;
+	  in = freopen(request.cgiFileName.c_str(), "r", stdin);
+	  out = freopen(std::string(ss.str()).c_str(), "w", stdout);
+	  (void)in;
+	  (void)out;
+	  execve(args[0], args, NULL);
   }
   else {
-    fclose(in);
-    fclose(out);
-    dup2(0, inp);
-    dup2(1, outp);
-    waitpid(pid, NULL, 0);
+	  waitpid(pid, NULL, 0);
+	  request.cgiFileName = ss.str();
   }
 }
 
@@ -147,12 +145,12 @@ bool	getExtension(std::string & target, std::string & extension) {
 void	targetChecker( Client & request ) {
 	if (request.target[0] != '/')
 		throw 400;
-  
+
 	if (request.location->second.cgi.first) {
 
 		std::string extension;
 		getExtension(request.target, extension);
-    
+
 		if (!extension.empty()) {
       std::map<std::string, std::string>::iterator it = request.location->second.cgi.second.find(extension);
 
@@ -209,12 +207,20 @@ void    reqParser(Client & request, int sock, std::vector<Server>& serv) {
             headersParsing(request, serv);
         if (request.state == DONE_WITH_HEADERS && request.method == "POST") {
             if (!request.outfile->is_open()) {
-              if (request.isCgi) {
-                request.cgiFileName = "cgi_out.txt";
-                request.outfile->open(request.cgiFileName.c_str());
+				if (request.isCgi) {
+                  std::stringstream	ss;
+
+				  ss << rand();
+				  request.cgiFileName = "_tmp/" + ss.str() + "_cgi_in.tmp";
+				  request.outfile->open(request.cgiFileName.c_str());
               }
-              else
-                request.outfile->open(getFileName(request).c_str());
+              else {
+				  std::string		extension = FileType::getExt(request.headers["Content-Type"]);
+				  std::stringstream	ss;
+
+				  ss << request.location->second.root << rand() << "_file." << extension;
+				  request.outfile->open(std::string(ss.str()).c_str());
+			  }
             }
             if (request.chunkSize >= request.buffSize) {
                 request.outfile->write(request.buf, request.buffSize);
@@ -228,10 +234,10 @@ void    reqParser(Client & request, int sock, std::vector<Server>& serv) {
             throw 200;
     }
     catch (int status) {
-        request.statusCode = status;
-        std::cout << "status code : " << status << std::endl;
-        if (request.isCgi)
-          executeCgi(request);
+		if (request.isCgi)
+			executeCgi(request);
+		request.statusCode = status;
+		std::cout << "status code : " << status << std::endl;
         request.state = DONE;
     }
 }
