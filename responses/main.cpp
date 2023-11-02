@@ -3,12 +3,13 @@
 void responses(Client &client)
 {
     char buffer[100];
+    std::string ftarget = client.target;
     std::string get_query = "";
     if (!client.is->is_open())
     {
         get_target(client, get_query);
         if (client.method == "GET")
-            get(client, get_query);
+            get(client, get_query, ftarget);
     }
     else
     {

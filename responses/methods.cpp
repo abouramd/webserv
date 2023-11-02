@@ -1,6 +1,6 @@
 #include "responses.hpp"
 
-void get(Client &client, std::string &get_query)
+void get(Client &client, std::string &get_query, std::string &ftarget)
 {
     (void)get_query;
     if (is_dir(client.target) == 0)
@@ -34,7 +34,7 @@ void get(Client &client, std::string &get_query)
         }else{
             if (client.server->second.auto_index)
             {
-                auto_index(client);
+                auto_index(client, ftarget);
             }
             else
             {
