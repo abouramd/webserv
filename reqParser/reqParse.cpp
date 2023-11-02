@@ -136,6 +136,7 @@ bool	getExtension(std::string & target, std::string & extension) {
 void	targetChecker( Client & request ) {
 	if (request.target[0] != '/')
 		throw 400;
+
 	if (request.location->second.cgi.first) {
 		std::string extension;
 		getExtension(request.target, extension);
@@ -166,7 +167,10 @@ void    headersParsing(Client & request, std::vector<Server>& serv) {
             throw 400;
         request.location = findServ(request.maxBodySize, serv, request.host, request.target);
         if (std::find(request.location->second.allow_method.begin(), request.location->second.allow_method.end(), request.method) == request.location->second.allow_method.end())
+        {
+          std::cout << "hello" << std::endl;
             throw 405;
+        }
         targetChecker(request);
         request.position = pos;
         request.state = DONE_WITH_HEADERS;
