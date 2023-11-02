@@ -131,3 +131,44 @@ int get_index(Client &client)
     }
     return 0;
 }
+
+int auto_index(Client &client)
+{
+    if (client.opened != 5)
+    {
+        s_header(client.fd, "200 OK", "text/html");
+        std::string head = "<!DOCTYPE html><html><head><title>Index of "+client.server->first+"</title><style>body {font-family: Arial, sans-serif;}h1 {text-align: center; font-size: 150px}ul {    list-style-type: none; text-align: center;    padding: 0; font-size: 100px}li {    margin: 5px 0;}li a {    text-decoration: none;    color: #0074d9;}li a:hover {    text-decoration: underline;}</style></head><body><h1>Index of "+client.server->first+"</h1><ul>";
+        s_chank(client.fd, head.c_str(), head.size());
+        client.dir = opendir(client.target.c_str());
+        client.opened = 5;
+        std::cout << "Here: " << client.server->first << std::endl;
+    }
+    else
+    {
+        if (client.dir) 
+        {
+            struct dirent* entry;
+            if ((entry = readdir(client.dir)))
+            {
+                if (entry->d_name[0] != '.')
+                {
+                    std::string dir = "<li><a href='" + std::string(entry->d_name) + "'>" + std::string(entry->d_name) + "</a></li>";
+                    s_chank(client.fd, dir.c_str(), dir.size());
+                }
+            }
+            else
+            {
+                std::string foot = "</ul></body></html>";
+                s_chank(client.fd, foot.c_str(), foot.size());
+                s_chank(client.fd, "", 0);
+                client.state = CLOSE;
+                closedir(client.dir);
+            }
+        }
+        else{
+            s_header(client.fd, "403 Forbidden", "text/html");
+            client.is->open("error_pages/403.html");
+        }
+    }
+    return 0;
+}

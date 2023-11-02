@@ -34,8 +34,7 @@ void get(Client &client, std::string &get_query)
         }else{
             if (client.server->second.auto_index)
             {
-                std::cout << "auto index" << std::endl;
-                client.state = CLOSE;
+                auto_index(client);
             }
             else
             {

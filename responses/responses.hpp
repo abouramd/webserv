@@ -8,6 +8,7 @@
 #include "../Client.hpp"
 #include "../FileType.hpp"
 #include <sys/stat.h>
+#include <dirent.h>
 
 typedef struct Client Client;
 void responses(Client &client);
@@ -21,3 +22,4 @@ std::string get_ex(std::string str);
 void get(Client &client, std::string &get_query);
 int is_cgi(Client &client);
 int get_index(Client &client);
+int auto_index(Client &client);

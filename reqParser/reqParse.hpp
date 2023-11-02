@@ -9,6 +9,7 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <dirent.h>
 #include "../Server.hpp"
 
 #define NOT_DONE 0
@@ -30,7 +31,8 @@ struct Client {
     std::map<std::string, std::string>          headers;
     std::ifstream                               *is;
     std::ofstream                               *outfile;
-    std::string get_query;
+    int opened;
+    DIR* dir;
 };
 
 void                                        moveBuf( Client & request, int amount );
