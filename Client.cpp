@@ -17,7 +17,6 @@ void	Client::reset() {
 	this->host.clear();
 	this->sizeDept.clear();
 	this->headersBuf.clear();
-	this->response.clear();
 	this->headers.clear();
 	this->outfile->close();
 	this->isCgi = false;

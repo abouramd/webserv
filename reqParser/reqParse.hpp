@@ -21,13 +21,13 @@ struct Client {
     Client(int fd, std::ifstream* i, std::ofstream* o);
 	void	reset();
 
-    std::map<std::string, Location>::iterator   server;
+    std::map<std::string, Location>::iterator   location;
     unsigned long                               contentLength, maxBodySize;
     int                                         fd, statusCode;
-	bool										isCgi;
+	  bool										                    isCgi;
     size_t                                      state, chunkSize, buffSize, position;
     char                                        buf[BUFF_SIZE + 1];
-    std::string                                 method, target, version, host, sizeDept, headersBuf, response;
+    std::string                                 method, target, version, host, sizeDept, headersBuf, cgiFileName, cgiScript;
     std::map<std::string, std::string>          headers;
     std::ifstream                               *is;
     std::ofstream                               *outfile;
