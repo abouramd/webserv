@@ -104,3 +104,13 @@ std::string get_ex(std::string str)
     }
     return s;
 }
+
+int is_cgi(Client &client)
+{
+    if (client.server->second.cgi.first)
+    {
+        if (client.server->second.cgi.second.find(get_ex(client.target)) != client.server->second.cgi.second.end())
+            return 1;
+    }
+    return 0;
+}

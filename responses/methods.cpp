@@ -1,15 +1,25 @@
 #include "responses.hpp"
 
-void get(Client &client)
+void get(Client &client, std::string &get_query)
 {
     if (is_dir(client.target) == 0)
     {
+        std::cout << get_query << std::endl;
         std::string type = FileType::getContentType(get_ex(client.target));
-        s_header(client.fd, "200 OK", type);
-        client.is->open(client.target);
+        if (!is_cgi(client))
+        {
+            s_header(client.fd, "200 OK", type);
+            client.is->open(client.target);
+        }
+        else
+        {
+            std::cout<< "Is cgi" << std::endl;
+            client.state = CLOSE;
+        }
     }
     else if (is_dir(client.target) == 1){
         std::cout<< "Is dir" << std::endl;
+        client.state = CLOSE;
     }
     else
     {

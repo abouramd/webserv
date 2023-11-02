@@ -18,4 +18,5 @@ void s_chank(int fd, const char *content, const int size);
 int is_dir(std::string& str);
 void get_target(Client &client, std::string &get_query);
 std::string get_ex(std::string str);
-void get(Client &client);
+void get(Client &client, std::string &get_query);
+int is_cgi(Client &client);

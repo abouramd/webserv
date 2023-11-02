@@ -8,7 +8,7 @@ void responses(Client &client)
     {
         get_target(client, get_query);
         if (client.method == "GET")
-            get(client);
+            get(client, get_query);
     }
     else
     {

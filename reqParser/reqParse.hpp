@@ -30,6 +30,7 @@ struct Client {
     std::map<std::string, std::string>          headers;
     std::ifstream                               *is;
     std::ofstream                               *outfile;
+    std::string get_query;
 };
 
 void                                        moveBuf( Client & request, int amount );
