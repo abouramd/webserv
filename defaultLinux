@@ -54,11 +54,11 @@ server_name localhost:8080
 location / {
   index index.php index.html
   root /home/lsemlali/Desktop/
-  allow_method GET DELET
+  allow_method GET DELET POST
   auto_index on
   uplode on //
   cgi on
-  # cgi_path .php /home/lsemlali/Desktop/php-cgi
+  cgi_path .php /home/lsemlali/Desktop/php-cgi
 }
 location /test {
  return 42.fr

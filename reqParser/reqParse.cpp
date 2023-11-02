@@ -1,7 +1,9 @@
 #include <cstddef>
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <fstream>
+#include <strings.h>
 #include <sys/wait.h>
 #include <vector>
 #include "reqParse.hpp"
@@ -105,30 +107,39 @@ void  executeCgi( Client & request ) {
   FILE          *in;
   FILE          *out;
 
-  args[0] = &request.cgiScript[0];
-  args[1] = &(request.location->second.root + request.target)[0];
+  args[0] = new char[request.cgiScript.size() + 1];
+  args[1] = new char[request.location->second.root.size() + request.target.size() + 1];
+  bzero(args[0], request.cgiScript.size() + 1);
+  bzero(args[1], request.location->second.root.size() + request.target.size() + 1);
+  strcpy(args[0], request.cgiScript.c_str());
+  strcpy(args[1], (request.location->second.root + request.target).c_str());
+  args[2] = NULL;
+  int inp = dup(0), outp = dup(1);
+  in = freopen(request.cgiFileName.c_str(), "r", stdin);
+  out = freopen("outfile.txt", "w", stdout);
   pid = fork();
   if (!pid) {
-    in = freopen(request.cgiFileName.c_str(), "r", stdout);
-    out = freopen("outfile.txt", "w", stdin);
+    std::cout << args[0] << ",  " << args[1] << std::endl;
     (void)in;
     (void)out;
     execve(request.cgiScript.c_str(), args, NULL);
+    std::cerr << "hhhhh" << std::endl;
   }
   else {
+    fclose(in);
+    fclose(out);
+    dup2(0, inp);
+    dup2(1, outp);
     waitpid(pid, NULL, 0);
   }
 }
 
 bool	getExtension(std::string & target, std::string & extension) {
-	std::string::reverse_iterator	it = target.rbegin();
-
-	while (it != target.rend()) {
-		if (*it == '.') {
-			extension.append(it, target.rbegin());
+	for (int i = target.size() - 1; i >= 0; i--) {
+		if (target[i] == '.') {
+			extension = target.substr(i);
 			return 1;
 		}
-		++it;
 	}
 	return 0;
 }
@@ -136,12 +147,15 @@ bool	getExtension(std::string & target, std::string & extension) {
 void	targetChecker( Client & request ) {
 	if (request.target[0] != '/')
 		throw 400;
-
+  
 	if (request.location->second.cgi.first) {
+
 		std::string extension;
 		getExtension(request.target, extension);
+    
 		if (!extension.empty()) {
       std::map<std::string, std::string>::iterator it = request.location->second.cgi.second.find(extension);
+
 			if (it != request.location->second.cgi.second.end()) {
         request.cgiScript = it->second;
         request.isCgi = true;
@@ -167,10 +181,7 @@ void    headersParsing(Client & request, std::vector<Server>& serv) {
             throw 400;
         request.location = findServ(request.maxBodySize, serv, request.host, request.target);
         if (std::find(request.location->second.allow_method.begin(), request.location->second.allow_method.end(), request.method) == request.location->second.allow_method.end())
-        {
-          std::cout << "hello" << std::endl;
             throw 405;
-        }
         targetChecker(request);
         request.position = pos;
         request.state = DONE_WITH_HEADERS;
