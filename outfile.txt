@@ -1,0 +1,4 @@
+/home/lsemlali/Desktop/php-cgi,  /home/lsemlali/Desktop//script.php
+[1;3;34mDate: Thu, 02 Nov 2023 10:05:52 GMT end of request and swap 7 to responce.[0m
+[1;3;32mDate: Thu, 02 Nov 2023 10:05:52 GMT send responce to 7[0m
+[1;3;35mDate: Thu, 02 Nov 2023 10:05:52 GMT remove a client 7[0m
