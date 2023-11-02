@@ -92,6 +92,8 @@ void Config::creat_socket() {
     }
     it_sev++;
   }
+  for (std::vector<Socket>::iterator i = this->socket.begin(); i != this->socket.end(); i++)
+    i->server_name.clear();
 }
 
 void Config::add_socket(sockaddr_in &addr, Server &sev, int &port) {

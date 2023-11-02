@@ -14,7 +14,6 @@ private:
   std::string host;
   int port;
   sockaddr_in server;
-  std::vector<std::string> server_name;
 
   // Socket(const Socket& obj);
   // Socket& operator=(const Socket& obj);
@@ -23,6 +22,8 @@ public:
   Socket();
   ~Socket();
 
+  std::vector<std::string> server_name;
+  
   // void setFd(const int fd);
   int getFd() const;
 
