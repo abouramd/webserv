@@ -8,16 +8,13 @@
 #include <sstream>
 #include <string>
 #ifndef __APPLE__
-  #include <endian.h>
+#include <endian.h>
 #endif // !__APPLE__
+#include <cstring>
 #include <sys/socket.h>
 #include <vector>
-#include <cstring>
 
-Config::Config()
-{
-
-}
+Config::Config() {}
 
 // Config::Config(const Config& obj)
 // {
@@ -30,37 +27,33 @@ Config::Config()
 //   return *this;
 // }
 //
-Config::~Config()
-{
+Config::~Config() {}
 
-}
-
-void Config::pars(int ac, char **av)
-{
+void Config::pars(int ac, char **av) {
   this->init_data(ac, av);
   this->read_data();
+  if (this->servers.empty())
+    throw std::string(
+        "Erorr: there should be at lest one server in the config file.");
   this->creat_socket();
 }
 
-
-void Config::init_data(int ac, char **av)
-{
+void Config::init_data(int ac, char **av) {
   if (ac != 2)
-    throw std::string("Error: number of args (the programe should take ane param).");
-  
+    throw std::string(
+        "Error: number of args (the programe should take ane param).");
+
   this->filename = av[1];
-  
+
   this->file.open(av[1]);
   if (!this->file.is_open())
     throw "Error" + std::string(strerror(errno)) + " (" + this->filename + ").";
 }
 
-void Config::read_data()
-{
+void Config::read_data() {
   std::string buffer;
 
-  while (ft_read(this->file, buffer))
-  {
+  while (ft_read(this->file, buffer)) {
     Server serv;
     if (buffer == "server {")
       serv.init_data(this->file);
@@ -68,32 +61,30 @@ void Config::read_data()
       throw "Error: " + buffer;
     serv.check();
     this->servers.push_back(serv);
-    
+
     // std::cout << "=> " << this->servers[0].getPort().size() << std::endl;
-     // std::cout << "port " <<  serv.getPort().size() << std::endl;
+    // std::cout << "port " <<  serv.getPort().size() << std::endl;
   }
   this->file.close();
 }
 
-void Config::creat_socket()
-{
+void Config::creat_socket() {
   std::vector<Server>::iterator it_sev = this->servers.begin();
-  while (it_sev != this->servers.end())
-  {
+  while (it_sev != this->servers.end()) {
     sockaddr_in addr;
     inet_aton(it_sev->getHost().c_str(), &addr.sin_addr);
     std::vector<std::string> ports = it_sev->getPort();
-    // std::cout << "number of servers is " << this->servers.size() << " " << it_sev->getPort().size() << std::endl;
+    // std::cout << "number of servers is " << this->servers.size() << " " <<
+    // it_sev->getPort().size() << std::endl;
     std::vector<std::string>::iterator it_port = ports.begin();
-    while (it_port != ports.end())
-    {
+    while (it_port != ports.end()) {
       std::stringstream str;
       int p;
 
       str << *it_port;
       str >> p;
 
-      addr.sin_port = htons(p); 
+      addr.sin_port = htons(p);
 
       this->add_socket(addr, *it_sev, p);
 
@@ -103,25 +94,25 @@ void Config::creat_socket()
   }
 }
 
-
-void Config::add_socket(sockaddr_in &addr, Server& sev, int& port)
-{
+void Config::add_socket(sockaddr_in &addr, Server &sev, int &port) {
   std::vector<Socket>::iterator it = this->socket.begin();
   std::stringstream ss;
-  while (it != this->socket.end())
-  {
-    if (it->getSinPort() == addr.sin_port)
-    {
+  while (it != this->socket.end()) {
+    if (it->getSinPort() == addr.sin_port) {
       if (it->getSinAddr().s_addr != addr.sin_addr.s_addr) {
-	ss << port;
-	   throw std::string("Error: this port " + ss.str() + " is used with " + inet_ntoa(it->getSinAddr()) + " and " + inet_ntoa(addr.sin_addr));
+        ss << port;
+        throw std::string("Error: this port " + ss.str() + " is used with " +
+                          inet_ntoa(it->getSinAddr()) + " and " +
+                          inet_ntoa(addr.sin_addr));
       }
+      it->check_server_name(sev.server_name);
       it->serv.push_back(sev);
       return;
     }
     it++;
   }
   Socket obj;
+  obj.check_server_name(sev.server_name);
   std::cout << "add a socket" << std::endl;
   obj.setHost(sev.getHost());
   obj.setPort(port);
@@ -130,9 +121,4 @@ void Config::add_socket(sockaddr_in &addr, Server& sev, int& port)
   this->socket.push_back(obj);
 }
 
-std::vector<Socket>& Config::get_socket()
-{
-  return this->socket;
-}
-
-
+std::vector<Socket> &Config::get_socket() { return this->socket; }

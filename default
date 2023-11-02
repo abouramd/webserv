@@ -24,7 +24,7 @@
 #Example:
 server {
 host 127.0.0.1
-listen 8080 8083 8082
+listen 8083 8082
 server_name 1337.com localhost:8082
 # max_body_size 10000000
 

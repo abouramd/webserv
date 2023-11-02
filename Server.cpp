@@ -217,7 +217,7 @@ void Server::set_server_name(const std::string &str) {
     it++;
   }
 }
-//
+
 // void Server::set_method(const std::string &str)
 // {
 //    std::vector<std::string> vec = my_split(str);
