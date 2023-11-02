@@ -60,11 +60,26 @@ int is_dir(std::string& str)
     return 2;
 }
 
-void get_target(Client &client)
+void get_target(Client &client, std::string &get_query)
 {
+    std::string target = "";
+    int i = 0, flag = 0;
     size_t found = client.target.find(client.server->first);
     if (found != std::string::npos)
         client.target.replace(found, client.server->first.length(), client.server->second.root);
+    while(client.target[i])
+    {
+        if (client.target[i] == '?')
+            flag = 1;
+        else{
+            if (!flag)
+                target += client.target[i];
+            else
+                get_query += client.target[i];
+        }
+        i++;
+    }
+    client.target = target;
 }
 
 std::string get_ex(std::string str)

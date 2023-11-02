@@ -14,6 +14,7 @@
 #include <vector>
 #include <utility>
 #include <ctime>
+#include <csignal>
 
 
 
@@ -81,6 +82,7 @@ int get_max_fd( std::vector<Socket> &my_s )
 
 int main(int ac, char **av)
 {
+  std::signal(SIGPIPE, SIG_IGN);
   Config obj;
   try{
     obj.pars(ac, av);

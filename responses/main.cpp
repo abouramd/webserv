@@ -3,29 +3,23 @@
 void responses(Client &client)
 {
     char buffer[100];
+    std::string get_query = "";
     if (!client.is->is_open())
     {
-        get_target(client);
-        if (is_dir(client.target) == 0)
-        {
-            std::string type = FileType::getContentType(get_ex(client.target));
-            s_header(client.fd, "200 OK", type);
-            client.is->open(client.target, std::ios::in | std::ios::binary);
-        }
-        else if (is_dir(client.target) == 1){
-            std::cout<< "Is dir" << std::endl;
-        }
-        else
-        {
-            s_header(client.fd, "404 Page Not Found", "text/html");
-            client.is->open("error_pages/404.html", std::ios::in | std::ios::binary);
-        }
+        get_target(client, get_query);
+        if (client.method == "GET")
+            get(client);
     }
     else
     {
-        if (client.is->read(buffer, sizeof(buffer)))
-            s_chank(client.fd, buffer, sizeof(buffer));
+        client.is->read(buffer, sizeof(buffer));
+        if (client.is->gcount())
+            s_chank(client.fd, buffer, client.is->gcount());
         else
+        {
+            s_chank(client.fd, "", 0);
+            client.is->close();
             client.state = CLOSE;
+        }
     }
 }
