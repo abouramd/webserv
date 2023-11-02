@@ -2,19 +2,28 @@
 
 void responses(Client &client)
 {
-    get_target(client);
-    if (is_dir(client.target) == 0)
+    char buffer[100];
+    if (!client.is->is_open())
     {
-        std::cout << "Is file" << std::endl;
-    }
-    else if (is_dir(client.target) == 1){
-        std::cout<< "Is dir" << std::endl;
+        get_target(client);
+        if (is_dir(client.target) == 0)
+        {
+            s_header(client.fd, "200 OK", "image/jpeg");
+            client.is->open(client.target, std::ios::in | std::ios::binary);
+        }
+        else if (is_dir(client.target) == 1){
+            std::cout<< "Is dir" << std::endl;
+        }
+        else
+        {
+            std::cout << "Not found" << std::endl;
+        }
     }
     else
     {
-        std::cout << "Not found" << std::endl;
+        if (client.is->read(buffer, sizeof(buffer)) || client.is->gcount())
+            s_chank(client.fd, buffer, sizeof(buffer));
+        else
+            client.state = CLOSE;
     }
-    s_header(client.fd, "200 OK", "text/html");
-    s_chank(client.fd, "Hello", 5);
-    s_chank(client.fd, "", 0);
 }

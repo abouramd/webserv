@@ -115,9 +115,7 @@ int main(int ac, char **av)
       {
         if (FD_ISSET(it_s->client[i].fd, &tmp_write))
         {
-          responses(it_s->client[i]);
-          it_s->client[i].state = CLOSE; 
-          
+          responses(it_s->client[i]);          
           if (it_s->client[i].state == CLOSE ) {
             FD_CLR(it_s->client[i].fd, &swrite);
             close(it_s->client[i].fd);
