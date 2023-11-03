@@ -9,7 +9,12 @@ void responses(Client &client)
     {
         get_target(client, get_query);
         if (client.method == "GET")
-            get(client, get_query, ftarget);
+        {
+            if (client.server->second.redirect.empty())
+                get(client, get_query, ftarget);
+            else
+                redirect(client, client.server->second.redirect);
+        }
     }
     else
     {

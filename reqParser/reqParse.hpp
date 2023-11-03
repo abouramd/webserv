@@ -31,7 +31,7 @@ struct Client {
     std::map<std::string, std::string>          headers;
     std::ifstream                               *is;
     std::ofstream                               *outfile;
-    int opened;
+    int opened, is_cgi;
     DIR* dir;
 };
 

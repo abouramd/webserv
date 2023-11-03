@@ -17,7 +17,10 @@ void get(Client &client, std::string &get_query, std::string &ftarget)
             client.state = CLOSE;
         }
     }
-    else if (is_dir(client.target) == 1){
+    else if (is_dir(client.target) == 1)
+    {
+        if (ftarget[ftarget.length() - 1] != '/')
+            ç(client, ftarget + "/");
         if (get_index(client))
         {
             std::string type = FileType::getContentType(get_ex(client.target));

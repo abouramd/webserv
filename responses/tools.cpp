@@ -172,3 +172,11 @@ int auto_index(Client &client, std::string &ftarget)
     }
     return 0;
 }
+
+void redirect(Client &client, std::string target)
+{
+    write(client.fd, "HTTP/1.1 301 Moved Permanently\r\nLocation: ", 42);
+    write(client.fd, target.c_str(), target.length());
+    write(client.fd, "\r\n\r\n", 4);
+    client.state = CLOSE;
+}

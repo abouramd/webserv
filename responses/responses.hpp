@@ -9,6 +9,8 @@
 #include "../FileType.hpp"
 #include <sys/stat.h>
 #include <dirent.h>
+#include <cstdlib>
+#include <ctime>
 
 typedef struct Client Client;
 void responses(Client &client);
@@ -23,3 +25,5 @@ void get(Client &client, std::string &get_query, std::string &ftarget);
 int is_cgi(Client &client);
 int get_index(Client &client);
 int auto_index(Client &client, std::string &ftarget);
+std::string cgi(Client &client);
+void redirect(Client &client, std::string target);
