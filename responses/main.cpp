@@ -31,7 +31,6 @@ void responses(Client &client)
                     header += "\r\n";
                 }
                 header +="\r\n";
-                std::cout << header << std::endl;
                 write(client.fd, header.c_str(), header.size());
                 client.is_cgi = 4;
             }

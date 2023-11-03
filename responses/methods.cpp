@@ -13,7 +13,7 @@ void get(Client &client, std::string &get_query, std::string &ftarget)
         }
         else
         {
-            cgi(client);
+            cgi(client, get_query);
         }
     }
     else if (is_dir(client.target) == 1)
@@ -30,7 +30,7 @@ void get(Client &client, std::string &get_query, std::string &ftarget)
             }
             else
             {
-                cgi(client);
+                cgi(client, get_query);
             }
         }else{
             if (client.server->second.auto_index)

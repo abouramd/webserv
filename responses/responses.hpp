@@ -14,6 +14,8 @@
 #include <fcntl.h>
 #include <sys/wait.h>
 #include <cstdio>
+#include <cstring>
+
 
 
 
@@ -30,5 +32,5 @@ void get(Client &client, std::string &get_query, std::string &ftarget);
 int is_cgi(Client &client);
 int get_index(Client &client);
 int auto_index(Client &client, std::string &ftarget);
-void cgi(Client &client);
+void cgi(Client &client, std::string &get_query);
 void redirect(Client &client, std::string target);
