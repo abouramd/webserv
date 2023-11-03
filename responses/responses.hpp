@@ -11,6 +11,11 @@
 #include <dirent.h>
 #include <cstdlib>
 #include <ctime>
+#include <fcntl.h>
+#include <sys/wait.h>
+#include <cstdio>
+
+
 
 typedef struct Client Client;
 void responses(Client &client);
@@ -25,5 +30,5 @@ void get(Client &client, std::string &get_query, std::string &ftarget);
 int is_cgi(Client &client);
 int get_index(Client &client);
 int auto_index(Client &client, std::string &ftarget);
-std::string cgi(Client &client);
+void cgi(Client &client);
 void redirect(Client &client, std::string target);

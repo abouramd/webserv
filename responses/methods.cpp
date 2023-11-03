@@ -13,14 +13,13 @@ void get(Client &client, std::string &get_query, std::string &ftarget)
         }
         else
         {
-            std::cout<< "Is cgi" << std::endl;
-            client.state = CLOSE;
+            cgi(client);
         }
     }
     else if (is_dir(client.target) == 1)
     {
         if (ftarget[ftarget.length() - 1] != '/')
-            ç(client, ftarget + "/");
+            redirect(client, ftarget + "/");
         if (get_index(client))
         {
             std::string type = FileType::getContentType(get_ex(client.target));
@@ -31,8 +30,7 @@ void get(Client &client, std::string &get_query, std::string &ftarget)
             }
             else
             {
-                std::cout<< "Is cgi" << std::endl;
-                client.state = CLOSE;
+                cgi(client);
             }
         }else{
             if (client.server->second.auto_index)
