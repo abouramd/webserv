@@ -15,6 +15,10 @@ void responses(Client &client)
             else
                 redirect(client, client.server->second.redirect);
         }
+        else if (client.method == "DELETE")
+        {
+            ft_delete(client);
+        }
     }
     else
     {

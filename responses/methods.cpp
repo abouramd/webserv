@@ -50,3 +50,22 @@ void get(Client &client, std::string &get_query, std::string &ftarget)
         client.is->open("error_pages/404.html");
     }
 }
+
+void ft_delete(Client &client)
+{
+    if (is_dir(client.target) == 0)
+    {
+        remove(client.target.c_str());
+        s_header(client.fd, "204 Deleted", "text/html");
+        client.is->open("error_pages/204.html");
+    }
+    else if (is_dir(client.target) == 1)
+    {
+        
+    }
+    else
+    {
+        s_header(client.fd, "404 Page Not Found", "text/html");
+        client.is->open("error_pages/404.html");
+    }
+}
