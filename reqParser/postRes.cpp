@@ -74,11 +74,7 @@ void    bodyParser(Client & request) {
             }
             throw 200;
 		}
-		else {
-			while (st < request.buffSize)
-				*(request.outfile) << request.buf[st++];
-			request.contentLength -= request.buffSize - request.position;
-			request.position = 0;
-		}
+		else
+			throw 413;
     }
 }
