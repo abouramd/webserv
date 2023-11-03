@@ -19,15 +19,17 @@ char	*Cgi::strDup(std::string src) {
 }
 
 void Cgi::setEnv() {
-	env = new char * [7];
+	std::string	root(request.location->second.root.begin(), request.location->second.root.end() - 1);
 
+	env = new char * [8];
 	env[0] = strDup("REQUEST_METHOD=" + request.method);
 	env[1] = strDup("CONTENT_TYPE=" + request.headers["Content-Type"]);
 	env[2] = strDup("CONTENT_LENGTH=" + request.headers["Content-length"]);
 	env[3] = strDup("HTTP_USER_AGENT=" + request.headers["User-Agent"]);
-	env[4] = strDup("SCRIPT_FILENAME=" + request.location->second.root + request.target);
+	env[4] = strDup("SCRIPT_FILENAME=" + root + request.target);
 	env[5] = strDup("SCRIPT_NAME=" + request.target);
-	env[6] = NULL;
+	env[6] = strDup("REDIRECT_STATUS=1");
+	env[7] = NULL;
 }
 
 void  Cgi::executeCgi() {
