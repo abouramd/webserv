@@ -1,55 +1,4 @@
-#include <cstddef>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <fstream>
-#include <strings.h>
-#include <sys/wait.h>
-#include <vector>
-#include "reqParse.hpp"
-#include <algorithm>
-#include <unistd.h>
-#include <wait.h>
-//bool    isCgi(Client & request) {
-//    std::stringstream   target(request.target);
-//    std::string         line;
-//
-//    while (getline(target, line, '/'));
-//
-//    for (int i = 0; i < line.size(); i++) {
-//        if (line[i] == '.' && i + 3 == line.size() - 1 && line.substr(i + 1, 3) == "php")
-//            return true;
-//    }
-//    return false;
-//}
-//
-//void    handleCgi(Client & request) {
-//    std::ifstream   cgiFile(request.target);
-//    char            **env;
-//    const char      args[] = {request.target, NULL};
-//    int             pid;
-//
-//    if (!cgiFile.is_open())
-//        throw 404;
-//    env = createEnv(request);
-//    pid = fork();
-//    if (!pid)
-//        execve(request.target, args, env);
-//}
-
-std::string getFileName(Client & request) {
-    std::fstream content("content_type.txt");
-    std::string     line;
-	std::string		res;
-
-    while (getline(content, line)) {
-        if (request.headers["Content-Type"] == line.substr(0, line.find(':'))) {
-			res = "file" + line.substr(line.find(':') + 1);
-			return res;
-		}
-    }
-    throw 415;
-}
+#include "Cgi.hpp"
 
 int    endFound( const char *buf ) {
     std::string str(buf);
@@ -101,37 +50,6 @@ void    startHParsing(Client & request) {
     }
 }
 
-void  executeCgi( Client & request ) {
-  int           pid;
-  char          *args[3];
-  FILE          *in;
-  FILE          *out;
-  std::stringstream	ss;
-
-  ss << "_tmp/" << rand() << "_cgi_out.tmp";
-  args[0] = new char[request.cgiScript.size() + 1];
-  args[1] = new char[request.location->second.root.size() + request.target.size() + 1];
-  bzero(args[0], request.cgiScript.size() + 1);
-  bzero(args[1], request.location->second.root.size() + request.target.size() + 1);
-  strcpy(args[0], request.cgiScript.c_str());
-  strcpy(args[1], (request.location->second.root + request.target).c_str());
-  args[2] = NULL;
-  request.outfile->close();
-  pid = fork();
-  if (!pid) {
-	  std::cerr << args[0] << ", " << args[1] << std::endl;
-	  in = freopen(request.cgiFileName.c_str(), "r", stdin);
-	  out = freopen(std::string(ss.str()).c_str(), "w", stdout);
-	  (void)in;
-	  (void)out;
-	  execve(args[0], args, NULL);
-  }
-  else {
-	  waitpid(pid, NULL, 0);
-	  request.cgiFileName = ss.str();
-  }
-}
-
 bool	getExtension(std::string & target, std::string & extension) {
 	for (int i = target.size() - 1; i >= 0; i--) {
 		if (target[i] == '.') {
@@ -152,12 +70,12 @@ void	targetChecker( Client & request ) {
 		getExtension(request.target, extension);
 
 		if (!extension.empty()) {
-      std::map<std::string, std::string>::iterator it = request.location->second.cgi.second.find(extension);
+			std::map<std::string, std::string>::iterator it = request.location->second.cgi.second.find(extension);
 
 			if (it != request.location->second.cgi.second.end()) {
-        request.cgiScript = it->second;
-        request.isCgi = true;
-      }
+				request.cgiScript = it->second;
+				request.isCgi = true;
+			}
 			else
 				throw 404;
 		}
@@ -234,8 +152,11 @@ void    reqParser(Client & request, int sock, std::vector<Server>& serv) {
             throw 200;
     }
     catch (int status) {
-		if (request.isCgi)
-			executeCgi(request);
+		if ((status == 200 || status == 201) && request.isCgi) {
+			Cgi	cgi(request);
+
+			cgi.executeCgi();
+		}
 		request.statusCode = status;
 		std::cout << "status code : " << status << std::endl;
         request.state = DONE;

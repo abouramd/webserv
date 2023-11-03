@@ -13,6 +13,7 @@
 #include <vector>
 #include <utility>
 #include <ctime>
+#include <cstdlib>
 
 
 
@@ -80,6 +81,7 @@ int get_max_fd( std::vector<Socket> &my_s )
 
 int main(int ac, char **av)
 {
+	std::srand(time(NULL));
   Config obj;
   try{
     obj.pars(ac, av);

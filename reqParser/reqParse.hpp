@@ -1,9 +1,13 @@
 #pragma once
 
+#include <cstddef>
+#include <cstdlib>
+#include <fstream>
+#include <algorithm>
+#include <unistd.h>
 #include <iostream>
 #include <sys/socket.h>
 #include <arpa/inet.h>
-#include <unistd.h>
 #include <sstream>
 #include <fstream>
 #include <map>
@@ -24,13 +28,14 @@ struct Client {
     std::map<std::string, Location>::iterator   location;
     unsigned long                               contentLength, maxBodySize;
     int                                         fd, statusCode;
-	  bool										                    isCgi;
+	bool										isCgi;
     size_t                                      state, chunkSize, buffSize, position;
     char                                        buf[BUFF_SIZE + 1];
     std::string                                 method, target, version, host, sizeDept, headersBuf, cgiFileName, cgiScript;
     std::map<std::string, std::string>          headers;
     std::ifstream                               *is;
     std::ofstream                               *outfile;
+
 };
 
 void                                        moveBuf( Client & request, int amount );
