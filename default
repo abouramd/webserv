@@ -25,7 +25,7 @@
 server {
 host 127.0.0.1
 listen 8080 8083 8082
-server_name 1337.com localhost:8082
+server_name  localhost:8082
 # max_body_size 10000000
 
 
@@ -44,7 +44,8 @@ location /test {
   root www/realtest
   allow_method GET DELET
   auto_index on
-  cgi_path php php-cgi
+  #cgi_path php php-cgi
+  cgi_path py /usr/bin/python3
   uplode on //
   cgi on
 }

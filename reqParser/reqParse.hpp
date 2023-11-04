@@ -33,6 +33,8 @@ struct Client {
     std::ofstream                               *outfile;
     int opened, is_cgi, pid;
     DIR* dir;
+    std::time_t currentTime;
+    
 };
 
 void                                        moveBuf( Client & request, int amount );

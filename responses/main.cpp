@@ -52,5 +52,18 @@ void responses(Client &client)
                     remove(client.method.c_str());
             }
         }
+        if (client.is_cgi == 5)
+        {
+            std::time_t currentTime = time(NULL);
+            if (currentTime - client.currentTime > 10)
+            {
+                s_header(client.fd, "408 Timed out", "text/html");
+                client.is->close();
+                client.is->open("error_pages/408.html");
+                kill(client.pid, SIGINT);
+                remove(client.method.c_str());
+                client.is_cgi = 4;
+            }
+        }
     }
 }

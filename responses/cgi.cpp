@@ -7,23 +7,23 @@ char **get_env(Client &client, std::string &get_query)
     (void)client;
     std::map<std::string, std::string>  env;
     // env["AUTH_TYPE"] = "";
-    // env["CONTENT_LENGTH"] = client.headers["Content-Length"];
-    // env["CONTENT_TYPE"] = client.headers["Content-Type"];
-    //env["PATH_INFO"] = _client.req.get_path();
-    //env["PATH_TRANSLATED"] = _client.req.real_uri;
+    // env["CONTENT_LENGTH"] = ?;
+    // env["CONTENT_TYPE"] = ?;
+    //env["PATH_INFO"] = ?;
+    //env["PATH_TRANSLATED"] = ?;
     env["QUERY_STRING"] = get_query;
-    // env["REMOTE_HOST"] = client.headers["Host"];
+    // env["REMOTE_HOST"] = ?;
     // env["REMOTE_USER"] = "";
-    // env["HTTP_COOKIE"] = client.headers["Cookie"];;
+    // env["HTTP_COOKIE"] = ?;
     // env["REMOTE_IDENT"] = "";
     // env["REQUEST_METHOD"] = client.method;
     // env["GATEWAY_INTERFACE"] = "CGI/1.1";
-    // env["REQUEST_URI"] = _client.req.uri;
-    // env["SCRIPT_NAME"] = _client.req.current_location.cgi_path;
+    // env["REQUEST_URI"] = ?;
+    // env["SCRIPT_NAME"] = ?;
     env["SCRIPT_FILENAME"] = "www/realtest/process_form.php";
-    // env["SERVER_NAME"] = _client.server_ptr->name;
+    // env["SERVER_NAME"] = ?;
     // env["SERVER_PROTOCOL"] = "HTTP/1.1";
-    // env["SERVER_PORT"] = std::to_string(_client.server_ptr->port);
+    // env["SERVER_PORT"] = ?;
     // env["SERVER_SOFTWARE"] = "webserv/1.0";
     // env["REDIRECT_STATUS"] = "200";
     // env["REQUEST_SCHEME"] = "http";
@@ -53,7 +53,6 @@ void cgi(Client &client, std::string &get_query)
     std::string filename = convert.str();
     filename = "temp/" + filename;
     int fd = open(filename.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-    
     if (!(client.pid = fork()))
     {
         char** env = get_env(client, get_query);
@@ -71,6 +70,7 @@ void cgi(Client &client, std::string &get_query)
     }
     else
     {
+        client.currentTime = time(NULL);
         client.is_cgi = 5;
         client.method = filename;
         client.is->open(filename);
