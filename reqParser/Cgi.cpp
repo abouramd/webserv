@@ -8,6 +8,15 @@ Cgi::~Cgi() {
 	delete[] env;
 }
 
+bool Cgi::fileExists(const char* filename) {
+	struct stat buffer;
+	return (stat(filename, &buffer) == 0);
+}
+
+bool Cgi::hasReadPermission(const char* filename) {
+	return (access(filename, R_OK) == 0);
+}
+
 char	*Cgi::strDup(std::string src) {
 	size_t	size = src.size();
 	char	*newStr;
