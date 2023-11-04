@@ -29,11 +29,16 @@ void responses(Client &client)
                 std::string header = "HTTP/1.1 200 OK\r\n";
                 header += "Transfer-Encoding: chunked\r\n";
                 std::string head;
-                while (std::getline(*client.is, head) && head != "\r" && head != "")
+                if (!(get_ex(client.target).compare("php")))
                 {
-                    header += head;
-                    header += "\r\n";
+                    while (std::getline(*client.is, head) && head != "\r" && head != "")
+                    {
+                        header += head;
+                        header += "\r\n";
+                    }
                 }
+                else
+                    header += "Content-type: text/html\r\n";
                 header +="\r\n";
                 write(client.fd, header.c_str(), header.size());
                 client.is_cgi = 4;

@@ -4,7 +4,6 @@
 
 char **get_env(Client &client, std::string &get_query)
 {
-    (void)client;
     std::map<std::string, std::string>  env;
     // env["AUTH_TYPE"] = "";
     // env["CONTENT_LENGTH"] = ?;
@@ -20,7 +19,7 @@ char **get_env(Client &client, std::string &get_query)
     // env["GATEWAY_INTERFACE"] = "CGI/1.1";
     // env["REQUEST_URI"] = ?;
     // env["SCRIPT_NAME"] = ?;
-    env["SCRIPT_FILENAME"] = "www/realtest/process_form.php";
+    env["SCRIPT_FILENAME"] = client.target;
     // env["SERVER_NAME"] = ?;
     // env["SERVER_PROTOCOL"] = "HTTP/1.1";
     // env["SERVER_PORT"] = ?;
@@ -62,10 +61,9 @@ void cgi(Client &client, std::string &get_query)
         //     std::cout << env[i] << std::endl;
         //     i++;
         // }
-        
         std::string Query = "QUERY_STRING=" + get_query;
         dup2(fd, 1);
-        char* argv[] = { const_cast<char*>(client.server->second.cgi.second["php"].c_str()), const_cast<char*>(client.target.c_str()), NULL };
+        char* argv[] = { const_cast<char*>(client.server->second.cgi.second[get_ex(client.target)].c_str()), const_cast<char*>(client.target.c_str()), NULL };
         execve(argv[0], argv, env);
     }
     else

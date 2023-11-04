@@ -5,7 +5,7 @@
 </head>
 <body>
     <h1>Simple GET Form</h1>
-    <form action="process_form.php" method="get">
+    <form action="process.php" method="get">
         <label for="name">Name:</label>
         <input type="text" name="name" id="name" required><br>
         <input type="submit" value="Submit">
