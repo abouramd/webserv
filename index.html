@@ -1,14 +1,9 @@
-<!DOCTYPE html>
 <html>
-<head>
-    <title>CGI Test Form</title>
-</head>
 <body>
-    <form action="script.php" method="post">
-        <label for="input_data">Enter some data:</label><br>
-        <input type="text" id="input_data" name="input_data"><br><br>
-        <input type="submit" value="Submit">
-    </form>
+<form enctype = "multipart/form-data" action = "script.php"
+      method = "post">
+    <p>File: <input type = "file" name = "userfile" /></p>
+    <p><input type = "submit" value = "Upload" /></p>
+</form>
 </body>
 </html>
-
