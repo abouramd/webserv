@@ -61,25 +61,31 @@ bool	getExtension(std::string & target, std::string & extension) {
 }
 
 void	targetChecker( Client & request ) {
+	std::string	filename(request.location->second.root + request.target);
+
 	if (request.target[0] != '/')
 		throw 400;
+	if (Cgi::fileExists(filename.c_str())) {
+		if (Cgi::hasReadPermission(filename.c_str())) {
+			if (request.location->second.cgi.first) {
+				std::string extension;
 
-	if (request.location->second.cgi.first) {
+				getExtension(request.target, extension);
+				if (!extension.empty()) {
+					std::map<std::string, std::string>::iterator it = request.location->second.cgi.second.find(extension);
 
-		std::string extension;
-		getExtension(request.target, extension);
-
-		if (!extension.empty()) {
-			std::map<std::string, std::string>::iterator it = request.location->second.cgi.second.find(extension);
-
-			if (it != request.location->second.cgi.second.end()) {
-				request.cgiScript = it->second;
-				request.isCgi = true;
+					if (it != request.location->second.cgi.second.end()) {
+						request.cgiScript = it->second;
+						request.isCgi = true;
+					}
+					else if (request.method == "POST")
+						throw 404;
+				}
 			}
-			else
-				throw 404;
-		}
-	}
+		} else
+			throw 403;
+	} else
+		throw 404;
 }
 
 void    headersParsing(Client & request, std::vector<Server>& serv) {
@@ -89,12 +95,12 @@ void    headersParsing(Client & request, std::vector<Server>& serv) {
         startHParsing(request);
         if (request.host.empty())
             throw 400;
-        if (request.method == "POST" && request.headers.find("Transfer-Encoding") != request.headers.end()) {
-            if (request.headers["Transfer-Encoding"] != "chunked" || request.headers.find("Content-Length") != request.headers.end())
+        if (request.method == "POST") {
+			if (request.headers.find("Transfer-Encoding") != request.headers.end() && request.headers["Transfer-Encoding"] != "chunked")
+				throw 400;
+            else if (request.headers.find("Transfer-Encoding") == request.headers.end() && request.headers.find("Content-Length") == request.headers.end())
                 throw 400;
         }
-        else if (request.method == "POST" && request.headers.find("Content-Length") == request.headers.end())
-            throw 400;
         request.location = findServ(request.maxBodySize, serv, request.host, request.target);
         if (std::find(request.location->second.allow_method.begin(), request.location->second.allow_method.end(), request.method) == request.location->second.allow_method.end())
             throw 405;
@@ -104,7 +110,7 @@ void    headersParsing(Client & request, std::vector<Server>& serv) {
         const char *ptr = request.headers["Content-Length"].c_str();
         request.contentLength = std::strtol(ptr, NULL, 10);
         if (request.contentLength > request.maxBodySize)
-            request.contentLength = request.maxBodySize;
+            throw 413;
     }
     else
 		request.headersBuf += request.buf;
@@ -152,11 +158,12 @@ void    reqParser(Client & request, int sock, std::vector<Server>& serv) {
             throw 200;
     }
     catch (int status) {
-		if ((status == 200 || status == 201) && request.isCgi) {
+		if (request.method == "POST" && (status == 200 || status == 201) && request.isCgi) {
 			Cgi	cgi(request);
 
 			cgi.executeCgi();
 		}
+		std::cout << ">>>>>>" << std::endl;
 		request.statusCode = status;
 		std::cout << "status code : " << status << std::endl;
         request.state = DONE;
