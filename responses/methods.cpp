@@ -51,6 +51,32 @@ void get(Client &client, std::string &get_query, std::string &ftarget)
     }
 }
 
+int delete_dir(std::string name)
+{
+    DIR* dir;
+    std::string path;
+
+    dir = opendir(name.c_str());
+    struct dirent* entry;
+    while ((entry = readdir(dir)))
+    {
+        if (!std::string(entry->d_name).compare("..") || !std::string(entry->d_name).compare("."))
+            continue;
+        path = name +"/"+ std::string(entry->d_name);
+        if (is_dir(path) == 1 && path[0] != '.')
+        {
+            delete_dir(path);
+        }
+        else if (is_dir(path) == 0)
+        {
+            remove(path.c_str());
+        }
+        
+    }
+    remove(name.c_str());
+    return 0;
+}
+
 void ft_delete(Client &client)
 {
     if (is_dir(client.target) == 0)
@@ -61,7 +87,9 @@ void ft_delete(Client &client)
     }
     else if (is_dir(client.target) == 1)
     {
-        
+        delete_dir(client.target);
+        s_header(client.fd, "204 Deleted", "text/html");
+        client.is->open("error_pages/204.html");
     }
     else
     {
