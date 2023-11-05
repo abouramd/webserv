@@ -8,6 +8,7 @@ void responses(Client &client)
     if (!client.is->is_open())
     {
         get_target(client, get_query);
+        error_handling(client);
         if (client.method == "GET")
         {
             if (client.server->second.redirect.empty())
