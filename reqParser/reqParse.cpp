@@ -51,13 +51,19 @@ void    startHParsing(Client & request) {
 }
 
 bool	getExtension(std::string & target, std::string & extension) {
+	size_t	pos;
+
 	for (int i = target.size() - 1; i >= 0; i--) {
 		if (target[i] == '.') {
-			extension = target.substr(i);
-			return 1;
+			pos = target.find('/', i);
+			if (pos != std::string::npos)
+				extension = target.substr(i, pos - i);
+			else
+				extension = target.substr(i);
+			return true;
 		}
 	}
-	return 0;
+	return false;
 }
 
 void	targetChecker( Client & request ) {
@@ -66,24 +72,19 @@ void	targetChecker( Client & request ) {
 
 	if (request.target[0] != '/')
 		throw 400;
-	if (Cgi::fileExists(filename.c_str(), isDir)) {
+	if (Cgi::pathExists(filename.c_str(), isDir)) {
 		if (Cgi::hasReadPermission(filename.c_str())) {
 			if (isDir && request.method == "GET") {
-				std::cout << Cgi::fileExists((filename + "/index.html").c_str(), isDir) << std::endl;
-				if (Cgi::fileExists((filename + "/index.html").c_str(), isDir) && Cgi::hasReadPermission((filename + "/index.html").c_str()))
+				if (Cgi::pathExists((filename + "/index.html").c_str(), isDir) && Cgi::hasReadPermission((filename + "/index.html").c_str()))
 					request.target += "/index.html";
 				else
 					throw 404;
-			}
-			else {
-				std::cout << request.target << ",,," << std::endl;
+			} else if (!isDir){
 				if (request.location->second.cgi.first) {
 					std::string extension;
 
-					getExtension(request.target, extension);
-					if (!extension.empty()) {
-						std::map<std::string, std::string>::iterator it = request.location->second.cgi.second.find(
-								extension);
+					if (getExtension(request.target, extension)) {
+						std::map<std::string, std::string>::iterator it = request.location->second.cgi.second.find(extension);
 
 						if (it != request.location->second.cgi.second.end()) {
 							request.cgiScript = it->second;
