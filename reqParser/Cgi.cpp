@@ -8,7 +8,7 @@ Cgi::~Cgi() {
 	delete[] env;
 }
 
-bool Cgi::fileExists(const char* filename, bool	& isDir) {
+bool Cgi::pathExists(const char* filename, bool	& isDir) {
 	struct stat fileState;
 	if (stat(filename, &fileState) == 0) {
 		if (S_ISDIR(fileState.st_mode))
@@ -35,14 +35,14 @@ char	*Cgi::strDup(std::string src) {
 void Cgi::setEnv() {
 	std::string	root(request.location->second.root.begin(), request.location->second.root.end() - 1);
 
-	env = new char * [8];
+	env = new char * [ENV_SIZE];
 	env[0] = strDup("REQUEST_METHOD=" + request.method);
 	env[1] = strDup("CONTENT_TYPE=" + request.headers["Content-Type"]);
 	env[2] = strDup("CONTENT_LENGTH=" + request.headers["Content-length"]);
 	env[3] = strDup("HTTP_USER_AGENT=" + request.headers["User-Agent"]);
 	env[4] = strDup("SCRIPT_FILENAME=" + root + request.target);
 	env[5] = strDup("SCRIPT_NAME=" + request.target);
-	env[6] = strDup("REDIRECT_STATUS=1");
+	env[6] = strDup("REDIRECT_STATUS=200");
 	env[7] = NULL;
 }
 
