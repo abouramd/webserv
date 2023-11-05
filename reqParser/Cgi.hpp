@@ -2,6 +2,7 @@
 #include <cstring>
 #include <filesystem>
 #include "sys/wait.h"
+#define ENV_SIZE 8
 
 class Cgi {
 private:
@@ -10,7 +11,7 @@ private:
 public:
 	Cgi( Client & );
 	~Cgi();
-	static bool fileExists( const char*, bool & );
+	static bool pathExists( const char*, bool & );
 	static bool hasReadPermission( const char* );
 	char	*strDup( std::string );
 	void	setEnv();
