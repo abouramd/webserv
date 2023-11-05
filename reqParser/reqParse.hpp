@@ -34,6 +34,7 @@ struct Client {
     int opened, is_cgi, pid;
     DIR* dir;
     std::time_t currentTime;
+    std::string statestring;
     
 };
 

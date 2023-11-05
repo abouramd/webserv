@@ -7,6 +7,7 @@ void responses(Client &client)
     std::string get_query = "";
     if (!client.is->is_open())
     {
+        client.statestring = "200 OK";
         get_target(client, get_query);
         error_handling(client);
         if (client.method == "GET")

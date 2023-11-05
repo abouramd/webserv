@@ -8,7 +8,7 @@ void get(Client &client, std::string &get_query, std::string &ftarget)
         std::string type = FileType::getContentType(get_ex(client.target));
         if (!is_cgi(client))
         {
-            s_header(client.fd, "200 OK", type);
+            s_header(client.fd, client.statestring, type);
             client.is->open(client.target);
         }
         else
@@ -25,7 +25,7 @@ void get(Client &client, std::string &get_query, std::string &ftarget)
             std::string type = FileType::getContentType(get_ex(client.target));
             if (!is_cgi(client))
             {
-                s_header(client.fd, "200 OK", type);
+                s_header(client.fd, client.statestring, type);
                 client.is->open(client.target);
             }
             else
