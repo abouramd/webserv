@@ -27,8 +27,6 @@ void    startHParsing(Client & request) {
         throw 400;
     ss >> request.version;
     if (request.version != "HTTP/1.1")
-        throw 400;
-    if (request.version != "HTTP/1.1")
         throw 505;
     if (ss.peek() == '\r')
         ss.ignore(2);
@@ -66,32 +64,53 @@ bool	getExtension(std::string & target, std::string & extension) {
 	return false;
 }
 
+void	checkValidCharacters(const std::string & path, const std::string & query, bool withQuery) {
+	for (size_t i = 0; i < path.size(); i++) {
+		if (!std::isalnum(path[i]) && std::string("/-_.").find(path[i]) == std::string::npos)
+			throw 400;
+	}
+	for (size_t i = 0; withQuery && i < query.size(); i++) {
+		if (!std::isalnum(query[i]) && std::string("$-_.+!*'(),").find(query[i]) == std::string::npos)
+			throw 400;
+	}
+}
+
+void	parseUri( Client & request, std::string & path, std::string & query ) {
+	size_t	pos;
+
+	pos = request.target.find('?');
+	if (pos != std::string::npos) {
+		path = request.target.substr(0, pos);
+		query = request.target.substr(pos + 1);
+		checkValidCharacters(path, query, true);
+	}
+	else {
+		path = request.target;
+		checkValidCharacters(path, query, false);
+	}
+}
+
 void	targetChecker( Client & request ) {
-	std::string	filename(request.location->second.root + request.target);
+	std::string	filename, path, query;
 	bool		isDir(false);
 
-	if (request.target[0] != '/')
+	if (request.target.size() > 2048 || request.target[0] != '/')
 		throw 400;
+	parseUri(request, path, query);
+	filename = request.location->second.root + path;
 	if (Cgi::pathExists(filename.c_str(), isDir)) {
 		if (Cgi::hasReadPermission(filename.c_str())) {
-			if (isDir && request.method == "GET") {
-				if (Cgi::pathExists((filename + "/index.html").c_str(), isDir) && Cgi::hasReadPermission((filename + "/index.html").c_str()))
-					request.target += "/index.html";
-				else
-					throw 404;
-			} else if (!isDir){
-				if (request.location->second.cgi.first) {
-					std::string extension;
+			if (!isDir && request.location->second.cgi.first) {
+				std::string extension;
 
-					if (getExtension(request.target, extension)) {
-						std::map<std::string, std::string>::iterator it = request.location->second.cgi.second.find(extension);
+				if (getExtension(request.target, extension)) {
+					std::map<std::string, std::string>::iterator it = request.location->second.cgi.second.find(extension);
 
-						if (it != request.location->second.cgi.second.end()) {
-							request.cgiScript = it->second;
-							request.isCgi = true;
-						} else if (request.method == "POST")
-							throw 404;
-					}
+					if (it != request.location->second.cgi.second.end()) {
+						request.cgiScript = it->second;
+						request.isCgi = true;
+					} else if (request.method == "POST")
+						throw 404;
 				}
 			}
 		} else
@@ -108,9 +127,13 @@ void    headersParsing(Client & request, std::vector<Server>& serv) {
         if (request.host.empty())
             throw 400;
         if (request.method == "POST") {
-			if (request.headers.find("Transfer-Encoding") != request.headers.end() && request.headers["Transfer-Encoding"] != "chunked")
-				throw 400;
-            else if (request.headers.find("Transfer-Encoding") == request.headers.end() && request.headers.find("Content-Length") == request.headers.end())
+			if (request.headers.find("Transfer-Encoding") != request.headers.end()) {
+				if (request.headers["Transfer-Encoding"] != "chunked")
+					throw 501;
+				if (request.headers.find("Content-Length") != request.headers.end())
+					throw 400;
+			}
+            else if (request.headers.find("Content-Length") == request.headers.end())
                 throw 400;
         }
         request.location = findServ(request.maxBodySize, serv, request.host, request.target);
