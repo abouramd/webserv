@@ -62,24 +62,35 @@ bool	getExtension(std::string & target, std::string & extension) {
 
 void	targetChecker( Client & request ) {
 	std::string	filename(request.location->second.root + request.target);
+	bool		isDir(false);
 
 	if (request.target[0] != '/')
 		throw 400;
-	if (Cgi::fileExists(filename.c_str())) {
+	if (Cgi::fileExists(filename.c_str(), isDir)) {
 		if (Cgi::hasReadPermission(filename.c_str())) {
-			if (request.location->second.cgi.first) {
-				std::string extension;
+			if (isDir && request.method == "GET") {
+				std::cout << Cgi::fileExists((filename + "/index.html").c_str(), isDir) << std::endl;
+				if (Cgi::fileExists((filename + "/index.html").c_str(), isDir) && Cgi::hasReadPermission((filename + "/index.html").c_str()))
+					request.target += "/index.html";
+				else
+					throw 404;
+			}
+			else {
+				std::cout << request.target << ",,," << std::endl;
+				if (request.location->second.cgi.first) {
+					std::string extension;
 
-				getExtension(request.target, extension);
-				if (!extension.empty()) {
-					std::map<std::string, std::string>::iterator it = request.location->second.cgi.second.find(extension);
+					getExtension(request.target, extension);
+					if (!extension.empty()) {
+						std::map<std::string, std::string>::iterator it = request.location->second.cgi.second.find(
+								extension);
 
-					if (it != request.location->second.cgi.second.end()) {
-						request.cgiScript = it->second;
-						request.isCgi = true;
+						if (it != request.location->second.cgi.second.end()) {
+							request.cgiScript = it->second;
+							request.isCgi = true;
+						} else if (request.method == "POST")
+							throw 404;
 					}
-					else if (request.method == "POST")
-						throw 404;
 				}
 			}
 		} else
