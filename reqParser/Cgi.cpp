@@ -8,9 +8,14 @@ Cgi::~Cgi() {
 	delete[] env;
 }
 
-bool Cgi::fileExists(const char* filename) {
-	struct stat buffer;
-	return (stat(filename, &buffer) == 0);
+bool Cgi::fileExists(const char* filename, bool	& isDir) {
+	struct stat fileState;
+	if (stat(filename, &fileState) == 0) {
+		if (S_ISDIR(fileState.st_mode))
+			isDir = true;
+		return true;
+	}
+	return false;
 }
 
 bool Cgi::hasReadPermission(const char* filename) {
