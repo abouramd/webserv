@@ -10,9 +10,9 @@ private:
 public:
 	Cgi( Client & );
 	~Cgi();
-	static bool fileExists(const char* filename);
-	static bool hasReadPermission(const char* filename);
-	char	*strDup(std::string src);
+	static bool fileExists( const char*, bool & );
+	static bool hasReadPermission( const char* );
+	char	*strDup( std::string );
 	void	setEnv();
 	void	executeCgi();
 };
