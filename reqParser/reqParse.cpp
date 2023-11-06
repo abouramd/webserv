@@ -94,12 +94,12 @@ void	parseUri( Client & request, std::string & path, std::string & query ) {
 
 void	targetChecker( Client & request ) {
 	std::string	filename, path, query;
-	bool		isDir(false);
+	bool		isDir(false), r(false), w(false);
 
 	parseUri(request, path, query);
 	filename = request.location->second.root + path;
-	if (Tools::pathExists(filename.c_str(), isDir)) {
-		if (Tools::hasReadPermission(filename.c_str())) {
+	if (Tools::pathExists(filename.c_str(), isDir, r, w)) {
+		if (r) {
 			if (!isDir && request.location->second.cgi.first) {
 				std::string extension;
 
@@ -128,6 +128,7 @@ void    headersParsing(Client & request, std::vector<Server>& serv) {
 			throw 400;
 		if (request.method == "POST") {
 			if (request.headers.find("Transfer-Encoding") != request.headers.end()) {
+        std::cout << "heeere" << std::endl;
 				if (request.headers["Transfer-Encoding"] != "chunked")
 					throw 501;
 				if (request.headers.find("Content-Length") != request.headers.end())
@@ -160,6 +161,7 @@ void    reqParser(Client & request, int sock, std::vector<Server>& serv) {
 		int amount;
 
 		amount = read(sock, request.buf, BUFF_SIZE);
+    std::cout << "amount .> " << amount << std::endl;
 		if (amount == 0) {
 			request.state = CLOSE;
 			throw 200;

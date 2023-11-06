@@ -96,12 +96,16 @@ void	postHandler(Client & request) {
 			extension = FileType::getExt(request.headers["Content-Type"]);
 			uploadPath = request.location->second.root + request.location->second.uplode.second;
 			Tools::getAndCheckPath(uploadPath, extension);
+      std::cout << ">>>>>" << uploadPath << std::endl;
 			request.outfile->open(uploadPath.c_str());
 		}
 		else
 			throw 405;
 		if (!request.outfile->is_open())
+    {
+      std::cout << "request" << std::endl;
 			throw 501;
+    }
 	}
 	if (request.chunkSize >= request.buffSize) {
 		std::cout << "mmmm" << std::endl;

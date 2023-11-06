@@ -1,11 +1,13 @@
 #include "Client.hpp"
+#include <ctime>
 
 Client::Client(int fd, std::ifstream *i, std::ofstream *o)  : is(i), outfile(o) {
     this->fd = fd;
-	this->isCgi = false;
+	  this->isCgi = false;
     this->position = 0;
     this->chunkSize = 0;
     this->state = NOT_DONE;
+    this->request_time = std::time(NULL);
 }
 
 void	Client::reset() {

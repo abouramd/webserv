@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <cstdlib>
+#include <ctime>
 #include <fstream>
 #include <algorithm>
 #include <unistd.h>
@@ -35,7 +36,7 @@ struct Client {
     std::map<std::string, std::string>          headers;
     std::ifstream                               *is;
     std::ofstream                               *outfile;
-
+    std::time_t request_time; 
 };
 
 void                                        moveBuf( Client & request, int amount );

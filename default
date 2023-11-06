@@ -26,15 +26,15 @@ server {
 host 127.0.0.1
 listen 8080 8083 8082
 server_name 1337.com localhost:8082
-# max_body_size 10000000
+max_body_size 1000000000000
 
 
 location / {
   index index.php index.html
   root /
-  allow_method GET DELET
+  allow_method GET POST
   auto_index on
-  uplode on //
+  uplode on /home/abdelhay/webserv/
   cgi on
   # cgi_path .php /php-cgi
 }
@@ -48,7 +48,7 @@ server {
 host 127.0.0.1
 listen 8080 8081 
 server_name 1337.com
-max_body_size 10000000
+max_body_size 100000000
 
 
 location / {
