@@ -48,7 +48,7 @@ server {
 host 127.0.0.1
 listen 8080 8081 
 server_name localhost:8080
-max_body_size 999999999
+max_body_size 99999999999999
 
 
 location / {
@@ -56,13 +56,13 @@ location / {
   root /home/lsemlali/Desktop/
   allow_method GET DELET POST
   auto_index on
-  uplode on //
+  uplode on /webserv
   cgi on
   cgi_path .php /usr/bin/php-cgi
 }
 location /test {
  return 42.fr
-  root /home/lsemlali/
+  root /home/lsemlali/Desktop
 }
 }
 

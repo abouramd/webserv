@@ -39,6 +39,6 @@ struct Client {
 };
 
 void                                        moveBuf( Client & request, int amount );
-void                                        bodyParser(Client & req);
 void                                        reqParser(Client & request, int sock, std::vector<Server> &serv);
 std::map<std::string, Location>::iterator   findServ(unsigned long &max_body_size, std::vector<Server>& serv, const std::string &host, const std::string &url);
+void										postHandler(Client & request);

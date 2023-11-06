@@ -1,8 +1,8 @@
-#include "reqParse.hpp"
+#include "Tools.hpp"
 #include <cstring>
 #include <filesystem>
 #include "sys/wait.h"
-#define ENV_SIZE 8
+#define ENV_SIZE 9
 
 class Cgi {
 private:
@@ -11,8 +11,6 @@ private:
 public:
 	Cgi( Client & );
 	~Cgi();
-	static bool pathExists( const char*, bool & );
-	static bool hasReadPermission( const char* );
 	char	*strDup( std::string );
 	void	setEnv();
 	void	executeCgi();
