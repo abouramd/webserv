@@ -22,7 +22,6 @@ void	Tools::getAndCheckPath(std::string & uploadPath, std::string & extension) {
 
 	if (!Tools::pathExists(uploadPath.c_str(), isDir, r, w))
 		throw 404;
-  std::cout << "right acc of " << uploadPath.c_str() << " >" << isDir << r << w << std::endl;
 	if (!isDir || !w)
 		throw 403;
 	ss << uploadPath + "/" << rand() << "_file." << extension;
@@ -58,4 +57,14 @@ void Tools::decodeUri(std::string &uri) {
 			result += uri[i];
 	}
 	uri = result;
+}
+
+bool	Tools::getExtension(std::string & target, std::string & extension) {
+	for (int i = target.size() - 1; i >= 0; i--) {
+		if (target[i] == '.') {
+			extension = target.substr(i);
+			return true;
+		}
+	}
+	return false;
 }

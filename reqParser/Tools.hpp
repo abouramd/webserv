@@ -7,4 +7,5 @@ public:
 	static void	getAndCheckPath(std::string &, std::string &);
 	static void	decode(std::string &);
 	static void	decodeUri(std::string &);
+	static bool	getExtension(std::string & target, std::string & extension);
 };

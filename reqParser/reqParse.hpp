@@ -32,7 +32,10 @@ struct Client {
 	bool										isCgi;
     size_t                                      state, chunkSize, buffSize, position;
     char                                        buf[BUFF_SIZE + 1];
-    std::string                                 method, target, version, host, sizeDept, headersBuf, cgiFileName, cgiScript;
+    std::string                                 method, target, version, host;
+	std::string									sizeDept, headersBuf;
+	std::string									cgiFileName, cgiScript;
+	std::string 								path, query, fullPath;
     std::map<std::string, std::string>          headers;
     std::ifstream                               *is;
     std::ofstream                               *outfile;

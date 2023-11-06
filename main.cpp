@@ -15,6 +15,7 @@
 #include <utility>
 #include <ctime>
 #include <cstdlib>
+#include <csignal>
 
 
 
@@ -82,6 +83,7 @@ int get_max_fd( std::vector<Socket> &my_s )
 
 int main(int ac, char **av)
 {
+	std::signal(SIGPIPE, SIG_IGN);
 	std::srand(time(NULL));
   Config obj;
   try{

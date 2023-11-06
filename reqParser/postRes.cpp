@@ -81,32 +81,41 @@ void    bodyParser(Client & request) {
     }
 }
 
-void	postHandler(Client & request) {
-	if (!request.outfile->is_open()) {
-		if (request.isCgi) {
-			std::stringstream	ss;
+void	createOutfile(Client & request) {
+	if (request.location->second.cgi.first) {
+		std::string extension;
 
-			ss << rand();
-			request.cgiFileName = "_tmp/" + ss.str() + "_cgi_in.tmp";
-			request.outfile->open(request.cgiFileName.c_str());
-		}
-		else if (request.location->second.uplode.first) {
-			std::string		extension , uploadPath;
+		if (Tools::getExtension(request.path, extension)) {
+			std::map<std::string, std::string>::iterator it = request.location->second.cgi.second.find(extension);
 
-			extension = FileType::getExt(request.headers["Content-Type"]);
-			uploadPath = request.location->second.root + request.location->second.uplode.second;
-			Tools::getAndCheckPath(uploadPath, extension);
-      std::cout << ">>>>>" << uploadPath << std::endl;
-			request.outfile->open(uploadPath.c_str());
+			if (it != request.location->second.cgi.second.end()) {
+				std::stringstream	ss;
+
+				request.cgiScript = it->second;
+				request.isCgi = true;
+				ss << rand();
+				request.cgiFileName = "_tmp/" + ss.str() + "_cgi_in.tmp";
+				request.outfile->open(request.cgiFileName.c_str());
+			}
+			else if (request.location->second.uplode.first) {
+				std::string		uploadPath;
+
+				extension = FileType::getExt(request.headers["Content-Type"]);
+				uploadPath = request.location->second.root + request.location->second.uplode.second;
+				Tools::getAndCheckPath(uploadPath, extension);
+				request.outfile->open(uploadPath.c_str());
+			}
+			else
+				throw 405;
 		}
-		else
-			throw 405;
-		if (!request.outfile->is_open())
-    {
-      std::cout << "request" << std::endl;
-			throw 501;
-    }
 	}
+}
+
+
+void	postHandler(Client & request) {
+
+	if (!request.outfile->is_open())
+		createOutfile(request);
 	if (request.chunkSize >= request.buffSize) {
 		std::cout << "mmmm" << std::endl;
 

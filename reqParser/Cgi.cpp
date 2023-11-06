@@ -43,11 +43,11 @@ void  Cgi::executeCgi() {
 	setEnv();
 	ss << "_tmp/" << rand() << "_cgi_out.tmp";
 	args[0] = new char[request.cgiScript.size() + 1];
-	args[1] = new char[request.location->second.root.size() + request.target.size() + 1];
+	args[1] = new char[request.fullPath.size() + 1];
 	bzero(args[0], request.cgiScript.size() + 1);
-	bzero(args[1], request.location->second.root.size() + request.target.size() + 1);
+	bzero(args[1], request.fullPath.size() + 1);
 	strcpy(args[0], request.cgiScript.c_str());
-	strcpy(args[1], (request.location->second.root + request.target).c_str());
+	strcpy(args[1], request.fullPath.c_str());
 	args[2] = NULL;
 	request.outfile->close();
 	pid = fork();
