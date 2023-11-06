@@ -1,4 +1,14 @@
 #include "Client.hpp"
+#include <ctime>
+
+Client::Client(int fd, std::ifstream *i, std::ofstream *o)  : is(i), outfile(o) {
+    this->fd = fd;
+	  this->isCgi = false;
+    this->position = 0;
+    this->chunkSize = 0;
+    this->state = NOT_DONE;
+    this->request_time = std::time(NULL);
+}
 
 Client::Client(int fd, std::ifstream *i, std::ofstream *o)  : is(i), outfile(o) {
     this->fd = fd;
@@ -16,7 +26,7 @@ void	Client::reset() {
 	this->host.clear();
 	this->sizeDept.clear();
 	this->headersBuf.clear();
-	this->response.clear();
 	this->headers.clear();
 	this->outfile->close();
+	this->isCgi = false;
 }

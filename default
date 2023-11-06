@@ -25,40 +25,22 @@
 server {
 host 127.0.0.1
 listen 8080 8083 8082
-server_name  localhost:8082
-# max_body_size 10000000
+server_name 1337.com localhost:8082
+max_body_size 1000000000000
 
 
 location / {
-  #index index.php index.html
-  root www
-  allow_method GET DELET
+  index index.php index.html
+  root /
+  allow_method GET POST
   auto_index on
-  uplode on //
+  uplode on /home/abdelhay/webserv/
   cgi on
   # cgi_path .php /php-cgi
 }
 location /test {
-  #index index.py index.html index.php
-  # return http://42.fr
-  root www/realtest
-  allow_method GET DELET
-  auto_index on
-  cgi_path php /bin/php-cgi
-  cgi_path py /bin/python3
-  uplode on //
-  cgi on
-}
-location /hhhh {
-  #index index.py index.html index.php
-  # return http://42.fr
-  root www/hhhh
-  allow_method GET DELET
-  auto_index on
-  cgi_path php php-cgi
-  cgi_path py /usr/bin/python3
-  uplode on //
-  cgi on
+ return 42.fr
+  root /
 }
 }
 
@@ -66,7 +48,7 @@ server {
 host 127.0.0.1
 listen 8080 8081 
 server_name 1337.com
-max_body_size 10000000
+max_body_size 100000000
 
 
 location / {
@@ -76,11 +58,11 @@ location / {
   auto_index on
   uplode on //
   cgi on
-  # cgi_path php /php-cgi
+  # cgi_path .php /php-cgi
 }
 location /test {
  return 42.fr
-  root www/realtest
+  root /
 }
 }
 
