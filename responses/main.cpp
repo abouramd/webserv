@@ -3,10 +3,10 @@
 void responses(Client &client)
 {
     char buffer[100];
-    std::string ftarget = client.target;
-    std::string get_query = "";
     if (!client.is->is_open())
     {
+        std::string ftarget = client.target;
+        std::string get_query = "";
         client.state_string = "200 OK";
         get_target(client, get_query);
         error_handling(client);
@@ -36,7 +36,7 @@ void responses(Client &client)
                     while (std::getline(*client.is, head) && head != "\r" && head != "")
                     {
                         header += head;
-                        header += "\r\n";
+                        header += "\n";
                     }
                 }
                 else

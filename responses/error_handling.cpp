@@ -23,11 +23,4 @@ void error_handling(Client &client)
         client.method = "GET";
         return;
     }
-    if (client.target.size() > 2048)
-    {
-        client.target = "error_pages/414.html";
-        client.state_string = "414 Request-URI Too Long";
-        client.method = "GET";
-        return;
-    }
 }

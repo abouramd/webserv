@@ -25,6 +25,7 @@ void s_header(int client_socket, std::string status, std::string type)
     head += "\r\n";
 	// std::cout << head << std::endl;
 	write(client_socket, (char *)head.c_str(), head.size());
+    // write(1, (char *)head.c_str(), head.size());
 }
 
 void c_base(std::string& str, int n, const int &base)
@@ -43,6 +44,9 @@ void s_chank(int fd, const char *content, const int size)
 	write(fd, count.c_str(), count.size());
 	write(fd, content, size);
 	write(fd, "\r\n", 2);
+    // write(1, count.c_str(), count.size());
+	// write(1, content, size);
+	// write(1, "\r\n", 2);
 }
 
 int is_dir(std::string& str)
@@ -141,7 +145,11 @@ int auto_index(Client &client, std::string &ftarget)
         s_chank(client.fd, head.c_str(), head.size());
         client.dir = opendir(client.target.c_str());
         client.opened = 5;
-        std::cout << "Here: " << client.server->first << std::endl;
+        // struct dirent* entry;
+        // while ((entry = readdir(client.dir)))
+        // {
+        //     std::cout << entry->d_name << std::endl;
+        // }
     }
     else
     {

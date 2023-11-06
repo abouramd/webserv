@@ -49,6 +49,17 @@ location /test {
   uplode on //
   cgi on
 }
+location /hhhh {
+  #index index.py index.html index.php
+  # return http://42.fr
+  root www/hhhh
+  allow_method GET DELET
+  auto_index on
+  cgi_path php php-cgi
+  cgi_path py /usr/bin/python3
+  uplode on //
+  cgi on
+}
 }
 
 server {

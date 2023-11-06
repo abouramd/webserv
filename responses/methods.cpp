@@ -3,7 +3,7 @@
 void get(Client &client, std::string &get_query, std::string &ftarget)
 {
     (void)get_query;
-    if (access(client.target.c_str(), R_OK))
+    if (!access(client.target.c_str(), F_OK) && access(client.target.c_str(), R_OK))
     {
         client.target = "error_pages/403.html";
         client.state_string = "403 Forbidden";
@@ -24,7 +24,10 @@ void get(Client &client, std::string &get_query, std::string &ftarget)
     else if (is_dir(client.target) == 1)
     {
         if (ftarget[ftarget.length() - 1] != '/')
+        {
             redirect(client, ftarget + "/");
+            return;
+        }
         if (get_index(client))
         {
             std::string type = FileType::getContentType(get_ex(client.target));
