@@ -138,6 +138,7 @@ int main(int ac, char **av)
         }
         else if (FD_ISSET(it_s->client[i].fd, &tmp_read))
         {
+          it_s->client[i].request_time = std::time(NULL);
           reqParser(it_s->client[i], it_s->client[i].fd, it_s->serv);
           if ( it_s->client[i].state == DONE )
           {
@@ -155,6 +156,16 @@ int main(int ac, char **av)
             it_s->client.erase(it_s->client.begin() + i); 
           }
         }
+        else if (it_s->client[i].state != DONE && it_s->client[i].request_time + 5 < std::time(NULL)) {
+          FD_CLR(it_s->client[i].fd, &sread);
+          close(it_s->client[i].fd);
+          delete map_files[it_s->client[i].fd].first;
+          delete map_files[it_s->client[i].fd].second;
+          map_files.erase(it_s->client[i].fd);
+          std::cout << PURPLE << get_time() << " remove a client " << it_s->client[i].fd << DFL << std::endl;
+          it_s->client.erase(it_s->client.begin() + i); 
+        }
+
       }
       if (FD_ISSET(it_s->getFd(), &tmp_read))
       {

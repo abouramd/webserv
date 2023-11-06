@@ -34,7 +34,7 @@ location / {
   root /home/lsemlali/Desktop/
   allow_method GET DELET
   auto_index on
-  uplode on //
+  uplode on /
   cgi on
   # cgi_path .php /home/lsemlali/Desktop/php-cgi
 }
