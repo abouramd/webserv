@@ -30,7 +30,7 @@ server_name  localhost:8082
 
 
 location / {
-  index index.php index.html
+  #index index.php index.html
   root www
   allow_method GET DELET
   auto_index on

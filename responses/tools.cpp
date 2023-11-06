@@ -70,7 +70,7 @@ void get_target(Client &client, std::string &get_query)
     int i = 0, flag = 0;
     size_t found = client.target.find(client.server->first);
     if (found != std::string::npos)
-        client.target.replace(found, client.server->first.length(), client.server->second.root);
+        client.target.replace(found, client.server->first.length(), client.server->second.root + "/");
     while(client.target[i])
     {
         if (client.target[i] == '?')
@@ -84,6 +84,7 @@ void get_target(Client &client, std::string &get_query)
         i++;
     }
     client.target = target;
+    client.real_target = 5;
 }
 
 std::string get_ex(std::string str)
@@ -145,11 +146,6 @@ int auto_index(Client &client, std::string &ftarget)
         s_chank(client.fd, head.c_str(), head.size());
         client.dir = opendir(client.target.c_str());
         client.opened = 5;
-        // struct dirent* entry;
-        // while ((entry = readdir(client.dir)))
-        // {
-        //     std::cout << entry->d_name << std::endl;
-        // }
     }
     else
     {

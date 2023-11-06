@@ -8,6 +8,8 @@ void get(Client &client, std::string &get_query, std::string &ftarget)
         client.target = "error_pages/403.html";
         client.state_string = "403 Forbidden";
     }
+    std::cout << ftarget << std::endl;
+    std::cout << client.target << std::endl;
     if (is_dir(client.target) == 0)
     {
         std::string type = FileType::getContentType(get_ex(client.target));
@@ -23,7 +25,7 @@ void get(Client &client, std::string &get_query, std::string &ftarget)
     }
     else if (is_dir(client.target) == 1)
     {
-        if (ftarget[ftarget.length() - 1] != '/')
+        if (ftarget[ftarget.length() - 1] != '/' && client.opened != 5)
         {
             redirect(client, ftarget + "/");
             return;
@@ -54,6 +56,7 @@ void get(Client &client, std::string &get_query, std::string &ftarget)
     }
     else
     {
+        std::cout << "404" << std::endl;
         s_header(client.fd, "404 Page Not Found", "text/html");
         client.is->open("error_pages/404.html");
     }

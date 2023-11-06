@@ -8,7 +8,8 @@ void responses(Client &client)
         std::string ftarget = client.target;
         std::string get_query = "";
         client.state_string = "200 OK";
-        get_target(client, get_query);
+        if (client.real_target != 5)
+            get_target(client, get_query);
         error_handling(client);
         if (client.method == "GET")
         {
