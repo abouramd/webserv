@@ -68,9 +68,9 @@ void get_target(Client &client, std::string &get_query)
 {
     std::string target = "";
     int i = 0, flag = 0;
-    size_t found = client.target.find(client.server->first);
+    size_t found = client.target.find(client.location->first);
     if (found != std::string::npos)
-        client.target.replace(found, client.server->first.length(), client.server->second.root + "/");
+        client.target.replace(found, client.location->first.length(), client.location->second.root + "/");
     while(client.target[i])
     {
         if (client.target[i] == '?')
@@ -112,9 +112,9 @@ std::string get_ex(std::string str)
 
 int is_cgi(Client &client)
 {
-    if (client.server->second.cgi.first)
+    if (client.location->second.cgi.first)
     {
-        if (client.server->second.cgi.second.find(get_ex(client.target)) != client.server->second.cgi.second.end())
+        if (client.location->second.cgi.second.find(get_ex(client.target)) != client.location->second.cgi.second.end())
             return 1;
     }
     return 0;
@@ -124,9 +124,9 @@ int get_index(Client &client)
 {
     int i = 0;
     std::string index;
-    while(i < (int)client.server->second.index.size())
+    while(i < (int)client.location->second.index.size())
     {
-        index = client.target + "/" + client.server->second.index[i];
+        index = client.target + "/" + client.location->second.index[i];
         if (access(index.c_str(), F_OK | R_OK) == 0)
         {
             client.target = index;

@@ -66,22 +66,9 @@ void    bodyParser(Client & request) {
 		unCh(request);
 	}
     else {
-<<<<<<< HEAD
-        size_t st = request.position;
-
-        if (request.contentLength <= request.buffSize - st) {
-			while (request.contentLength > 0) {
-                *(request.outfile) << request.buf[st++];
-                request.contentLength--;
-            }
-            throw 200;
-		}
-		else {
-=======
 		size_t st = request.position;
 
 		if (request.contentLength >= request.buffSize - st) {
->>>>>>> master
 			while (st < request.buffSize)
 				*(request.outfile) << request.buf[st++];
 			request.contentLength -= request.buffSize - request.position;
@@ -107,14 +94,16 @@ void	createOutfile(Client & request) {
 				request.cgiScript = it->second;
 				request.isCgi = true;
 				ss << rand();
-				request.cgiFileName = "_tmp/" + ss.str() + "_cgi_in.tmp";
+				request.cgiFileName = "temp/" + ss.str() + "_cgi_in.tmp";
 				request.outfile->open(request.cgiFileName.c_str());
 			}
-			else if (request.location->second.uplode.first) {
+			else
+            if (request.location->second.uplode.first) {
 				std::string		uploadPath;
 
 				extension = FileType::getExt(request.headers["Content-Type"]);
 				uploadPath = request.location->second.root + request.location->second.uplode.second;
+                std::cout << RED <<  "uploadPath: " << uploadPath << DFL << std::endl;
 				Tools::getAndCheckPath(uploadPath, extension);
 				request.outfile->open(uploadPath.c_str());
 			}
@@ -130,7 +119,7 @@ void	postHandler(Client & request) {
 	if (!request.outfile->is_open())
 		createOutfile(request);
 	if (request.chunkSize >= request.buffSize) {
-		std::cout << "mmmm" << std::endl;
+		// std::cout << "mmmm" << std::endl;
 
 		request.outfile->write(request.buf, request.buffSize);
 		request.chunkSize -= request.buffSize;

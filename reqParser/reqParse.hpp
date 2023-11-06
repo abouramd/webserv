@@ -27,9 +27,6 @@
 struct Client {
     Client(int fd, std::ifstream* i, std::ofstream* o);
 	void	reset();
-
-<<<<<<< HEAD
-    std::map<std::string, Location>::iterator   server;
     unsigned long                               contentLength, maxBodySize;
     int                                         fd, statusCode;
     size_t                                      state, chunkSize, buffSize, position;
@@ -42,32 +39,15 @@ struct Client {
     DIR* dir;
     std::time_t currentTime;
     std::string state_string;
-    
+    std::map<std::string, Location>::iterator   location;
+	bool										isCgi;
+	std::string									cgiFileName, cgiScript;
+	std::string 								path, query, fullPath;
+    std::time_t request_time; 
 };
 
 void                                        moveBuf( Client & request, int amount );
 void                                        bodyParser(Client & req);
 void                                        reqParser(Client & request, int sock, std::vector<Server> &serv);
 std::map<std::string, Location>::iterator   findServ(unsigned long &max_body_size, std::vector<Server>& serv, const std::string &host, const std::string &url);
-=======
-    std::map<std::string, Location>::iterator   location;
-    unsigned long                               contentLength, maxBodySize;
-    int                                         fd, statusCode;
-	bool										isCgi;
-    size_t                                      state, chunkSize, buffSize, position;
-    char                                        buf[BUFF_SIZE + 1];
-    std::string                                 method, target, version, host;
-	std::string									sizeDept, headersBuf;
-	std::string									cgiFileName, cgiScript;
-	std::string 								path, query, fullPath;
-    std::map<std::string, std::string>          headers;
-    std::ifstream                               *is;
-    std::ofstream                               *outfile;
-    std::time_t request_time; 
-};
-
-void                                        moveBuf( Client & request, int amount );
-void                                        reqParser(Client & request, int sock, std::vector<Server> &serv);
-std::map<std::string, Location>::iterator   findServ(unsigned long &max_body_size, std::vector<Server>& serv, const std::string &host, const std::string &url);
 void										postHandler(Client & request);
->>>>>>> master

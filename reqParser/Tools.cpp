@@ -66,5 +66,5 @@ bool	Tools::getExtension(std::string & target, std::string & extension) {
 			return true;
 		}
 	}
-	return false;
+	return true;
 }

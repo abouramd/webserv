@@ -35,7 +35,7 @@ std::string FileType::getExt(const std::string & contenttype)
   for (std::map<std::string, std::string>::iterator it = fileTypesRev.begin(); it != fileTypesRev.end(); it++)
     if (it->first == contenttype)
       return it->second;
- throw 415;
+  return ".bin";
 }
 
 std::string FileType::getContentType(const std::string & ext)

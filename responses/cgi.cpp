@@ -63,7 +63,7 @@ void cgi(Client &client, std::string &get_query)
         // }
         std::string Query = "QUERY_STRING=" + get_query;
         dup2(fd, 1);
-        char* argv[] = { const_cast<char*>(client.server->second.cgi.second[get_ex(client.target)].c_str()), const_cast<char*>(client.target.c_str()), NULL };
+        char* argv[] = { const_cast<char*>(client.location->second.cgi.second[get_ex(client.target)].c_str()), const_cast<char*>(client.target.c_str()), NULL };
         execve(argv[0], argv, env);
     }
     else

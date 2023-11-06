@@ -41,7 +41,7 @@ void  Cgi::executeCgi() {
 	std::stringstream	ss;
 
 	setEnv();
-	ss << "_tmp/" << rand() << "_cgi_out.tmp";
+	ss << "temp/" << rand() << "_cgi_out.tmp";
 	args[0] = new char[request.cgiScript.size() + 1];
 	args[1] = new char[request.fullPath.size() + 1];
 	bzero(args[0], request.cgiScript.size() + 1);

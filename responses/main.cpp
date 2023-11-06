@@ -5,18 +5,25 @@ void responses(Client &client)
     char buffer[100];
     if (!client.is->is_open())
     {
-        std::string ftarget = client.target;
+        std::string ftarget = "/" + client.target;
         std::string get_query = "";
         client.state_string = "200 OK";
         if (client.real_target != 5)
-            get_target(client, get_query);
+        {
+            client.target = "/" + client.target;
+            // get_target(client, get_query);
+            client.real_target = 5;
+            get_query = client.query;
+            client.target = client.fullPath;
+        }
+        // std::cout << client.target << std::endl;
         error_handling(client);
         if (client.method == "GET")
         {
-            if (client.server->second.redirect.empty())
+            if (client.location->second.redirect.empty())
                 get(client, get_query, ftarget);
             else
-                redirect(client, client.server->second.redirect);
+                redirect(client, client.location->second.redirect);
         }
         else if (client.method == "DELETE")
         {

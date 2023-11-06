@@ -43,7 +43,7 @@ void get(Client &client, std::string &get_query, std::string &ftarget)
                 cgi(client, get_query);
             }
         }else{
-            if (client.server->second.auto_index)
+            if (client.location->second.auto_index)
             {
                 auto_index(client, ftarget);
             }
