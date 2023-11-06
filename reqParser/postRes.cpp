@@ -1,4 +1,4 @@
-#include "reqParse.hpp"
+#include "Tools.hpp"
 
 bool getSize(Client & request, size_t & st) {
     std::stringstream   sizeStream;
@@ -62,19 +62,54 @@ void    unCh(Client & request) {
 }
 
 void    bodyParser(Client & request) {
-    if (request.headers["Transfer-Encoding"] == "chunked")
-        unCh(request);
+	if (request.headers["Transfer-Encoding"] == "chunked") {
+		unCh(request);
+	}
     else {
-        size_t st = request.position;
+		size_t st = request.position;
 
-        if (request.contentLength <= request.buffSize - st) {
-			while (request.contentLength > 0) {
-                *(request.outfile) << request.buf[st++];
-                request.contentLength--;
-            }
-            throw 200;
+		if (request.contentLength >= request.buffSize - st) {
+			while (st < request.buffSize)
+				*(request.outfile) << request.buf[st++];
+			request.contentLength -= request.buffSize - request.position;
+			request.position = 0;
+			if (request.contentLength == 0)
+				throw 200;
 		}
 		else
 			throw 413;
     }
+}
+
+void	postHandler(Client & request) {
+	if (!request.outfile->is_open()) {
+		if (request.isCgi) {
+			std::stringstream	ss;
+
+			ss << rand();
+			request.cgiFileName = "_tmp/" + ss.str() + "_cgi_in.tmp";
+			request.outfile->open(request.cgiFileName.c_str());
+		}
+		else if (request.location->second.uplode.first) {
+			std::string		extension , uploadPath;
+
+			extension = FileType::getExt(request.headers["Content-Type"]);
+			uploadPath = request.location->second.root + request.location->second.uplode.second;
+			Tools::getAndCheckPath(uploadPath, extension);
+			request.outfile->open(uploadPath.c_str());
+		}
+		else
+			throw 405;
+		if (!request.outfile->is_open())
+			throw 501;
+	}
+	if (request.chunkSize >= request.buffSize) {
+		std::cout << "mmmm" << std::endl;
+
+		request.outfile->write(request.buf, request.buffSize);
+		request.chunkSize -= request.buffSize;
+		request.position = 2;
+	}
+	else
+		bodyParser(request);
 }

@@ -8,20 +8,6 @@ Cgi::~Cgi() {
 	delete[] env;
 }
 
-bool Cgi::pathExists(const char* filename, bool	& isDir) {
-	struct stat fileState;
-	if (stat(filename, &fileState) == 0) {
-		if (S_ISDIR(fileState.st_mode))
-			isDir = true;
-		return true;
-	}
-	return false;
-}
-
-bool Cgi::hasReadPermission(const char* filename) {
-	return (access(filename, R_OK) == 0);
-}
-
 char	*Cgi::strDup(std::string src) {
 	size_t	size = src.size();
 	char	*newStr;
@@ -43,7 +29,8 @@ void Cgi::setEnv() {
 	env[4] = strDup("SCRIPT_FILENAME=" + root + request.target);
 	env[5] = strDup("SCRIPT_NAME=" + request.target);
 	env[6] = strDup("REDIRECT_STATUS=200");
-	env[7] = NULL;
+	env[7] = strDup("PATH_INFO=" + request.location->second.root + request.target);
+	env[8] = NULL;
 }
 
 void  Cgi::executeCgi() {
