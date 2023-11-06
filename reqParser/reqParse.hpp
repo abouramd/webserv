@@ -11,6 +11,7 @@
 #include <string>
 #include <dirent.h>
 #include "../Server.hpp"
+#include <ctime>
 
 #define NOT_DONE 0
 #define DONE_WITH_HEADERS 1

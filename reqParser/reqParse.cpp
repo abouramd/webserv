@@ -116,7 +116,7 @@ void    headersParsing(Client & request, std::vector<Server>& serv) {
         if (request.contentLength > request.maxBodySize)
             request.contentLength = request.maxBodySize;
     }
-	else
+	  else
 		request.headersBuf += request.buf;
 }
 

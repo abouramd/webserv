@@ -71,6 +71,6 @@ void cgi(Client &client, std::string &get_query)
         client.currentTime = time(NULL);
         client.is_cgi = 5;
         client.method = filename;
-        client.is->open(filename);
+        client.is->open(filename.c_str());
     }
 }

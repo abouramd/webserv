@@ -44,8 +44,8 @@ location /test {
   root www/realtest
   allow_method GET DELET
   auto_index on
-  cgi_path php php-cgi
-  cgi_path py /usr/bin/python3
+  cgi_path php /bin/php-cgi
+  cgi_path py /bin/python3
   uplode on //
   cgi on
 }

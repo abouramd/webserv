@@ -8,15 +8,15 @@ void get(Client &client, std::string &get_query, std::string &ftarget)
         client.target = "error_pages/403.html";
         client.state_string = "403 Forbidden";
     }
-    std::cout << ftarget << std::endl;
-    std::cout << client.target << std::endl;
+    // std::cout << ftarget << std::endl;
+    // std::cout << client.target << std::endl;
     if (is_dir(client.target) == 0)
     {
         std::string type = FileType::getContentType(get_ex(client.target));
         if (!is_cgi(client))
         {
             s_header(client.fd, client.state_string, type);
-            client.is->open(client.target);
+            client.is->open(client.target.c_str());
         }
         else
         {
@@ -36,7 +36,7 @@ void get(Client &client, std::string &get_query, std::string &ftarget)
             if (!is_cgi(client))
             {
                 s_header(client.fd, client.state_string, type);
-                client.is->open(client.target);
+                client.is->open(client.target.c_str());
             }
             else
             {
