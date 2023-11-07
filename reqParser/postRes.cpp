@@ -95,7 +95,6 @@ void	createOutfile(Client & request) {
 			request.isCgi = true;
 			ss << rand();
 			request.cgiFileName = "temp/" + ss.str() + "_cgi_in.tmp";
-			std::cout << request.cgiFileName << ",,,,," << std::endl;
 			request.outfile->open(request.cgiFileName.c_str());
 		}
 	}
