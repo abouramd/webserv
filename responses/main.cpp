@@ -5,24 +5,13 @@ void responses(Client &client)
     char buffer[100];
     if (!client.is->is_open())
     {
-		std::cout << client.target << std::endl;
-        std::string ftarget = client.target;
-        std::string get_query = "";
+        std::string ftarget = client.location->first + client.target;
         client.state_string = "200 OK";
-        if (client.real_target != 5)
-        {
-//            client.target = "/" + client.target;
-            // get_target(client, get_query);
-            client.real_target = 5;
-            get_query = client.query;
-            client.target = client.fullPath;
-        }
-        // std::cout << client.target << std::endl;
         error_handling(client);
         if (client.method == "GET")
         {
             if (client.location->second.redirect.empty())
-                get(client, get_query, ftarget);
+                get(client, ftarget);
             else
                 redirect(client, client.location->second.redirect);
         }
@@ -40,7 +29,7 @@ void responses(Client &client)
                 std::string header = "HTTP/1.1 200 OK\r\n";
                 header += "Transfer-Encoding: chunked\r\n";
                 std::string head;
-                if (!(get_ex(client.target).compare("php")))
+                if (!(get_ex(client.fullPath).compare("php")))
                 {
                     while (std::getline(*client.is, head) && head != "\r" && head != "")
                     {

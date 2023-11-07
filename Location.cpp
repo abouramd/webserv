@@ -153,13 +153,13 @@ void Location::set_method(const std::string &str)
       
       this->allow_method.push_back("POST");
     }
-    else if (*it == "DELET")
+    else if (*it == "DELETE")
     {
       if (this->dup[4])
-        throw std::string("Error: The DELET method is duplicated `" + str + "`.");
+        throw std::string("Error: The DELETE method is duplicated `" + str + "`.");
       this->dup[4] = true;
       
-      this->allow_method.push_back("DELET");
+      this->allow_method.push_back("DELETE");
     }
     else
       throw std::string("Error: unknowing method `" + *it + "` in (" + str + ")");

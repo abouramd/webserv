@@ -1,29 +1,27 @@
 #include "responses.hpp"
 
-void get(Client &client, std::string &get_query, std::string &ftarget)
+void get(Client &client, std::string &ftarget)
 {
-    (void)get_query;
-    if (!access(client.target.c_str(), F_OK) && access(client.target.c_str(), R_OK))
+    if (!access(client.fullPath.c_str(), F_OK) && access(client.fullPath.c_str(), R_OK))
     {
-        client.target = "error_pages/403.html";
+        client.fullPath = "error_pages/403.html";
         client.state_string = "403 Forbidden";
     }
-    // std::cout << ftarget << std::endl;
-    // std::cout << client.target << std::endl;
-    if (is_dir(client.target) == 0)
+
+    if (is_dir(client.fullPath) == 0)
     {
-        std::string type = FileType::getContentType(get_ex(client.target));
+        std::string type = FileType::getContentType(get_ex(client.fullPath));
         if (!is_cgi(client))
         {
             s_header(client.fd, client.state_string, type);
-            client.is->open(client.target.c_str());
+            client.is->open(client.fullPath.c_str());
         }
         else
         {
-            cgi(client, get_query);
+            cgi(client);
         }
     }
-    else if (is_dir(client.target) == 1)
+    else if (is_dir(client.fullPath) == 1)
     {
         if (ftarget[ftarget.length() - 1] != '/' && client.opened != 5)
         {
@@ -32,15 +30,15 @@ void get(Client &client, std::string &get_query, std::string &ftarget)
         }
         if (get_index(client))
         {
-            std::string type = FileType::getContentType(get_ex(client.target));
+            std::string type = FileType::getContentType(get_ex(client.fullPath));
             if (!is_cgi(client))
             {
                 s_header(client.fd, client.state_string, type);
-                client.is->open(client.target.c_str());
+                client.is->open(client.fullPath.c_str());
             }
             else
             {
-                cgi(client, get_query);
+                cgi(client);
             }
         }else{
             if (client.location->second.auto_index)
@@ -73,8 +71,8 @@ int delete_dir(std::string name)
     {
         if (!std::string(entry->d_name).compare("..") || !std::string(entry->d_name).compare("."))
             continue;
-        path = name +"/"+ std::string(entry->d_name);
-        if (is_dir(path) == 1 && path[0] != '.')
+        path = name +"/"+ std::string(entry->d_name) ;
+        if (is_dir(path) == 1)
         {
             delete_dir(path);
         }
@@ -90,15 +88,15 @@ int delete_dir(std::string name)
 
 void ft_delete(Client &client)
 {
-    if (is_dir(client.target) == 0)
+    if (is_dir(client.fullPath) == 0)
     {
-        remove(client.target.c_str());
+        remove(client.fullPath.c_str());
         s_header(client.fd, "204 Deleted", "text/html");
         client.is->open("error_pages/204.html");
     }
-    else if (is_dir(client.target) == 1)
+    else if (is_dir(client.fullPath) == 1)
     {
-        delete_dir(client.target);
+        delete_dir(client.fullPath);
         s_header(client.fd, "204 Deleted", "text/html");
         client.is->open("error_pages/204.html");
     }

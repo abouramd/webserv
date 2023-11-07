@@ -64,28 +64,7 @@ int is_dir(std::string& str)
     return 2;
 }
 
-void get_target(Client &client, std::string &get_query)
-{
-    std::string target = "";
-    int i = 0, flag = 0;
-    size_t found = client.target.find(client.location->first);
-    if (found != std::string::npos)
-        client.target.replace(found, client.location->first.length(), client.location->second.root + "/");
-    while(client.target[i])
-    {
-        if (client.target[i] == '?')
-            flag = 1;
-        else{
-            if (!flag)
-                target += client.target[i];
-            else
-                get_query += client.target[i];
-        }
-        i++;
-    }
-    client.target = target;
-    client.real_target = 5;
-}
+
 
 std::string get_ex(std::string str)
 {
@@ -114,7 +93,7 @@ int is_cgi(Client &client)
 {
     if (client.location->second.cgi.first)
     {
-        if (client.location->second.cgi.second.find(get_ex(client.target)) != client.location->second.cgi.second.end())
+        if (client.location->second.cgi.second.find(get_ex(client.fullPath)) != client.location->second.cgi.second.end())
             return 1;
     }
     return 0;
@@ -126,10 +105,10 @@ int get_index(Client &client)
     std::string index;
     while(i < (int)client.location->second.index.size())
     {
-        index = client.target + "/" + client.location->second.index[i];
+        index = client.fullPath + "/" + client.location->second.index[i];
         if (access(index.c_str(), F_OK | R_OK) == 0)
         {
-            client.target = index;
+            client.fullPath = index;
             return 1;
         }
         i++;
@@ -144,7 +123,7 @@ int auto_index(Client &client, std::string &ftarget)
         s_header(client.fd, "200 OK", "text/html");
         std::string head = "<!DOCTYPE html><html><head><title>Index of "+ftarget+"</title><style>body {font-family: Arial, sans-serif;}h1 {text-align: center; font-size: 150px}ul {    list-style-type: none; text-align: center;    padding: 0; font-size: 100px}li {    margin: 5px 0;}li a {    text-decoration: none;    color: #0074d9;}li a:hover {    text-decoration: underline;}</style></head><body><h1>Index of "+ftarget+"</h1><ul>";
         s_chank(client.fd, head.c_str(), head.size());
-        client.dir = opendir(client.target.c_str());
+        client.dir = opendir(client.fullPath.c_str());
         client.opened = 5;
     }
     else

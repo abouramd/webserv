@@ -2,7 +2,7 @@
 #include <string>
 
 
-char **get_env(Client &client, std::string &get_query)
+char **get_env(Client &client)
 {
     std::map<std::string, std::string>  env;
     // env["AUTH_TYPE"] = "";
@@ -10,7 +10,7 @@ char **get_env(Client &client, std::string &get_query)
     // env["CONTENT_TYPE"] = ?;
     //env["PATH_INFO"] = ?;
     //env["PATH_TRANSLATED"] = ?;
-    env["QUERY_STRING"] = get_query;
+    env["QUERY_STRING"] = client.query;
     // env["REMOTE_HOST"] = ?;
     // env["REMOTE_USER"] = "";
     // env["HTTP_COOKIE"] = ?;
@@ -19,7 +19,7 @@ char **get_env(Client &client, std::string &get_query)
     // env["GATEWAY_INTERFACE"] = "CGI/1.1";
     // env["REQUEST_URI"] = ?;
     // env["SCRIPT_NAME"] = ?;
-    env["SCRIPT_FILENAME"] = client.target;
+    env["SCRIPT_FILENAME"] = client.fullPath;
     // env["SERVER_NAME"] = ?;
     // env["SERVER_PROTOCOL"] = "HTTP/1.1";
     // env["SERVER_PORT"] = ?;
@@ -43,7 +43,7 @@ char **get_env(Client &client, std::string &get_query)
     return(keyValueArray);
 }
 
-void cgi(Client &client, std::string &get_query)
+void cgi(Client &client)
 {
     srand((unsigned) time(NULL));
     int num = rand();
@@ -54,16 +54,15 @@ void cgi(Client &client, std::string &get_query)
     int fd = open(filename.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
     if (!(client.pid = fork()))
     {
-        char** env = get_env(client, get_query);
+        char** env = get_env(client);
         // int i = 0;
         // while (env[i])
         // {
         //     std::cout << env[i] << std::endl;
         //     i++;
         // }
-        std::string Query = "QUERY_STRING=" + get_query;
         dup2(fd, 1);
-        char* argv[] = { const_cast<char*>(client.location->second.cgi.second[get_ex(client.target)].c_str()), const_cast<char*>(client.target.c_str()), NULL };
+        char* argv[] = { const_cast<char*>(client.location->second.cgi.second[get_ex(client.fullPath)].c_str()), const_cast<char*>(client.fullPath.c_str()), NULL };
         execve(argv[0], argv, env);
     }
     else
