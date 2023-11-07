@@ -12,7 +12,9 @@ void responses(Client &client)
             if (client.location->second.redirect.empty())
                 get(client);
             else
+            {
                 redirect(client, client.location->second.redirect);
+            }
         }
         else if (client.method == "DELETE")
         {
