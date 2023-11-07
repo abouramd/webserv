@@ -39,6 +39,8 @@ void    startHParsing(Client & request) {
 		std::string key, value;
 		key = header.substr(0, header.find(':'));
 		value = header.substr(header.find(':') + 2);
+		std::transform(key.begin(), key.begin(), key.end(), ::tolower);
+		std::transform(value.begin(), value.begin(), value.end(), ::tolower);
 //        std::cout << key << ",>>>," << value << std::endl;
 		if (key.empty() || value.empty() || request.headers.find(key) != request.headers.end())
 			throw 400;
@@ -100,13 +102,13 @@ void    headersParsing(Client & request, std::vector<Server>& serv) {
 		if (request.host.empty())
 			throw 400;
 		if (request.method == "POST") {
-			if (request.headers.find("Transfer-Encoding") != request.headers.end()) {
-				if (request.headers["Transfer-Encoding"] != "chunked")
+			if (request.headers.find("transfer-encoding") != request.headers.end()) {
+				if (request.headers["transfer-encoding"] != "chunked")
 					throw 501;
-				if (request.headers.find("Content-Length") != request.headers.end())
+				if (request.headers.find("content-length") != request.headers.end())
 					throw 400;
 			}
-			else if (request.headers.find("Content-Length") == request.headers.end())
+			else if (request.headers.find("content-length") == request.headers.end())
 				throw 400;
 		}
 		request.location = findServ(request.maxBodySize, serv, request.host, request.target);
@@ -117,7 +119,7 @@ void    headersParsing(Client & request, std::vector<Server>& serv) {
 		targetChecker(request);
 		request.position = pos;
 		request.state = DONE_WITH_HEADERS;
-		const char *ptr = request.headers["Content-Length"].c_str();
+		const char *ptr = request.headers["content-length"].c_str();
 		request.contentLength = std::strtol(ptr, NULL, 10);
 		if (request.contentLength > request.maxBodySize)
 			throw 413;

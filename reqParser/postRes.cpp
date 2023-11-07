@@ -62,7 +62,7 @@ void    unCh(Client & request) {
 }
 
 void    bodyParser(Client & request) {
-	if (request.headers["Transfer-Encoding"] == "chunked") {
+	if (request.headers["transfer-encoding"] == "chunked") {
 		unCh(request);
 	}
     else {
@@ -95,13 +95,14 @@ void	createOutfile(Client & request) {
 			request.isCgi = true;
 			ss << rand();
 			request.cgiFileName = "temp/" + ss.str() + "_cgi_in.tmp";
+			std::cout << request.cgiFileName << ",,,,," << std::endl;
 			request.outfile->open(request.cgiFileName.c_str());
 		}
 	}
 	if (!request.isCgi && request.location->second.uplode.first) {
 		std::string extension, uploadPath;
 
-		extension = FileType::getExt(request.headers["Content-Type"]);
+		extension = FileType::getExt(request.headers["content-type"]);
 		uploadPath = request.location->second.root + request.location->second.uplode.second;
 		Tools::getAndCheckPath(uploadPath, extension);
 		request.outfile->open(uploadPath.c_str());
