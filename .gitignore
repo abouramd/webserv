@@ -20,4 +20,11 @@ webserv
 *.mp3
 
 
+.DS_Store
+
+
+*.webm
+*.mp4
+*.jpeg
+*.pdf
 

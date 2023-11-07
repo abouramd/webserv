@@ -13,8 +13,8 @@
 #   auto_index on
 #   uplode on /new/
 #   cgi on
-#   cgi_path .php /php-cgi
-#   cgi_path .py /php-cgi
+#   cgi_path php /php-cgi
+#   cgi_path py /php-cgi
 # }
 # location /test {
 #  return 42.fr
@@ -24,19 +24,19 @@
 #Example:
 server {
 host 127.0.0.1
-listen 8083 8082
+listen 8080 8083 8082
 server_name 1337.com localhost:8082
 # max_body_size 10000000
 
 
 location / {
   index index.php index.html
-  root /
+  root ./www/
   allow_method GET DELET
   auto_index on
   uplode on //
   cgi on
-  # cgi_path .php /php-cgi
+  # cgi_path php /php-cgi
 }
 location /test {
  return 42.fr
@@ -47,22 +47,22 @@ location /test {
 server {
 host 127.0.0.1
 listen 8080 8081 
-server_name 1337.com
+server_name localhost:8081
 max_body_size 10000000
 
 
 location / {
-  index index.php index.html
-  root /
+  # index index.php index.html
+  root ./www/
   allow_method GET DELET
   auto_index on
   uplode on //
   cgi on
-  # cgi_path .php /php-cgi
+  cgi_path php ./php-cgi
 }
 location /test {
  return 42.fr
-  root /
+  root ./www/
 }
 }
 

@@ -32,10 +32,11 @@ void FileType::set_mime_type(std::string filename) {
 
 std::string FileType::getExt(const std::string & contenttype)
 {
+  std::cout << contenttype << std::endl;
   for (std::map<std::string, std::string>::iterator it = fileTypesRev.begin(); it != fileTypesRev.end(); it++)
     if (it->first == contenttype)
       return it->second;
- throw 415;
+  throw 415;
 }
 
 std::string FileType::getContentType(const std::string & ext)

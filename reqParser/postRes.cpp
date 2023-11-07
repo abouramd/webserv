@@ -1,4 +1,4 @@
-#include "reqParse.hpp"
+#include "Tools.hpp"
 
 bool getSize(Client & request, size_t & st) {
     std::stringstream   sizeStream;
@@ -62,23 +62,66 @@ void    unCh(Client & request) {
 }
 
 void    bodyParser(Client & request) {
-    if (request.headers["Transfer-Encoding"] == "chunked")
-        unCh(request);
+	if (request.headers["transfer-encoding"] == "chunked") {
+		unCh(request);
+	}
     else {
-        size_t st = request.position;
+		size_t st = request.position;
 
-        if (request.contentLength <= request.buffSize - st) {
-			while (request.contentLength > 0) {
-                *(request.outfile) << request.buf[st++];
-                request.contentLength--;
-            }
-            throw 200;
-		}
-		else {
+		if (request.contentLength >= request.buffSize - st) {
 			while (st < request.buffSize)
 				*(request.outfile) << request.buf[st++];
 			request.contentLength -= request.buffSize - request.position;
 			request.position = 0;
+			if (request.contentLength == 0)
+				throw 201;
 		}
+		else
+			throw 413;
     }
+}
+
+void	createOutfile(Client & request) {
+	if (!request.isDir && request.location->second.cgi.first) {
+		std::map<std::string, std::string>::iterator	it;
+		std::string										extension;
+
+		Tools::getExtension(request.path, extension);
+		it = request.location->second.cgi.second.find(extension);
+		if (it != request.location->second.cgi.second.end()) {
+			std::stringstream ss;
+
+			request.cgiScript = it->second;
+			request.isCgi = true;
+			ss << rand();
+			request.cgiFileName = "temp/" + ss.str() + "_cgi_in.tmp";
+			std::cout << request.cgiFileName << ",,,,," << std::endl;
+			request.outfile->open(request.cgiFileName.c_str());
+		}
+	}
+	if (!request.isCgi && request.location->second.uplode.first) {
+		std::string extension, uploadPath;
+
+		extension = FileType::getExt(request.headers["content-type"]);
+		uploadPath = request.location->second.root + request.location->second.uplode.second;
+		Tools::getAndCheckPath(uploadPath, extension);
+		request.outfile->open(uploadPath.c_str());
+	}
+	if (!request.isCgi && !request.location->second.uplode.first)
+		throw 403;
+}
+
+void	postHandler(Client & request) {
+
+	if (!request.outfile->is_open())
+		createOutfile(request);
+	if (request.chunkSize >= request.buffSize) {
+		// std::cout << "mmmm" << std::endl;
+
+		request.outfile->write(request.buf, request.buffSize);
+		request.chunkSize -= request.buffSize;
+		request.position = 2;
+	}
+	else
+		bodyParser(request);
 }

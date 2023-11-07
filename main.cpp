@@ -3,6 +3,7 @@
 #include "Location.hpp"
 #include "Socket.hpp"
 #include "reqParser/reqParse.hpp"
+#include "responses/responses.hpp"
 #include <cstdio>
 #include <fstream>
 #include <iostream>
@@ -13,7 +14,11 @@
 #include <vector>
 #include <utility>
 #include <ctime>
-
+#include <cstdlib>
+#include <csignal>
+#ifndef __APPLE__
+#include <bits/types/struct_timeval.h>
+#endif // !__APPLE__
 
 
 /* start test multiplix */
@@ -80,6 +85,8 @@ int get_max_fd( std::vector<Socket> &my_s )
 
 int main(int ac, char **av)
 {
+	std::signal(SIGPIPE, SIG_IGN);
+	std::srand(time(NULL));
   Config obj;
   try{
     obj.pars(ac, av);
@@ -100,7 +107,10 @@ int main(int ac, char **av)
   while (1)
   {
     fd_set tmp_read = sread, tmp_write = swrite;
-    int ready = select(get_max_fd(my_s), &tmp_read, &tmp_write, NULL, NULL);
+    timeval timeout;
+    timeout.tv_sec = 60;
+    timeout.tv_usec = 0;
+    int ready = select(get_max_fd(my_s), &tmp_read, &tmp_write, NULL, &timeout);
     // std::cout << "pass select" << std::endl;
     if (ready == -1)
     {
@@ -114,16 +124,7 @@ int main(int ac, char **av)
       {
         if (FD_ISSET(it_s->client[i].fd, &tmp_write))
         {
-          std::ifstream in("index.html");
-          std::string   file;
-
-          std::getline(in, file, '\0');
-          std::cout << GREEN << get_time() << " send responce to "  << it_s->client[i].fd << DFL << std::endl;
-          ft_send_header(it_s->client[i].fd, "200 OK", "text/html");
-          send_chank(it_s->client[i].fd, file.c_str(), file.size());
-          send_chank(it_s->client[i].fd, "", 0);
-          it_s->client[i].state = CLOSE; 
-          
+          responses(it_s->client[i]);          
           if (it_s->client[i].state == CLOSE ) {
             FD_CLR(it_s->client[i].fd, &swrite);
             close(it_s->client[i].fd);
@@ -136,6 +137,7 @@ int main(int ac, char **av)
         }
         else if (FD_ISSET(it_s->client[i].fd, &tmp_read))
         {
+          it_s->client[i].request_time = std::time(NULL);
           reqParser(it_s->client[i], it_s->client[i].fd, it_s->serv);
           if ( it_s->client[i].state == DONE )
           {
@@ -153,6 +155,16 @@ int main(int ac, char **av)
             it_s->client.erase(it_s->client.begin() + i); 
           }
         }
+        else if (it_s->client[i].state != DONE && it_s->client[i].request_time + 60 < std::time(NULL)) {
+          FD_CLR(it_s->client[i].fd, &sread);
+          close(it_s->client[i].fd);
+          delete map_files[it_s->client[i].fd].first;
+          delete map_files[it_s->client[i].fd].second;
+          map_files.erase(it_s->client[i].fd);
+          std::cout << PURPLE << get_time() << " remove a client after 1 min timeout " << it_s->client[i].fd << DFL << std::endl;
+          it_s->client.erase(it_s->client.begin() + i); 
+        }
+
       }
       if (FD_ISSET(it_s->getFd(), &tmp_read))
       {

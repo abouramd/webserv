@@ -12,7 +12,10 @@ std::map<std::string, Location>::iterator   findLoca(Server& serv, const std::st
   while (it-- != serv.location.begin())
   {
     if (!url.compare(0, it->first.length(), it->first))
+    {
+      std::cout << GREEN << "Root of location : " << it->second.root << DFL << std::endl;
       return it;
+    }
   }
   std::cout << BLUE << "didn't found the location" << DFL << std::endl;
   throw 403;
