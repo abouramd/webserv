@@ -60,17 +60,18 @@ void	checkValidCharacters(const std::string & path, const std::string & query, b
 }
 
 void	parseUri( Client & request, std::string & path, std::string & query ) {
-	size_t	pos;
+	size_t		pos;
+	std::string	target(request.target.substr(request.location->first.size()));
 
-	pos = request.target.find('?');
+	pos = target.find('?');
 	if (pos != std::string::npos) {
-		path = request.target.substr(0, pos);
-		query = request.target.substr(pos + 1);
+		path = target.substr(0, pos);
+		query = target.substr(pos + 1);
 		Tools::decodeUri(path);
 		checkValidCharacters(path, query, true);
 	}
 	else {
-		path = request.target;
+		path = target;
 		Tools::decodeUri(path);
 		checkValidCharacters(path, query, false);
 	}
@@ -84,6 +85,7 @@ void	targetChecker( Client & request ) {
 	request.path = path;
 	request.query = query;
 	request.fullPath = request.location->second.root + path;
+	std::cout << request.fullPath << ">>>" << std::endl;
 	if (!Tools::pathExists(request.fullPath.c_str(), request.isDir, r, w))
 		throw 404;
 	if (!r)
