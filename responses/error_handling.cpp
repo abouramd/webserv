@@ -23,4 +23,11 @@ void error_handling(Client &client)
         client.method = "GET";
         return;
     }
+    if (client.statusCode == 415)
+    {
+        client.fullPath = "error_pages/415.html";
+        client.state_string = "415 - Unsupported Media Type";
+        client.method = "GET";
+        return;
+    }
 }
