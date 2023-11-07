@@ -23,9 +23,9 @@ void Cgi::setEnv() {
 
 	env = new char * [ENV_SIZE];
 	env[0] = strDup("REQUEST_METHOD=" + request.method);
-	env[1] = strDup("CONTENT_TYPE=" + request.headers["Content-Type"]);
-	env[2] = strDup("CONTENT_LENGTH=" + request.headers["Content-length"]);
-	env[3] = strDup("HTTP_USER_AGENT=" + request.headers["User-Agent"]);
+	env[1] = strDup("CONTENT_TYPE=" + request.headers["content-type"]);
+	env[2] = strDup("CONTENT_LENGTH=" + request.headers["content-length"]);
+	env[3] = strDup("HTTP_USER_AGENT=" + request.headers["user-agent"]);
 	env[4] = strDup("SCRIPT_FILENAME=" + root + request.target);
 	env[5] = strDup("SCRIPT_NAME=" + request.target);
 	env[6] = strDup("REDIRECT_STATUS=200");

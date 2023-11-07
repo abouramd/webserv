@@ -39,6 +39,8 @@ void    startHParsing(Client & request) {
 		std::string key, value;
 		key = header.substr(0, header.find(':'));
 		value = header.substr(header.find(':') + 2);
+		std::transform(key.begin(), key.begin(), key.end(), ::tolower);
+		std::transform(value.begin(), value.begin(), value.end(), ::tolower);
 //        std::cout << key << ",>>>," << value << std::endl;
 		if (key.empty() || value.empty() || request.headers.find(key) != request.headers.end())
 			throw 400;
@@ -60,17 +62,18 @@ void	checkValidCharacters(const std::string & path, const std::string & query, b
 }
 
 void	parseUri( Client & request, std::string & path, std::string & query ) {
-	size_t	pos;
+	size_t		pos;
+	std::string	target(request.target.substr(request.location->first.size()));
 
-	pos = request.target.find('?');
+	pos = target.find('?');
 	if (pos != std::string::npos) {
-		path = request.target.substr(0, pos);
-		query = request.target.substr(pos + 1);
+		path = target.substr(0, pos);
+		query = target.substr(pos + 1);
 		Tools::decodeUri(path);
 		checkValidCharacters(path, query, true);
 	}
 	else {
-		path = request.target;
+		path = target;
 		Tools::decodeUri(path);
 		checkValidCharacters(path, query, false);
 	}
@@ -78,13 +81,14 @@ void	parseUri( Client & request, std::string & path, std::string & query ) {
 
 void	targetChecker( Client & request ) {
 	std::string	path, query;
-	bool		isDir(false), r(false), w(false);
+	bool		r(false), w(false);
 
 	parseUri(request, path, query);
 	request.path = path;
 	request.query = query;
 	request.fullPath = request.location->second.root + path;
-	if (!Tools::pathExists(request.fullPath.c_str(), isDir, r, w))
+	std::cout << request.fullPath << ">>>" << std::endl;
+	if (!Tools::pathExists(request.fullPath.c_str(), request.isDir, r, w))
 		throw 404;
 	if (!r)
 		throw 403;
@@ -98,13 +102,13 @@ void    headersParsing(Client & request, std::vector<Server>& serv) {
 		if (request.host.empty())
 			throw 400;
 		if (request.method == "POST") {
-			if (request.headers.find("Transfer-Encoding") != request.headers.end()) {
-				if (request.headers["Transfer-Encoding"] != "chunked")
+			if (request.headers.find("transfer-encoding") != request.headers.end()) {
+				if (request.headers["transfer-encoding"] != "chunked")
 					throw 501;
-				if (request.headers.find("Content-Length") != request.headers.end())
+				if (request.headers.find("content-length") != request.headers.end())
 					throw 400;
 			}
-			else if (request.headers.find("Content-Length") == request.headers.end())
+			else if (request.headers.find("content-length") == request.headers.end())
 				throw 400;
 		}
 		request.location = findServ(request.maxBodySize, serv, request.host, request.target);
@@ -112,13 +116,11 @@ void    headersParsing(Client & request, std::vector<Server>& serv) {
 			throw 405;
 		if (request.target[0] != '/' || request.target.size() > 2048)
 			throw 400;
-		request.target = request.target.substr(request.location->first.size());
 		targetChecker(request);
 		request.position = pos;
 		request.state = DONE_WITH_HEADERS;
-		const char *ptr = request.headers["Content-Length"].c_str();
+		const char *ptr = request.headers["content-length"].c_str();
 		request.contentLength = std::strtol(ptr, NULL, 10);
-		std::cout << request.maxBodySize << ",,,," << request.contentLength << std::endl;
 		if (request.contentLength > request.maxBodySize)
 			throw 413;
 	}
@@ -148,8 +150,7 @@ void    reqParser(Client & request, int sock, std::vector<Server>& serv) {
 		if (request.method == "POST" && (status == 200 || status == 201) && request.isCgi) {
 			Cgi	cgi(request);
 
-			cgi.executeCgi();        std::cout << "heeere" << std::endl;
-
+			cgi.executeCgi();
 		}
 		request.statusCode = status;
 		std::cout << "status code : " << status << std::endl;

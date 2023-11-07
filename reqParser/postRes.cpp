@@ -62,7 +62,7 @@ void    unCh(Client & request) {
 }
 
 void    bodyParser(Client & request) {
-	if (request.headers["Transfer-Encoding"] == "chunked") {
+	if (request.headers["transfer-encoding"] == "chunked") {
 		unCh(request);
 	}
     else {
@@ -74,7 +74,7 @@ void    bodyParser(Client & request) {
 			request.contentLength -= request.buffSize - request.position;
 			request.position = 0;
 			if (request.contentLength == 0)
-				throw 200;
+				throw 201;
 		}
 		else
 			throw 413;
@@ -82,37 +82,33 @@ void    bodyParser(Client & request) {
 }
 
 void	createOutfile(Client & request) {
-	if (request.location->second.cgi.first) {
-		std::string extension;
+	if (!request.isDir && request.location->second.cgi.first) {
+		std::map<std::string, std::string>::iterator	it;
+		std::string										extension;
 
-		if (Tools::getExtension(request.path, extension)) {
-			std::map<std::string, std::string>::iterator it = request.location->second.cgi.second.find(extension);
+		Tools::getExtension(request.path, extension);
+		it = request.location->second.cgi.second.find(extension);
+		if (it != request.location->second.cgi.second.end()) {
+			std::stringstream ss;
 
-			if (it != request.location->second.cgi.second.end()) {
-				std::stringstream	ss;
-
-				request.cgiScript = it->second;
-				request.isCgi = true;
-				ss << rand();
-				request.cgiFileName = "temp/" + ss.str() + "_cgi_in.tmp";
-				request.outfile->open(request.cgiFileName.c_str());
-			}
-			else
-            if (request.location->second.uplode.first) {
-				std::string		uploadPath;
-
-				extension = FileType::getExt(request.headers["Content-Type"]);
-				uploadPath = request.location->second.root + request.location->second.uplode.second;
-                std::cout << RED <<  "uploadPath: " << uploadPath << DFL << std::endl;
-				Tools::getAndCheckPath(uploadPath, extension);
-				request.outfile->open(uploadPath.c_str());
-			}
-			else
-				throw 405;
+			request.cgiScript = it->second;
+			request.isCgi = true;
+			ss << rand();
+			request.cgiFileName = "temp/" + ss.str() + "_cgi_in.tmp";
+			request.outfile->open(request.cgiFileName.c_str());
 		}
 	}
-}
+	if (!request.isCgi && request.location->second.uplode.first) {
+		std::string extension, uploadPath;
 
+		extension = FileType::getExt(request.headers["content-type"]);
+		uploadPath = request.location->second.root + request.location->second.uplode.second;
+		Tools::getAndCheckPath(uploadPath, extension);
+		request.outfile->open(uploadPath.c_str());
+	}
+	if (!request.isCgi && !request.location->second.uplode.first)
+		throw 403;
+}
 
 void	postHandler(Client & request) {
 
