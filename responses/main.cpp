@@ -5,13 +5,12 @@ void responses(Client &client)
     char buffer[100];
     if (!client.is->is_open())
     {
-        std::string ftarget = client.location->first + client.target;
         client.state_string = "200 OK";
         error_handling(client);
         if (client.method == "GET")
         {
             if (client.location->second.redirect.empty())
-                get(client, ftarget);
+                get(client);
             else
                 redirect(client, client.location->second.redirect);
         }

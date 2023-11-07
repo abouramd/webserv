@@ -4,7 +4,8 @@
 #include "Socket.hpp"
 #include "reqParser/reqParse.hpp"
 #include "responses/responses.hpp"
-#include <bits/types/struct_timeval.h>
+// #include <bits/types/struct_timeval.h>
+#include <sys/time.h>
 #include <cstdio>
 #include <fstream>
 #include <iostream>

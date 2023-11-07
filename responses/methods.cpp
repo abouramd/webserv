@@ -1,6 +1,6 @@
 #include "responses.hpp"
 
-void get(Client &client, std::string &ftarget)
+void get(Client &client)
 {
     if (!access(client.fullPath.c_str(), F_OK) && access(client.fullPath.c_str(), R_OK))
     {
@@ -23,9 +23,9 @@ void get(Client &client, std::string &ftarget)
     }
     else if (is_dir(client.fullPath) == 1)
     {
-        if (ftarget[ftarget.length() - 1] != '/' && client.opened != 5)
+        if (client.target[client.target.length() - 1] != '/' && client.opened != 5)
         {
-            redirect(client, ftarget + "/");
+            redirect(client, client.target + "/");
             return;
         }
         if (get_index(client))
@@ -43,7 +43,7 @@ void get(Client &client, std::string &ftarget)
         }else{
             if (client.location->second.auto_index)
             {
-                auto_index(client, ftarget);
+                auto_index(client);
             }
             else
             {

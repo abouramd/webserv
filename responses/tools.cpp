@@ -116,12 +116,12 @@ int get_index(Client &client)
     return 0;
 }
 
-int auto_index(Client &client, std::string &ftarget)
+int auto_index(Client &client)
 {
     if (client.opened != 5)
     {
         s_header(client.fd, "200 OK", "text/html");
-        std::string head = "<!DOCTYPE html><html><head><title>Index of "+ftarget+"</title><style>body {font-family: Arial, sans-serif;}h1 {text-align: center; font-size: 150px}ul {    list-style-type: none; text-align: center;    padding: 0; font-size: 100px}li {    margin: 5px 0;}li a {    text-decoration: none;    color: #0074d9;}li a:hover {    text-decoration: underline;}</style></head><body><h1>Index of "+ftarget+"</h1><ul>";
+        std::string head = "<!DOCTYPE html><html><head><title>Index of "+client.target+"</title><style>body {font-family: Arial, sans-serif;}h1 {text-align: center; font-size: 150px}ul {    list-style-type: none; text-align: center;    padding: 0; font-size: 100px}li {    margin: 5px 0;}li a {    text-decoration: none;    color: #0074d9;}li a:hover {    text-decoration: underline;}</style></head><body><h1>Index of "+client.target+"</h1><ul>";
         s_chank(client.fd, head.c_str(), head.size());
         client.dir = opendir(client.fullPath.c_str());
         client.opened = 5;
@@ -135,7 +135,7 @@ int auto_index(Client &client, std::string &ftarget)
             {
                 if (entry->d_name[0] != '.')
                 {
-                    std::string dir = "<li><a href='" + std::string(entry->d_name) + "'>" + std::string(entry->d_name) + "</a></li>";
+                    std::string dir = "<li><a href='./"  + std::string(entry->d_name) + "'>" + std::string(entry->d_name) + "</a></li>";
                     s_chank(client.fd, dir.c_str(), dir.size());
                 }
             }
