@@ -5,12 +5,13 @@ void responses(Client &client)
     char buffer[100];
     if (!client.is->is_open())
     {
-        std::string ftarget = "/" + client.target;
+		std::cout << client.target << std::endl;
+        std::string ftarget = client.target;
         std::string get_query = "";
         client.state_string = "200 OK";
         if (client.real_target != 5)
         {
-            client.target = "/" + client.target;
+//            client.target = "/" + client.target;
             // get_target(client, get_query);
             client.real_target = 5;
             get_query = client.query;
