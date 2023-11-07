@@ -39,7 +39,7 @@ location / {
   # cgi_path php /php-cgi
 }
 location /test {
- return 42.fr
+ return http://google.com
   root /
 }
 }
@@ -61,7 +61,7 @@ location / {
   cgi_path php ./php-cgi
 }
 location /test {
- return 42.fr
+ return http://youtube.com
   root ./www/
 }
 }

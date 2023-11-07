@@ -142,7 +142,7 @@ int auto_index(Client &client, std::string &ftarget)
     if (client.opened != 5)
     {
         s_header(client.fd, "200 OK", "text/html");
-        std::string head = "<!DOCTYPE html><html><head><title>Index of "+ftarget+"</title><style>body {font-family: Arial, sans-serif;}h1 {text-align: center; font-size: 150px}ul {    list-style-type: none; text-align: center;    padding: 0; font-size: 100px}li {    margin: 5px 0;}li a {    text-decoration: none;    color: #0074d9;}li a:hover {    text-decoration: underline;}</style></head><body><h1>Index of "+ftarget+"</h1><ul>";
+        std::string head = "<!DOCTYPE html><html><head><title>Index of "+ftarget+"</title><style>body,ul{padding:20px}a,li strong{font-weight:700}body,ul{margin:0}body{background-color:#f8f8f8;font-family:Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh}h1{background-color:#333;border:2px solid #3498db;border-radius:10px;color:#fff;padding:10px;text-align:center;font-size:24px}ul{background-color:#fff;border:2px solid #3498db;border-radius:10px;box-shadow:0 0 15px rgba(0,0,0,.2);width:80%;list-style-type:none}li{margin-bottom:10px;padding:8px;border:1px solid #ccc;border-radius:5px;background-color:#f2f2f2}li strong{color:#e74c3c}a{text-decoration:none;color:#3498db;opacity:1;transition:opacity 1s}a:hover{text-decoration:underline;color:#4ce73c;opacity:.6}</style></head><body><h1>Index of "+ftarget+"</h1><ul>";
         s_chank(client.fd, head.c_str(), head.size());
         client.dir = opendir(client.target.c_str());
         client.opened = 5;
