@@ -150,7 +150,6 @@ void    reqParser(Client & request, int sock, std::vector<Server>& serv) {
 		}
 		request.statusCode = status;
 		std::cout << "status code : " << status << std::endl;
-		exit (5);
 		request.state = DONE;
 	}
 }
