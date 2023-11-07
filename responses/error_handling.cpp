@@ -1,5 +1,7 @@
 #include "responses.hpp"
 
+
+// 413 501 403
 void error_handling(Client &client)
 {
     if (client.statusCode == 405)
