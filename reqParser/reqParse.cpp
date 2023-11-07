@@ -78,13 +78,13 @@ void	parseUri( Client & request, std::string & path, std::string & query ) {
 
 void	targetChecker( Client & request ) {
 	std::string	path, query;
-	bool		isDir(false), r(false), w(false);
+	bool		r(false), w(false);
 
 	parseUri(request, path, query);
 	request.path = path;
 	request.query = query;
 	request.fullPath = request.location->second.root + path;
-	if (!Tools::pathExists(request.fullPath.c_str(), isDir, r, w))
+	if (!Tools::pathExists(request.fullPath.c_str(), request.isDir, r, w))
 		throw 404;
 	if (!r)
 		throw 403;
@@ -112,13 +112,11 @@ void    headersParsing(Client & request, std::vector<Server>& serv) {
 			throw 405;
 		if (request.target[0] != '/' || request.target.size() > 2048)
 			throw 400;
-		request.target = request.target.substr(request.location->first.size());
 		targetChecker(request);
 		request.position = pos;
 		request.state = DONE_WITH_HEADERS;
 		const char *ptr = request.headers["Content-Length"].c_str();
 		request.contentLength = std::strtol(ptr, NULL, 10);
-		std::cout << request.maxBodySize << ",,,," << request.contentLength << std::endl;
 		if (request.contentLength > request.maxBodySize)
 			throw 413;
 	}
@@ -148,11 +146,11 @@ void    reqParser(Client & request, int sock, std::vector<Server>& serv) {
 		if (request.method == "POST" && (status == 200 || status == 201) && request.isCgi) {
 			Cgi	cgi(request);
 
-			cgi.executeCgi();        std::cout << "heeere" << std::endl;
-
+			cgi.executeCgi();
 		}
 		request.statusCode = status;
 		std::cout << "status code : " << status << std::endl;
+		exit (5);
 		request.state = DONE;
 	}
 }
