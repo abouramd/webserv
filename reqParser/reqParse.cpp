@@ -56,13 +56,11 @@ void    startHParsing(Client & request) {
 	}
 }
 
-void	checkValidCharacters(const std::string & path, const std::string & query, bool withQuery) {
-	for (size_t i = 0; i < path.size(); i++) {
-		if (!std::isalnum(path[i]) && std::string("/-_.").find(path[i]) == std::string::npos)
-			throw 400;
-	}
-	for (size_t i = 0; withQuery && i < query.size(); i++) {
-		if (!std::isalnum(query[i]) && std::string("$=-_.+!*'(),").find(query[i]) == std::string::npos)
+void	checkValidCharacters(const std::string & uri) {
+    std::string validCharacters("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?# []@!$&'()*+,;=%");
+
+	for (size_t i = 0; i < uri.size(); i++) {
+		if (validCharacters.find(uri[i]) == std::string::npos)
 			throw 400;
 	}
 }
@@ -71,17 +69,16 @@ void	parseUri( Client & request, std::string & path, std::string & query ) {
 	size_t		pos;
 	std::string	target(request.target.substr(request.location->first.size()));
 
-	pos = target.find('?');
+    checkValidCharacters(target);
+    pos = target.find('?');
 	if (pos != std::string::npos) {
 		path = target.substr(0, pos);
 		query = target.substr(pos + 1);
 		Tools::decodeUri(path);
-		checkValidCharacters(path, query, true);
 	}
 	else {
 		path = target;
 		Tools::decodeUri(path);
-		checkValidCharacters(path, query, false);
 	}
 }
 
