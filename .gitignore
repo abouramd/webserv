@@ -14,7 +14,7 @@
 *.o
 a.out
 webserv
-
+temp/*
 
 
 *.webm
