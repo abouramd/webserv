@@ -13,11 +13,9 @@ int    endFound( const char *buf ) {
 	return -1;
 }
 
-void	toLower(std::string & key, std::string & value) {
+void	toLower(std::string & key) {
 	for (size_t i = 0; i < key.size(); i++)
 		key[i] = std::tolower(key[i]);
-	for (size_t i = 0; i < value.size(); i++)
-		value[i] = std::tolower(value[i]);
 }
 
 void    startHParsing(Client & request) {
@@ -46,7 +44,7 @@ void    startHParsing(Client & request) {
 		std::string key, value;
 		key = header.substr(0, header.find(':'));
 		value = header.substr(header.find(':') + 2);
-		toLower(key, value);
+		toLower(key);
 //        std::cout << key << ",>>>," << value << std::endl;
 		if (key.empty() || value.empty() || request.headers.find(key) != request.headers.end())
 			throw 400;
@@ -67,7 +65,7 @@ void	checkValidCharacters(const std::string & uri) {
 
 void	parseUri( Client & request, std::string & path, std::string & query ) {
 	size_t		pos;
-	std::string	target(request.target.substr(request.location->first.size()));
+	std::string	target(request.target.substr(request.location->first.size() - 1));
 
     checkValidCharacters(target);
     pos = target.find('?');
@@ -101,9 +99,24 @@ void    headersParsing(Client & request, std::vector<Server>& serv) {
 	int pos = endFound(request.buf);
 
 	if (pos != -1) {
-		startHParsing(request);
+        request.position = pos;
+        startHParsing(request);
 		if (request.host.empty())
 			throw 400;
+        std::cout << request.headers["content-type"] << "..." << std::endl;
+        if (request.headers["content-type"].find("multipart/form-data; boundary=") == 0) {
+            std::string buf(request.buf);
+
+            request.isBound = true;
+            request.boundary = request.headers["content-type"].substr(30);
+            std::cout << buf.substr(request.position + 2, request.boundary.size()) << ":::::" << std::endl;
+            std::cout << request.boundary << ":::::" << std::endl;
+            if (buf.substr(request.position + 2, request.boundary.size()) != request.boundary)
+                throw 400;
+            if (request.headers.find("transfer-encoding") != request.headers.end())
+                throw 501;
+            request.position += request.boundary.size() + 1;
+        }
 		if (request.method == "POST") {
 			if (request.headers.find("transfer-encoding") != request.headers.end()) {
 				if (request.headers["transfer-encoding"] != "chunked")
@@ -120,7 +133,6 @@ void    headersParsing(Client & request, std::vector<Server>& serv) {
 		if (request.target[0] != '/' || request.target.size() > 2048)
 			throw 400;
 		targetChecker(request);
-		request.position = pos;
 		request.state = DONE_WITH_HEADERS;
 		const char *ptr = request.headers["content-length"].c_str();
 		request.contentLength = std::strtol(ptr, NULL, 10);
@@ -150,13 +162,15 @@ void    reqParser(Client & request, int sock, std::vector<Server>& serv) {
 			throw 200;
 	}
 	catch (int status) {
-		if (request.method == "POST" && (status == 200 || status == 201) && request.isCgi) {
+
+        if (request.method == "POST" && (status == 200 || status == 201) && request.isCgi) {
 			Cgi	cgi(request);
 
 			cgi.executeCgi();
 		}
 		request.statusCode = status;
 		std::cout << "status code : " << status << std::endl;
+        request.outfile->close();
 		request.state = DONE;
 	}
 }

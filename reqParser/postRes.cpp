@@ -61,10 +61,70 @@ void    unCh(Client & request) {
     }
 }
 
+//void    matching(Client & request) {
+//    if (request.matchState == CRLF) {
+//        while (request.position < request.buffSize && request.boundBuf.size() <= 2)
+//            request.boundBuf += request.buf[request.position++];
+//        if (request.boundBuf.size() == 2) {
+//            if (request.boundBuf == "\r\n")
+//                request.boundState = BOD;
+//            request.boundBuf.clear();
+//            request.matchState = NON;
+//        }
+//    }
+//    if (request.matchState == BOUND) {
+//        while (request.position < request.buffSize && request.boundBuf.size() <= request.boundary.size() + 4)
+//            request.boundBuf += request.buf[request.position++];
+//        if (request.boundBuf.size() == request.boundary.size() + 4) {
+//            if (request.boundBuf == "--" + request.boundary + "--")
+//                throw 201;
+//            else if (request.boundBuf == "--" + request.boundary + "\r\n")
+//                request.boundState = HEAD;
+//            else
+//                request.outfile << request.boundBuf;
+//            request.boundBuf.clear();
+//            request.matchState = NON;
+//        }
+//    }
+//}
+
+void    unBound(Client & request) {
+    std::stringstream   ss;
+    std::string         buf(request.buf);
+
+    ss << request.boundBuf;
+    request.boundBuf.clear();
+    ss << buf.substr(request.position);
+    buf.clear();
+    while (getline(ss, buf)) {
+        std::cout << "heeee rere " << buf << std::endl;
+        std::cout << "heeee ther " << "--" + request.boundary + "--" << std::endl;
+        if (buf == "--" + request.boundary + "--\r") {
+            std::cout << ",,,,," << std::endl;
+            throw 200;
+        }
+        if (ss.eof()) {
+            request.boundBuf = buf;
+            return;
+        }
+        if (request.boundState != HEAD && buf == "--" + request.boundary + '\r')
+            request.boundState = HEAD;
+        else if (request.boundState == HEAD) {
+            if (buf == "\r")
+                request.boundState = BOD;
+        }
+        else if (request.boundState == BOD) {
+            std::cout << ".>>>>>" << buf << std::endl;
+            *(request.outfile) << buf;
+        }
+    }
+}
+
 void    bodyParser(Client & request) {
-	if (request.headers["transfer-encoding"] == "chunked") {
+    if (request.isBound && !request.isCgi)
+        unBound(request);
+	else if (request.headers["transfer-encoding"] == "chunked")
 		unCh(request);
-	}
     else {
 		size_t st = request.position;
 
@@ -111,12 +171,11 @@ void	createOutfile(Client & request) {
 }
 
 void	postHandler(Client & request) {
-
-	if (!request.outfile->is_open())
+    if (request.isBound && !request.outfile->is_open())
+        request.outfile->open("temp.temp");
+	else if (!request.outfile->is_open())
 		createOutfile(request);
 	if (request.chunkSize >= request.buffSize) {
-		// std::cout << "mmmm" << std::endl;
-
 		request.outfile->write(request.buf, request.buffSize);
 		request.chunkSize -= request.buffSize;
 		request.position = 2;

@@ -24,14 +24,20 @@
 #define CLOSE 3
 #define BUFF_SIZE 1024
 
+#define BOUND 43
+#define HEAD 44
+#define BOD 45
+#define CRLF 46
+#define NON 404
+
 struct Client {
     Client(int fd, std::ifstream* i, std::ofstream* o);
 	void	reset();
     unsigned long                               contentLength, maxBodySize;
     int                                         fd, statusCode;
-    size_t                                      state, chunkSize, buffSize, position;
-    char                                        buf[BUFF_SIZE + 1];
-    std::string                                 method, target, version, host, sizeDept, headersBuf, response;
+    size_t                                      matchState, boundState, state, chunkSize, buffSize, position;
+    char                                        buf[BUFF_SIZE + 1], lastChar;
+    std::string                                 method, target, version, host, sizeDept, headersBuf, boundary, boundBuf;
     std::map<std::string, std::string>          headers;
     std::ifstream                               *is;
     std::ofstream                               *outfile;
@@ -40,7 +46,7 @@ struct Client {
     std::time_t currentTime;
     std::string state_string;
     std::map<std::string, Location>::iterator   location;
-	bool										isCgi, isDir;
+	bool										isCgi, isDir, isBound;
 	std::string									cgiFileName, cgiScript;
 	std::string 								path, query, fullPath;
     std::time_t request_time; 
