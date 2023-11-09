@@ -21,7 +21,7 @@ char	*Cgi::strDup(std::string src) {
 void Cgi::setEnv() {
 	std::string	root(request.location->second.root.begin(), request.location->second.root.end() - 1);
 
-	env = new char * [ENV_SIZE];
+	env = new char * [11];
 	env[0] = strDup("REQUEST_METHOD=" + request.method);
 	env[1] = strDup("CONTENT_TYPE=" + request.headers["content-type"]);
 	env[2] = strDup("CONTENT_LENGTH=" + request.headers["content-length"]);
@@ -30,14 +30,14 @@ void Cgi::setEnv() {
 	env[5] = strDup("SCRIPT_NAME=" + request.target);
 	env[6] = strDup("REDIRECT_STATUS=200");
 	env[7] = strDup("PATH_INFO=" + request.location->second.root + request.target);
-	env[8] = NULL;
+	env[8] = strDup("HTTP_COOKIE=" + request.headers["cookie"]);
+	env[9] = strDup("QUERY_STRING=" + request.query);
+	env[10] = NULL;
 }
 
 void  Cgi::executeCgi() {
 	int           pid;
 	char          *args[3];
-	FILE          *in;
-	FILE          *out;
 	std::stringstream	ss;
 
 	setEnv();
@@ -50,19 +50,23 @@ void  Cgi::executeCgi() {
 	strcpy(args[1], request.fullPath.c_str());
 	args[2] = NULL;
 	request.outfile->close();
+	std::string _tmp(ss.str());
+	request.outfile->open(_tmp.c_str());
+	request.outfile->close();
 	pid = fork();
 	if (!pid) {
+		freopen(request.cgiFileName.c_str(), "r", stdin);
+		freopen(std::string(ss.str()).c_str(), "w", stdout);
 		std::cerr << args[0] << ", " << args[1] << std::endl;
-		in = freopen(request.cgiFileName.c_str(), "r", stdin);
-		out = freopen(std::string(ss.str()).c_str(), "w", stdout);
-		(void)in;
-		(void)out;
 		execve(args[0], args, env);
 		std::cerr << "execve fails!" << std::endl;
 		exit (404);
 	}
 	else {
-		waitpid(pid, NULL, 0);
-		request.cgiFileName = ss.str();
+		request.pid = pid;
+		request.is_cgi = 5;
+		request.cgiFileName = _tmp;
+		request.currentTime = std::time(NULL);
+		request.is->open(request.cgiFileName.c_str());
 	}
 }

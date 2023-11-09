@@ -104,24 +104,26 @@ void Config::creat_socket()
 }
 
 
-void Config::add_socket(sockaddr_in &addr, Server& sev, int& port)
-{
+
+void Config::add_socket(sockaddr_in &addr, Server &sev, int &port) {
   std::vector<Socket>::iterator it = this->socket.begin();
   std::stringstream ss;
-  while (it != this->socket.end())
-  {
-    if (it->getSinPort() == addr.sin_port)
-    {
+  while (it != this->socket.end()) {
+    if (it->getSinPort() == addr.sin_port) {
       if (it->getSinAddr().s_addr != addr.sin_addr.s_addr) {
-	ss << port;
-	   throw std::string("Error: this port " + ss.str() + " is used with " + inet_ntoa(it->getSinAddr()) + " and " + inet_ntoa(addr.sin_addr));
+        ss << port;
+        throw std::string("Error: this port " + ss.str() + " is used with " +
+                          inet_ntoa(it->getSinAddr()) + " and " +
+                          inet_ntoa(addr.sin_addr));
       }
+      it->check_server_name(sev.server_name);
       it->serv.push_back(sev);
       return;
     }
     it++;
   }
   Socket obj;
+  obj.check_server_name(sev.server_name);
   std::cout << "add a socket" << std::endl;
   obj.setHost(sev.getHost());
   obj.setPort(port);

@@ -23,9 +23,9 @@ void get(Client &client)
     }
     else if (is_dir(client.fullPath) == 1)
     {
-        if (client.target[client.target.length() - 1] != '/' && client.opened != 5)
+        if (client.path[client.path.length() - 1] != '/' && client.opened != 5)
         {
-            redirect(client, client.target + "/");
+            redirect(client, client.path + "/");
             return;
         }
         if (get_index(client))

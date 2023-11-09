@@ -13,21 +13,21 @@ char **get_env(Client &client)
     env["QUERY_STRING"] = client.query;
     // env["REMOTE_HOST"] = ?;
     // env["REMOTE_USER"] = "";
-    // env["HTTP_COOKIE"] = ?;
     // env["REMOTE_IDENT"] = "";
-    // env["REQUEST_METHOD"] = client.method;
+    env["REQUEST_METHOD"] = client.method;
     // env["GATEWAY_INTERFACE"] = "CGI/1.1";
     // env["REQUEST_URI"] = ?;
     // env["SCRIPT_NAME"] = ?;
     env["SCRIPT_FILENAME"] = client.fullPath;
     // env["SERVER_NAME"] = ?;
-    // env["SERVER_PROTOCOL"] = "HTTP/1.1";
+    env["SERVER_PROTOCOL"] = "HTTP/1.1";
     // env["SERVER_PORT"] = ?;
     // env["SERVER_SOFTWARE"] = "webserv/1.0";
-    // env["REDIRECT_STATUS"] = "200";
+    env["REDIRECT_STATUS"] = "200";
     // env["REQUEST_SCHEME"] = "http";
-    // env["HTTPS"] = "off";
+    env["HTTPS"] = "off";
     // env["SERVER_SIGNATURE"] = "webserv/1.0";
+    env["HTTP_COOKIE"] = client.headers["cookie"];
 
     char** keyValueArray = new char*[env.size() + 1];
 
@@ -55,12 +55,12 @@ void cgi(Client &client)
     if (!(client.pid = fork()))
     {
         char** env = get_env(client);
-        // int i = 0;
-        // while (env[i])
-        // {
-        //     std::cout << env[i] << std::endl;
-        //     i++;
-        // }
+        int i = 0;
+        while (env[i])
+        {
+            std::cout << env[i] << std::endl;
+            i++;
+        }
         dup2(fd, 1);
         char* argv[] = { const_cast<char*>(client.location->second.cgi.second[get_ex(client.fullPath)].c_str()), const_cast<char*>(client.fullPath.c_str()), NULL };
         execve(argv[0], argv, env);

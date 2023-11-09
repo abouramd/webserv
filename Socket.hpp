@@ -21,6 +21,8 @@ public:
     Socket();
     ~Socket();
 
+    std::vector<std::string> server_name;
+
     // void setFd(const int fd);
     int getFd() const;
   
@@ -34,6 +36,8 @@ public:
     int getPort() const;
 
     void connectASocket();
+  
+    void check_server_name(std::vector<std::string> &ports);
     
     std::vector<Client> client;
     std::vector<Server> serv;

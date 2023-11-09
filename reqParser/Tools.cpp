@@ -62,7 +62,7 @@ void Tools::decodeUri(std::string &uri) {
 bool	Tools::getExtension(std::string & target, std::string & extension) {
 	for (int i = target.size() - 1; i >= 0; i--) {
 		if (target[i] == '.') {
-			extension = target.substr(i);
+			extension = target.substr(i + 1);
 			return true;
 		}
 	}

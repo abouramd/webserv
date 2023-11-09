@@ -13,11 +13,9 @@ int    endFound( const char *buf ) {
 	return -1;
 }
 
-void	toLower(std::string & key, std::string & value) {
+void	toLower(std::string & key) {
 	for (size_t i = 0; i < key.size(); i++)
 		key[i] = std::tolower(key[i]);
-	for (size_t i = 0; i < value.size(); i++)
-		value[i] = std::tolower(value[i]);
 }
 
 void    startHParsing(Client & request) {
@@ -46,7 +44,7 @@ void    startHParsing(Client & request) {
 		std::string key, value;
 		key = header.substr(0, header.find(':'));
 		value = header.substr(header.find(':') + 2);
-		toLower(key, value);
+		toLower(key);
 //        std::cout << key << ",>>>," << value << std::endl;
 		if (key.empty() || value.empty() || request.headers.find(key) != request.headers.end())
 			throw 400;
@@ -62,14 +60,14 @@ void	checkValidCharacters(const std::string & path, const std::string & query, b
 			throw 400;
 	}
 	for (size_t i = 0; withQuery && i < query.size(); i++) {
-		if (!std::isalnum(query[i]) && std::string("$=-_.+!*'(),").find(query[i]) == std::string::npos)
-			throw 400;
+		// if (!std::isalnum(query[i]) && std::string("$=-_.+!*'(),").find(query[i]) == std::string::npos)
+		// 	throw 400;
 	}
 }
 
 void	parseUri( Client & request, std::string & path, std::string & query ) {
 	size_t		pos;
-	std::string	target(request.target.substr(request.location->first.size()));
+	std::string	target(request.target.substr(request.location->first.size() - 1));
 
 	pos = target.find('?');
 	if (pos != std::string::npos) {

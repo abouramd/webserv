@@ -96,8 +96,15 @@ void Socket::connectASocket()
 }
 
 
-
-
+void Socket::check_server_name(std::vector<std::string> &sn)
+{
+  for (std::vector<std::string>::iterator it = sn.begin(); it != sn.end(); it++)
+  { 
+    for (std::vector<std::string>::iterator s = this->server_name.begin(); s != this->server_name.end(); s++) 
+      if (*it == *s) throw std::string("Error: `" + *s + "` in two server that have the same port and host.");
+  }
+  this->server_name.insert(this->server_name.begin(), sn.begin(), sn.end());
+}
 
 
 

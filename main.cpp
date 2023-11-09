@@ -124,6 +124,7 @@ int main(int ac, char **av)
       {
         if (FD_ISSET(it_s->client[i].fd, &tmp_write))
         {
+          it_s->client[i].request_time = std::time(NULL);
           responses(it_s->client[i]);          
           if (it_s->client[i].state == CLOSE ) {
             FD_CLR(it_s->client[i].fd, &swrite);
@@ -155,8 +156,11 @@ int main(int ac, char **av)
             it_s->client.erase(it_s->client.begin() + i); 
           }
         }
-        else if (it_s->client[i].state != DONE && it_s->client[i].request_time + 60 < std::time(NULL)) {
-          FD_CLR(it_s->client[i].fd, &sread);
+        else if (it_s->client[i].request_time + 60 < std::time(NULL)) {
+          if (it_s->client[i].state == DONE)
+            FD_CLR(it_s->client[i].fd, &sread);
+          else
+            FD_CLR(it_s->client[i].fd, &swrite);
           close(it_s->client[i].fd);
           delete map_files[it_s->client[i].fd].first;
           delete map_files[it_s->client[i].fd].second;
