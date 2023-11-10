@@ -117,7 +117,7 @@ void    headersParsing(Client & request, std::vector<Server>& serv) {
 			else if (request.headers.find("content-length") == request.headers.end())
 				throw 400;
 		}
-		request.location = findServ(request.maxBodySize, serv, request.host, request.target);
+		request.location = findServ(request, serv, request.host, request.target);
 		if (std::find(request.location->second.allow_method.begin(), request.location->second.allow_method.end(), request.method) == request.location->second.allow_method.end())
 			throw 405;
 		if (request.target[0] != '/' || request.target.size() > 2048)

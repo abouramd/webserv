@@ -1,0 +1,8 @@
+
+414.html error page 
+
+in post if the target is a dir check if there is an index file (index.php)
+
+
+
+
