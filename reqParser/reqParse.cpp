@@ -100,17 +100,12 @@ void    headersParsing(Client & request, std::vector<Server>& serv) {
 			throw 400;
         std::cout << request.headers["content-type"] << "..." << std::endl;
         if (request.headers["content-type"].find("multipart/form-data; boundary=") == 0) {
-            std::string buf(request.buf);
-
             request.isBound = true;
             request.boundary = request.headers["content-type"].substr(30);
-            std::cout << buf.substr(request.position + 2, request.boundary.size()) << ":::::" << std::endl;
-            std::cout << request.boundary << ":::::" << std::endl;
-            if (buf.substr(request.position + 2, request.boundary.size()) != request.boundary)
-                throw 400;
+//            std::cout << buf.substr(request.position + 2, request.boundary.size()) << ":::::" << std::endl;
+//            std::cout << request.boundary << ":::::" << std::endl;
             if (request.headers.find("transfer-encoding") != request.headers.end())
                 throw 501;
-            request.position += request.boundary.size() + 1;
         }
 		if (request.method == "POST") {
 			if (request.headers.find("transfer-encoding") != request.headers.end()) {

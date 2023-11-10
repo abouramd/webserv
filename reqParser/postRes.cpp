@@ -146,6 +146,8 @@ void    bodyParser(Client & request) {
 	else if (request.headers["transfer-encoding"] == "chunked")
 		unCh(request);
     else {
+        std::cout << ">>>>>>>" << request.buf << std::endl;
+        std::cout << ">>>>>>>++ " << request.position << std::endl;
 		size_t st = request.position;
 
 		if (request.contentLength >= request.buffSize - st) {
@@ -180,7 +182,16 @@ void	createOutfile(Client & request) {
 			request.outfile->open(request.cgiFileName.c_str());
 		}
 	}
-	if (!request.isCgi && request.location->second.uplode.first) {
+    if (!request.isCgi && request.isBound) {
+        std::string buf(request.buf);
+
+        if (buf.substr(request.position + 2, request.boundary.size()) != request.boundary)
+            throw 400;
+        request.position += request.boundary.size() + 1;
+        request.beenThere = true;
+        return;
+    }
+	else if (!request.isCgi && request.location->second.uplode.first) {
 		std::string extension, uploadPath;
 
 		extension = FileType::getExt(request.headers["content-type"]);
@@ -190,10 +201,11 @@ void	createOutfile(Client & request) {
 	}
 	if (!request.isCgi && !request.location->second.uplode.first)
 		throw 403;
+    request.beenThere = true;
 }
 
 void	postHandler(Client & request) {
-	if (!request.isBound && !request.outfile->is_open())
+	if (!request.beenThere && !request.outfile->is_open())
 		createOutfile(request);
 	if (request.chunkSize >= request.buffSize) {
 		request.outfile->write(request.buf, request.buffSize);

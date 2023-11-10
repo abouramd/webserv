@@ -46,7 +46,7 @@ struct Client {
     std::time_t currentTime;
     std::string state_string;
     std::map<std::string, Location>::iterator   location;
-	bool										isCgi, isDir, isBound;
+	bool										isCgi, isDir, isBound, beenThere;
 	std::string									cgiFileName, cgiScript;
 	std::string 								path, query, fullPath;
     std::time_t request_time; 
