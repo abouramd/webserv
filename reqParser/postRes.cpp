@@ -90,31 +90,51 @@ void    unCh(Client & request) {
 
 void    unBound(Client & request) {
     std::stringstream   ss;
-    std::string         buf(request.buf);
+    std::string         buf(request.buf), contentType;
 
     ss << request.boundBuf;
     request.boundBuf.clear();
     ss << buf.substr(request.position);
     buf.clear();
     while (getline(ss, buf)) {
-        std::cout << "heeee rere " << buf << std::endl;
-        std::cout << "heeee ther " << "--" + request.boundary + "--" << std::endl;
-        if (buf == "--" + request.boundary + "--\r") {
-            std::cout << ",,,,," << std::endl;
+        if (buf[buf.size() - 1] == '\r')
+            buf = buf.substr(0, buf.size() - 1);
+        if (buf == "--" + request.boundary + "--")
             throw 200;
-        }
         if (ss.eof()) {
             request.boundBuf = buf;
             return;
         }
-        if (request.boundState != HEAD && buf == "--" + request.boundary + '\r')
+        if (request.boundState != HEAD && buf == "--" + request.boundary) {
             request.boundState = HEAD;
+            request.outfile->close();
+        }
         else if (request.boundState == HEAD) {
-            if (buf == "\r")
+            if (buf.empty())
                 request.boundState = BOD;
+            if (Tools::toLower(buf.substr(0, buf.find(':'))) == "content-type")
+                contentType = buf.substr(buf.find(':') + 1);
         }
         else if (request.boundState == BOD) {
-            std::cout << ".>>>>>" << buf << std::endl;
+            if (!request.outfile->is_open()) {
+                std::string extension, uploadPath;
+
+                uploadPath = request.location->second.root + request.location->second.uplode.second;
+                if (!contentType.empty())
+                    extension = FileType::getExt(contentType);
+                Tools::getAndCheckPath(uploadPath, extension);
+                if (!contentType.empty())
+                    request.outfile->open(uploadPath.c_str());
+                else {
+                    std::stringstream   ss;
+
+                    ss << request.location->second.root + request.location->second.uplode.second + "/" << rand() << ".file";
+                    extension = ss.str();
+                    std::cout << ">>>>" << extension << std::endl;
+                    request.outfile->open(extension.c_str());
+                }
+                contentType.clear();
+            }
             *(request.outfile) << buf;
         }
     }
@@ -171,9 +191,7 @@ void	createOutfile(Client & request) {
 }
 
 void	postHandler(Client & request) {
-    if (request.isBound && !request.outfile->is_open())
-        request.outfile->open("temp.temp");
-	else if (!request.outfile->is_open())
+	if (!request.isBound && !request.outfile->is_open())
 		createOutfile(request);
 	if (request.chunkSize >= request.buffSize) {
 		request.outfile->write(request.buf, request.buffSize);

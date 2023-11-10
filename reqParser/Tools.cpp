@@ -68,3 +68,9 @@ bool	Tools::getExtension(std::string & target, std::string & extension) {
 	}
 	return true;
 }
+
+std::string Tools::toLower(std::string key) {
+    for (size_t i = 0; i < key.size(); i++)
+        key[i] = std::tolower(key[i]);
+    return key;
+}

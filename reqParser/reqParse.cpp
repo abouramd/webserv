@@ -13,11 +13,6 @@ int    endFound( const char *buf ) {
 	return -1;
 }
 
-void	toLower(std::string & key) {
-	for (size_t i = 0; i < key.size(); i++)
-		key[i] = std::tolower(key[i]);
-}
-
 void    startHParsing(Client & request) {
 	std::string header;
 	std::stringstream   ss;
@@ -44,7 +39,7 @@ void    startHParsing(Client & request) {
 		std::string key, value;
 		key = header.substr(0, header.find(':'));
 		value = header.substr(header.find(':') + 2);
-		toLower(key);
+		key = Tools::toLower(key);
 //        std::cout << key << ",>>>," << value << std::endl;
 		if (key.empty() || value.empty() || request.headers.find(key) != request.headers.end())
 			throw 400;
