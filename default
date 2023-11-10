@@ -124,9 +124,9 @@ listen 4000
 
 
 location / {
-  index index.php 
+  index home.php 
   # root ./www/simple-php-website/
-  root /home/abouramd/Desktop/www/E-Commerce-Website-Using-PHP/E-Commerce-Website-Using-PHP/
+  root ./www/E-learning-Website/
   allow_method GET POST DELETE
   auto_index on
   uploade on /
