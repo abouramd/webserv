@@ -115,7 +115,7 @@ int main(int ac, char **av)
     if (ready == -1)
     {
       std::cerr << "select failed" << std::endl;
-      return 1;
+      continue;
     }
 
     for (std::vector<Socket>::iterator it_s = my_s.begin(); it_s != my_s.end(); it_s++)
