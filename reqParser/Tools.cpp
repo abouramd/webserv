@@ -1,4 +1,5 @@
 #include "Tools.hpp"
+#include <ios>
 #include <sys/stat.h>
 #include <unistd.h>
 
@@ -36,8 +37,12 @@ void	Tools::decode(std::string &str) {
 		throw 400;
 	if (hex.find(str[0]) == std::string::npos || hex.find(str[1]) == std::string::npos)
 		throw 400;
-	unHex << std::hex << str;
-	str = unHex.str();
+	unHex << str;
+  str.clear();
+  int tmp;
+  unHex >> std::hex >> tmp;
+  str = std::string(1, tmp);
+  std::cout <<  "|" + str + "|" << " : " << tmp << std::endl;
 }
 
 void Tools::decodeUri(std::string &uri) {
@@ -51,12 +56,13 @@ void Tools::decodeUri(std::string &uri) {
 			unHex = uri.substr(i + 1, 2);
 			Tools::decode(unHex);
 			result += unHex;
-			i += 3;
+			i += 2;
 		}
 		else
 			result += uri[i];
 	}
 	uri = result;
+  std::cout << "URL: " << uri << std::endl;
 }
 
 bool	Tools::getExtension(std::string & target, std::string & extension) {
@@ -67,4 +73,10 @@ bool	Tools::getExtension(std::string & target, std::string & extension) {
 		}
 	}
 	return true;
+}
+
+std::string Tools::toLower(std::string key) {
+    for (size_t i = 0; i < key.size(); i++)
+        key[i] = std::tolower(key[i]);
+    return key;
 }

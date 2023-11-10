@@ -61,11 +61,93 @@ void    unCh(Client & request) {
     }
 }
 
+//void    matching(Client & request) {
+//    if (request.matchState == CRLF) {
+//        while (request.position < request.buffSize && request.boundBuf.size() <= 2)
+//            request.boundBuf += request.buf[request.position++];
+//        if (request.boundBuf.size() == 2) {
+//            if (request.boundBuf == "\r\n")
+//                request.boundState = BOD;
+//            request.boundBuf.clear();
+//            request.matchState = NON;
+//        }
+//    }
+//    if (request.matchState == BOUND) {
+//        while (request.position < request.buffSize && request.boundBuf.size() <= request.boundary.size() + 4)
+//            request.boundBuf += request.buf[request.position++];
+//        if (request.boundBuf.size() == request.boundary.size() + 4) {
+//            if (request.boundBuf == "--" + request.boundary + "--")
+//                throw 201;
+//            else if (request.boundBuf == "--" + request.boundary + "\r\n")
+//                request.boundState = HEAD;
+//            else
+//                request.outfile << request.boundBuf;
+//            request.boundBuf.clear();
+//            request.matchState = NON;
+//        }
+//    }
+//}
+
+void    unBound(Client & request) {
+    std::stringstream   ss;
+    std::string         buf(request.buf), contentType;
+
+    ss << request.boundBuf;
+    request.boundBuf.clear();
+    ss << buf.substr(request.position);
+    buf.clear();
+    while (getline(ss, buf)) {
+        if (buf[buf.size() - 1] == '\r')
+            buf = buf.substr(0, buf.size() - 1);
+        if (buf == "--" + request.boundary + "--")
+            throw 201;
+        if (ss.eof()) {
+            request.boundBuf = buf;
+            return;
+        }
+        if (request.boundState != HEAD && buf == "--" + request.boundary) {
+            request.boundState = HEAD;
+            request.outfile->close();
+        }
+        else if (request.boundState == HEAD) {
+            if (buf.empty())
+                request.boundState = BOD;
+            if (Tools::toLower(buf.substr(0, buf.find(':'))) == "content-type")
+                contentType = buf.substr(buf.find(':') + 1);
+        }
+        else if (request.boundState == BOD) {
+            if (!request.outfile->is_open()) {
+                std::string extension, uploadPath;
+
+                uploadPath = request.location->second.root + request.location->second.uplode.second;
+                if (!contentType.empty())
+                    extension = FileType::getExt(contentType);
+                Tools::getAndCheckPath(uploadPath, extension);
+                if (!contentType.empty())
+                    request.outfile->open(uploadPath.c_str());
+                else {
+                    std::stringstream   ss;
+
+                    ss << request.location->second.root + request.location->second.uplode.second + "/" << rand() << ".file";
+                    extension = ss.str();
+                    std::cout << ">>>>" << extension << std::endl;
+                    request.outfile->open(extension.c_str());
+                }
+                contentType.clear();
+            }
+            *(request.outfile) << buf;
+        }
+    }
+}
+
 void    bodyParser(Client & request) {
-	if (request.headers["transfer-encoding"] == "chunked") {
+    if (request.isBound && !request.isCgi)
+        unBound(request);
+	else if (request.headers["transfer-encoding"] == "chunked")
 		unCh(request);
-	}
     else {
+        std::cout << ">>>>>>>" << request.buf << std::endl;
+        std::cout << ">>>>>>>++ " << request.position << std::endl;
 		size_t st = request.position;
 
 		if (request.contentLength >= request.buffSize - st) {
@@ -100,7 +182,16 @@ void	createOutfile(Client & request) {
 			request.outfile->open(request.cgiFileName.c_str());
 		}
 	}
-	if (!request.isCgi && request.location->second.uplode.first) {
+    if (!request.isCgi && request.isBound) {
+        std::string buf(request.buf);
+
+        if (buf.substr(request.position + 2, request.boundary.size()) != request.boundary)
+            throw 400;
+        request.position += request.boundary.size() + 1;
+        request.beenThere = true;
+        return;
+    }
+	else if (!request.isCgi && request.location->second.uplode.first) {
 		std::string extension, uploadPath;
 
 		extension = FileType::getExt(request.headers["content-type"]);
@@ -110,15 +201,13 @@ void	createOutfile(Client & request) {
 	}
 	if (!request.isCgi && !request.location->second.uplode.first)
 		throw 403;
+    request.beenThere = true;
 }
 
 void	postHandler(Client & request) {
-
-	if (!request.outfile->is_open())
+	if (!request.beenThere && !request.outfile->is_open())
 		createOutfile(request);
 	if (request.chunkSize >= request.buffSize) {
-		// std::cout << "mmmm" << std::endl;
-
 		request.outfile->write(request.buf, request.buffSize);
 		request.chunkSize -= request.buffSize;
 		request.position = 2;

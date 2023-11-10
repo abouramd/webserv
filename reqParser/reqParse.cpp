@@ -13,11 +13,6 @@ int    endFound( const char *buf ) {
 	return -1;
 }
 
-void	toLower(std::string & key) {
-	for (size_t i = 0; i < key.size(); i++)
-		key[i] = std::tolower(key[i]);
-}
-
 void    startHParsing(Client & request) {
 	std::string header;
 	std::stringstream   ss;
@@ -44,7 +39,7 @@ void    startHParsing(Client & request) {
 		std::string key, value;
 		key = header.substr(0, header.find(':'));
 		value = header.substr(header.find(':') + 2);
-		toLower(key);
+		key = Tools::toLower(key);
 //        std::cout << key << ",>>>," << value << std::endl;
 		if (key.empty() || value.empty() || request.headers.find(key) != request.headers.end())
 			throw 400;
@@ -54,14 +49,12 @@ void    startHParsing(Client & request) {
 	}
 }
 
-void	checkValidCharacters(const std::string & path, const std::string & query, bool withQuery) {
-	for (size_t i = 0; i < path.size(); i++) {
-		if (!std::isalnum(path[i]) && std::string("/-_.").find(path[i]) == std::string::npos)
+void	checkValidCharacters(const std::string & uri) {
+    std::string validCharacters("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?# []@!$&'()*+,;=%");
+
+	for (size_t i = 0; i < uri.size(); i++) {
+		if (validCharacters.find(uri[i]) == std::string::npos)
 			throw 400;
-	}
-	for (size_t i = 0; withQuery && i < query.size(); i++) {
-		// if (!std::isalnum(query[i]) && std::string("$=-_.+!*'(),").find(query[i]) == std::string::npos)
-		// 	throw 400;
 	}
 }
 
@@ -69,17 +62,16 @@ void	parseUri( Client & request, std::string & path, std::string & query ) {
 	size_t		pos;
 	std::string	target(request.target.substr(request.location->first.size() - 1));
 
-	pos = target.find('?');
+    checkValidCharacters(target);
+    pos = target.find('?');
 	if (pos != std::string::npos) {
 		path = target.substr(0, pos);
 		query = target.substr(pos + 1);
 		Tools::decodeUri(path);
-		checkValidCharacters(path, query, true);
 	}
 	else {
 		path = target;
 		Tools::decodeUri(path);
-		checkValidCharacters(path, query, false);
 	}
 }
 
@@ -102,9 +94,19 @@ void    headersParsing(Client & request, std::vector<Server>& serv) {
 	int pos = endFound(request.buf);
 
 	if (pos != -1) {
-		startHParsing(request);
+        request.position = pos;
+        startHParsing(request);
 		if (request.host.empty())
 			throw 400;
+        std::cout << request.headers["content-type"] << "..." << std::endl;
+        if (request.headers["content-type"].find("multipart/form-data; boundary=") == 0) {
+            request.isBound = true;
+            request.boundary = request.headers["content-type"].substr(30);
+//            std::cout << buf.substr(request.position + 2, request.boundary.size()) << ":::::" << std::endl;
+//            std::cout << request.boundary << ":::::" << std::endl;
+            if (request.headers.find("transfer-encoding") != request.headers.end())
+                throw 501;
+        }
 		if (request.method == "POST") {
 			if (request.headers.find("transfer-encoding") != request.headers.end()) {
 				if (request.headers["transfer-encoding"] != "chunked")
@@ -121,7 +123,6 @@ void    headersParsing(Client & request, std::vector<Server>& serv) {
 		if (request.target[0] != '/' || request.target.size() > 2048)
 			throw 400;
 		targetChecker(request);
-		request.position = pos;
 		request.state = DONE_WITH_HEADERS;
 		const char *ptr = request.headers["content-length"].c_str();
 		request.contentLength = std::strtol(ptr, NULL, 10);
@@ -151,13 +152,15 @@ void    reqParser(Client & request, int sock, std::vector<Server>& serv) {
 			throw 200;
 	}
 	catch (int status) {
-		if (request.method == "POST" && (status == 200 || status == 201) && request.isCgi) {
+
+        if (request.method == "POST" && (status == 200 || status == 201) && request.isCgi) {
 			Cgi	cgi(request);
 
 			cgi.executeCgi();
 		}
 		request.statusCode = status;
 		std::cout << "status code : " << status << std::endl;
+        request.outfile->close();
 		request.state = DONE;
 	}
 }

@@ -8,4 +8,6 @@ public:
 	static void	decode(std::string &);
 	static void	decodeUri(std::string &);
 	static bool	getExtension(std::string & target, std::string & extension);
+    static std::string  toLower(std::string key);
+
 };
