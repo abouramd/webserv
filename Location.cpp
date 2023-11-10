@@ -19,7 +19,7 @@ Location::Location() {
     this->key[2] = "allow_method";
     this->key[3] = "auto_index";
     this->key[4] = "return";
-    this->key[5] = "uplode";
+    this->key[5] = "uploade";
     this->key[6] = "cgi";
     this->key[7] = "cgi_path";
     this->key[8] = "";

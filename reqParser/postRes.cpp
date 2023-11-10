@@ -100,7 +100,7 @@ void    unBound(Client & request) {
         if (buf[buf.size() - 1] == '\r')
             buf = buf.substr(0, buf.size() - 1);
         if (buf == "--" + request.boundary + "--")
-            throw 200;
+            throw 201;
         if (ss.eof()) {
             request.boundBuf = buf;
             return;
@@ -167,7 +167,9 @@ void	createOutfile(Client & request) {
 		std::string										extension;
 
 		Tools::getExtension(request.path, extension);
+        std::cout << BLUE << "EXT: " << extension << std::endl;
 		it = request.location->second.cgi.second.find(extension);
+        std::cout << request.location->second.cgi.second.find(extension)->second << std::endl;
 		if (it != request.location->second.cgi.second.end()) {
 			std::stringstream ss;
 

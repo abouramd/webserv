@@ -2,7 +2,7 @@
 
 void responses(Client &client)
 {
-    char buffer[100];
+    char buffer[100];        
     if (!client.is->is_open())
     {
         client.state_string = "200 OK";
@@ -27,19 +27,24 @@ void responses(Client &client)
         {
             if (client.is_cgi == 5)
             {
-                std::string header = "HTTP/1.1 200 OK\r\n";
-                header += "Transfer-Encoding: chunked\r\n";
+                std::string header;// = "HTTP/1.1 200 OK\r\n";
                 std::string head;
-                if (!(get_ex(client.fullPath).compare("php")))
+                bool ct(true);
+                while (std::getline(*client.is, head) && head != "\r" && head != "")
                 {
-                    while (std::getline(*client.is, head) && head != "\r" && head != "")
-                    {
-                        header += head;
-                        header += "\n";
+                    if (!head.compare(0, std::strlen("Status: "), "Status: "))
+                      head = "HTTP/1.1 " + head.substr(7);
+                    else if (header.empty()) {
+                      header += "HTTP/1.1 200 OK\r\n";
                     }
+                    if (head.compare(0, std::strlen("Content-type: "), "Content-type: "))
+                        ct = false;
+                    header += head;
+                    header += "\n";
                 }
-                else
+                if (ct)
                     header += "Content-type: text/html\r\n";
+                header += "Transfer-Encoding: chunked\r\n";
                 header +="\r\n";
                 write(client.fd, header.c_str(), header.size());
                 client.is_cgi = 4;
