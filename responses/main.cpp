@@ -6,8 +6,11 @@ void responses(Client &client)
     if (!client.is->is_open())
     {
         client.state_string = "200 OK";
-        error_handling(client);
-        if (client.method == "GET")
+        if (error_handling(client))
+        {
+            client.is->open(client.fullPath.c_str());
+        }
+        else if (client.method == "GET")
         {
             if (client.location->second.redirect.empty())
                 get(client);
