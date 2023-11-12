@@ -113,6 +113,11 @@ void    headersParsing(Client & request, std::vector<Server>& serv) {
 	if (pos != -1) {
         request.position = pos;
         startHParsing(request);
+		request.location = findServ(request, serv, request.host, request.target);
+		if (std::find(request.location->second.allow_method.begin(), request.location->second.allow_method.end(), request.method) == request.location->second.allow_method.end())
+			throw 405;
+		if (request.target[0] != '/' || request.target.size() > 2048)
+			throw 400;
 		if (request.host.empty())
 			throw 400;
         if (request.headers["content-type"].find("multipart/form-data; boundary=") == 0) {
@@ -132,11 +137,6 @@ void    headersParsing(Client & request, std::vector<Server>& serv) {
 			else if (request.headers.find("content-length") == request.headers.end())
 				throw 400;
 		}
-		request.location = findServ(request, serv, request.host, request.target);
-		if (std::find(request.location->second.allow_method.begin(), request.location->second.allow_method.end(), request.method) == request.location->second.allow_method.end())
-			throw 405;
-		if (request.target[0] != '/' || request.target.size() > 2048)
-			throw 400;
 		targetChecker(request);
 		request.state = DONE_WITH_HEADERS;
 		request.contentLength = std::strtol(request.headers["content-length"].c_str(), NULL, 10);
