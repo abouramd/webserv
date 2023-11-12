@@ -34,7 +34,7 @@ void    bodS(Client & request) {
     else if (!request.outfile->is_open()) {
         std::string extension, uploadPath;
 
-        uploadPath = request.location->second.root + request.location->second.uplode.second;
+        uploadPath = request.location.second.root + request.location.second.uplode.second;
         if (request.contentType.size())
             extension = FileType::getExt(std::string(request.contentType.c_str()));
         Tools::getAndCheckPath(uploadPath, extension);
@@ -43,7 +43,7 @@ void    bodS(Client & request) {
         else {
             std::stringstream   ss;
 
-            ss << request.location->second.root + request.location->second.uplode.second + "/" << rand() << ".file";
+            ss << request.location.second.root + request.location.second.uplode.second + "/" << rand() << ".file";
             extension = ss.str();
             request.outfile->open(extension.c_str());
             ss.str("");

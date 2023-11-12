@@ -41,7 +41,7 @@ void get(Client &client)
                 cgi(client);
             }
         }else{
-            if (client.location->second.auto_index)
+            if (client.location.second.auto_index)
             {
                 auto_index(client);
             }

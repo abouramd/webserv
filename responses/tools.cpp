@@ -92,9 +92,9 @@ std::string get_ex(std::string str)
 
 int is_cgi(Client &client)
 {
-    if (client.location->second.cgi.first)
+    if (client.location.second.cgi.first)
     {
-        if (client.location->second.cgi.second.find(get_ex(client.fullPath)) != client.location->second.cgi.second.end())
+        if (client.location.second.cgi.second.find(get_ex(client.fullPath)) != client.location.second.cgi.second.end())
             return 1;
     }
     return 0;
@@ -104,9 +104,9 @@ int get_index(Client &client)
 {
     int i = 0;
     std::string index;
-    while(i < (int)client.location->second.index.size())
+    while(i < (int)client.location.second.index.size())
     {
-        index = client.fullPath + "/" + client.location->second.index[i];
+        index = client.fullPath + "/" + client.location.second.index[i];
         if (!access(index.c_str(), F_OK | R_OK) && !is_dir(index))
         {
             std::cout << "Here: "<< index << std::endl;

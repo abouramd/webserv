@@ -62,7 +62,7 @@ void cgi(Client &client)
             i++;
         }
         dup2(fd, 1);
-        char* argv[] = { const_cast<char*>(client.location->second.cgi.second[get_ex(client.fullPath)].c_str()), const_cast<char*>(client.fullPath.c_str()), NULL };
+        char* argv[] = { const_cast<char*>(client.location.second.cgi.second[get_ex(client.fullPath)].c_str()), const_cast<char*>(client.fullPath.c_str()), NULL };
         execve(argv[0], argv, env);
     }
     else

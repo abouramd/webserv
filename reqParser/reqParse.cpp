@@ -60,7 +60,7 @@ void	checkValidCharacters(const std::string & uri) {
 
 void	parseUri( Client & request, std::string & path, std::string & query ) {
 	size_t		pos;
-	std::string	target(request.target.substr(request.location->first.size() - 1));
+	std::string	target(request.target.substr(request.location.first.size() - 1));
 
     checkValidCharacters(target);
     pos = target.find('?');
@@ -82,21 +82,21 @@ void	targetChecker( Client & request ) {
 	parseUri(request, path, query);
 	request.path = path;
 	request.query = query;
-	request.fullPath = request.location->second.root + path;
+	request.fullPath = request.location.second.root + path;
 	std::cout << request.fullPath << ">>>" << std::endl;
 	if (!Tools::pathExists(request.fullPath.c_str(), request.isDir, r, w))
 		throw 404;
 	if (!r)
 		throw 403;
-	if (request.method == "POST" && request.isDir && request.location->second.index.size()) {
+	if (request.method == "POST" && request.isDir && request.location.second.index.size()) {
 		std::string	newPath;
 		bool		isDir;
 
-		for (size_t	i = 0; i < request.location->second.index.size(); i++) {
+		for (size_t	i = 0; i < request.location.second.index.size(); i++) {
 			isDir = false;
 			r = false;
 			w = false;
-			newPath = request.fullPath + request.location->second.index[0];
+			newPath = request.fullPath + request.location.second.index[0];
 			if (Tools::pathExists(newPath.c_str(), isDir, r, w) && r) {
 				request.fullPath = newPath;
 				request.isDir = isDir;
@@ -113,8 +113,8 @@ void    headersParsing(Client & request, std::vector<Server>& serv) {
 	if (pos != -1) {
         request.position = pos;
         startHParsing(request);
-		request.location = findServ(request, serv, request.host, request.target);
-		if (std::find(request.location->second.allow_method.begin(), request.location->second.allow_method.end(), request.method) == request.location->second.allow_method.end())
+		findServ(request, serv, request.host, request.target);
+		if (std::find(request.location.second.allow_method.begin(), request.location.second.allow_method.end(), request.method) == request.location.second.allow_method.end())
 			throw 405;
 		if (request.target[0] != '/' || request.target.size() > 2048)
 			throw 400;

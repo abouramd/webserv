@@ -83,15 +83,15 @@ void    bodyParser(Client & request) {
 }
 
 void	createOutfile(Client & request) {
-	if (!request.isDir && request.location->second.cgi.first) {
+	if (!request.isDir && request.location.second.cgi.first) {
 		std::map<std::string, std::string>::iterator	it;
 		std::string										extension;
 
 		Tools::getExtension(request.fullPath, extension);
         std::cout << BLUE << "EXT: " << extension << std::endl;
-		it = request.location->second.cgi.second.find(extension);
-        std::cout << request.location->second.cgi.second.find(extension)->second << std::endl;
-		if (it != request.location->second.cgi.second.end()) {
+		it = request.location.second.cgi.second.find(extension);
+        std::cout << request.location.second.cgi.second.find(extension)->second << std::endl;
+		if (it != request.location.second.cgi.second.end()) {
 			std::stringstream ss;
 
 			request.cgiScript = it->second;
@@ -111,15 +111,15 @@ void	createOutfile(Client & request) {
         request.beenThere = true;
         return;
     }
-	else if (!request.isCgi && request.location->second.uplode.first) {
+	else if (!request.isCgi && request.location.second.uplode.first) {
 		std::string extension, uploadPath;
 
 		extension = FileType::getExt(request.headers["content-type"]);
-		uploadPath = request.location->second.root + request.location->second.uplode.second;
+		uploadPath = request.location.second.root + request.location.second.uplode.second;
 		Tools::getAndCheckPath(uploadPath, extension);
 		request.outfile->open(uploadPath.c_str());
 	}
-	if (!request.isCgi && !request.location->second.uplode.first)
+	if (!request.isCgi && !request.location.second.uplode.first)
 		throw 403;
     request.beenThere = true;
 }

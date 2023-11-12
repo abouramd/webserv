@@ -19,7 +19,7 @@ char	*Cgi::strDup(std::string src) {
 }
 
 void Cgi::setEnv() {
-	std::string	root(request.location->second.root.begin(), request.location->second.root.end() - 1);
+	std::string	root(request.location.second.root.begin(), request.location.second.root.end() - 1);
 
 	env = new char * [11];
 	env[0] = strDup("REQUEST_METHOD=" + request.method);
@@ -29,7 +29,7 @@ void Cgi::setEnv() {
 	env[4] = strDup("SCRIPT_FILENAME=" + request.fullPath);
 	env[5] = strDup("QUERY_STRING=" + request.query);
 	env[6] = strDup("REDIRECT_STATUS=200");
-	env[7] = strDup("PATH_INFO=" + request.location->second.root + request.target);
+	env[7] = strDup("PATH_INFO=" + request.location.second.root + request.target);
 	env[8] = strDup("HTTP_COOKIE=" + request.headers["cookie"]);
 	env[9] = strDup("SCRIPT_NAME=" + request.path);
 	env[10] = NULL;

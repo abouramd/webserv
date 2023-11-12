@@ -50,7 +50,7 @@ struct Client {
     DIR* dir;
     std::time_t currentTime;
     std::string state_string;
-    std::map<std::string, Location>::iterator   location;
+    std::pair<std::string, Location>            location;
 	bool										isCgi, isDir, isBound, beenThere;
 	std::string									cgiFileName, cgiScript;
 	std::string 								path, query, fullPath;
@@ -62,6 +62,6 @@ void                                        bodyParser(Client & req);
 void                                        reqParser(Client & request, int sock, std::vector<Server> &serv);
 void                                        unBound(Client & request);
 
-std::map<std::string, Location>::iterator   findServ(Client &client, std::vector<Server>& serv, const std::string &host, const std::string &url);
+void  findServ(Client &client, std::vector<Server>& serv, const std::string &host, const std::string &url);
 
 void										postHandler(Client & request);

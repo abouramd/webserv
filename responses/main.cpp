@@ -6,17 +6,14 @@ void responses(Client &client)
     if (!client.is->is_open())
     {
         client.state_string = "200 OK";
-        if (error_handling(client))
+        error_handling(client);
+        if (client.method == "GET")
         {
-            client.is->open(client.fullPath.c_str());
-        }
-        else if (client.method == "GET")
-        {
-            if (client.location->second.redirect.empty())
+            if (client.location.second.redirect.empty())
                 get(client);
             else
             {
-                redirect(client, client.location->second.redirect);
+                redirect(client, client.location.second.redirect);
             }
         }
         else if (client.method == "DELETE")

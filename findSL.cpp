@@ -21,7 +21,7 @@ std::map<std::string, Location>::iterator   findLoca(Server& serv, const std::st
   throw 404;
 }
 
-std::map<std::string, Location>::iterator   findServ(Client &client, std::vector<Server>& serv, const std::string &host, const std::string &url)
+void   findServ(Client &client, std::vector<Server>& serv, const std::string &host, const std::string &url)
 {
   for (std::vector<Server>::iterator it = serv.begin(); it != serv.end(); it++)
   {
@@ -34,7 +34,10 @@ std::map<std::string, Location>::iterator   findServ(Client &client, std::vector
         client.maxBodySize = it->max_body_size;
         client.error_page = it->error_page;
         client.error_page_dfl = it->error_page_dfl;
-        return findLoca(*it, url);
+        std::map<std::string, Location>::iterator t = findLoca(*it, url);
+        client.location.first = t->first;
+        client.location.second = t->second;
+        return;
       }
     }
   }
@@ -42,7 +45,9 @@ std::map<std::string, Location>::iterator   findServ(Client &client, std::vector
   client.maxBodySize = serv.begin()->max_body_size;
   client.error_page = serv.begin()->error_page;
   client.error_page_dfl = serv.begin()->error_page_dfl;
-  return findLoca(*serv.begin(), url);
+  std::map<std::string, Location>::iterator t =  findLoca(*serv.begin(), url);
+  client.location.first = t->first;
+  client.location.second = t->second;
 }
 
 
