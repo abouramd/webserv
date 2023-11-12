@@ -3,11 +3,14 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-bool	Tools::pathExists(const char* filename, bool	& isDir, bool & r, bool & w) {
+bool	Tools::pathExists(const char* filename, bool & isDir, bool & r, bool & w) {
 	struct stat fileState;
+
 	if (stat(filename, &fileState) == 0) {
 		if (S_ISDIR(fileState.st_mode))
 			isDir = true;
+	std::cout << "path >> " << filename << ", " << isDir << std::endl;
+	
     if (!access(filename, R_OK))
       r = true;
     if (!access(filename, W_OK))

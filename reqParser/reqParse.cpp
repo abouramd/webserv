@@ -88,6 +88,23 @@ void	targetChecker( Client & request ) {
 		throw 404;
 	if (!r)
 		throw 403;
+	if (request.method == "POST" && request.isDir && request.location->second.index.size()) {
+		std::string	newPath;
+		bool		isDir;
+
+		for (size_t	i = 0; i < request.location->second.index.size(); i++) {
+			isDir = false;
+			r = false;
+			w = false;
+			newPath = request.fullPath + request.location->second.index[0];
+			if (Tools::pathExists(newPath.c_str(), isDir, r, w) && r) {
+				request.fullPath = newPath;
+				request.isDir = isDir;
+				break;
+			}
+			std::cout << request.isDir << "::::" << std::endl;
+		}
+	}
 }
 
 void    headersParsing(Client & request, std::vector<Server>& serv) {
@@ -98,11 +115,9 @@ void    headersParsing(Client & request, std::vector<Server>& serv) {
         startHParsing(request);
 		if (request.host.empty())
 			throw 400;
-        std::cout << request.headers["content-type"] << "..." << std::endl;
         if (request.headers["content-type"].find("multipart/form-data; boundary=") == 0) {
             request.isBound = true;
             request.boundary = request.headers["content-type"].substr(30);
-//            std::cout << buf.substr(request.position + 2, request.boundary.size()) << ":::::" << std::endl;
 //            std::cout << request.boundary << ":::::" << std::endl;
             if (request.headers.find("transfer-encoding") != request.headers.end())
                 throw 501;
@@ -124,8 +139,7 @@ void    headersParsing(Client & request, std::vector<Server>& serv) {
 			throw 400;
 		targetChecker(request);
 		request.state = DONE_WITH_HEADERS;
-		const char *ptr = request.headers["content-length"].c_str();
-		request.contentLength = std::strtol(ptr, NULL, 10);
+		request.contentLength = std::strtol(request.headers["content-length"].c_str(), NULL, 10);
 		if (request.contentLength > request.maxBodySize)
 			throw 413;
 	}
@@ -134,11 +148,22 @@ void    headersParsing(Client & request, std::vector<Server>& serv) {
 }
 
 void    reqParser(Client & request, int sock, std::vector<Server>& serv) {
-	try {
-		int amount;
+    try {
+		int amount = 1024;
+//        std::ofstream fll("hello.hello");
+//        while (true) {
+//            std::cout << amount << std::endl;
+//            amount = recv(sock, request.buf, BUFF_SIZE, 0);
+//            fll.write(request.buf, amount);
+//            fll.flush();
+//            request.buf[amount] = 0;
+//            std::cout << request.buf << std::endl;
+//        }
 
-		amount = read(sock, request.buf, BUFF_SIZE);
-		if (amount == 0) {
+//        fll.close();
+//        exit(444);
+        amount = read(sock, request.buf, BUFF_SIZE);
+        if (amount == 0) {
 			request.state = CLOSE;
 			throw 200;
 		}
@@ -146,18 +171,19 @@ void    reqParser(Client & request, int sock, std::vector<Server>& serv) {
 		request.buf[request.buffSize] = 0;
 		if (request.state == NOT_DONE)
 			headersParsing(request, serv);
-		if (request.state == DONE_WITH_HEADERS && request.method == "POST")
-			postHandler(request);
-		if (request.state == DONE_WITH_HEADERS && request.method != "POST")
-			throw 200;
+        if (request.state == DONE_WITH_HEADERS && request.method != "POST")
+            throw 200;
+        if (request.state == DONE_WITH_HEADERS && request.method == "POST")
+            postHandler(request);
 	}
 	catch (int status) {
-
         if (request.method == "POST" && (status == 200 || status == 201) && request.isCgi) {
 			Cgi	cgi(request);
 
 			cgi.executeCgi();
 		}
+        else if (!request.isDir)
+            request.method = "GET";
 		request.statusCode = status;
 		std::cout << "status code : " << status << std::endl;
         request.outfile->close();
