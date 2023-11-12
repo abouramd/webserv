@@ -46,7 +46,7 @@ struct Client {
     std::map<std::string, std::string>          headers;
     std::ifstream                               *is;
     std::ofstream                               *outfile;
-    int opened, is_cgi, pid;
+    int opened, is_cgi, pid, checked;
     DIR* dir;
     std::time_t currentTime;
     std::string state_string;

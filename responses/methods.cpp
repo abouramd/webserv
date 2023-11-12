@@ -48,7 +48,7 @@ void get(Client &client)
             else
             {
                 s_header(client.fd, "403 Forbidden", "text/html");
-                client.is->open("error_pages/403.html");
+                client.is->open(get_page(client, 403).c_str());
             }
         }
     }

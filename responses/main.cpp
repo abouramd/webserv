@@ -30,13 +30,21 @@ void responses(Client &client)
                 std::string header;// = "HTTP/1.1 200 OK\r\n";
                 std::string head;
                 bool ct(true);
-                while (std::getline(*client.is, head) && head != "\r" && head != "")
+                while (client.checked != 5 && std::getline(*client.is, head) && head != "\r" && head != "")
                 {
                     if (!head.compare(0, std::strlen("Status: "), "Status: "))
                       head = "HTTP/1.1 " + head.substr(7);
                     else if (header.empty()) {
                       header += "HTTP/1.1 200 OK\r\n";
+                        if (!check_header(head) && client.checked != 5)
+                        {
+                            client.checked = 5;
+                            client.is->close();
+                            client.is->open(client.method.c_str());
+                            break;
+                        }
                     }
+                    
                     if (head.compare(0, std::strlen("Content-type: "), "Content-type: "))
                         ct = false;
                     header += head;

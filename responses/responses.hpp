@@ -37,3 +37,5 @@ void cgi(Client &client);
 void redirect(Client &client, std::string target);
 void ft_delete(Client &client);
 int error_handling(Client &client);
+int check_header(std::string header);
+std::string get_page(Client &client, int n);

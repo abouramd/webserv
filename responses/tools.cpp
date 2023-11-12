@@ -165,3 +165,82 @@ void redirect(Client &client, std::string target)
     write(client.fd, "\r\n\r\n", 4);
     client.state = CLOSE;
 }
+
+int check_header(std::string header)
+{
+    std::vector<std::string> headers;
+    std::string key = "";
+    int i = 0;
+
+    while(i < (int)header.size())
+    {
+        if (header[i] == ':')
+            break;
+        key += header[i];
+        i++;
+    }
+
+    headers.push_back(Tools::toLower("Accept-CH"));
+    headers.push_back(Tools::toLower("Access-Control-Allow-Origin"));
+    headers.push_back(Tools::toLower("Accept-Patch"));
+    headers.push_back(Tools::toLower("Accept-Ranges"));
+    headers.push_back(Tools::toLower("Age"));
+    headers.push_back(Tools::toLower("Allow"));
+    headers.push_back(Tools::toLower("Alt-Svc"));
+    headers.push_back(Tools::toLower("Cache-Control"));
+    headers.push_back(Tools::toLower("Connection"));
+    headers.push_back(Tools::toLower("Content-Disposition"));
+    headers.push_back(Tools::toLower("Content-Encoding"));
+    headers.push_back(Tools::toLower("Content-Language"));
+    headers.push_back(Tools::toLower("Content-Length"));
+    headers.push_back(Tools::toLower("Content-Location"));
+    headers.push_back(Tools::toLower("keyContent-MD5"));
+    headers.push_back(Tools::toLower("Content-Range"));
+    headers.push_back(Tools::toLower("Content-Type"));
+    headers.push_back(Tools::toLower("Date"));
+    headers.push_back(Tools::toLower("Delta-Base"));
+    headers.push_back(Tools::toLower("ETag"));
+    headers.push_back(Tools::toLower("Expires"));
+    headers.push_back(Tools::toLower("IM"));
+    headers.push_back(Tools::toLower("Last-Modified"));
+    headers.push_back(Tools::toLower("Link"));
+    headers.push_back(Tools::toLower("Location"));
+    headers.push_back(Tools::toLower("P3P"));
+    headers.push_back(Tools::toLower("Pragma"));
+    headers.push_back(Tools::toLower("Preference-Applied"));
+    headers.push_back(Tools::toLower("Proxy-Authenticate"));
+    headers.push_back(Tools::toLower("Public-Key-Pins"));
+    headers.push_back(Tools::toLower("Retry-After"));
+    headers.push_back(Tools::toLower("Server"));
+    headers.push_back(Tools::toLower("Set-Cookie"));
+    headers.push_back(Tools::toLower("Strict-Transport-Security"));
+    headers.push_back(Tools::toLower("Trailer"));
+    headers.push_back(Tools::toLower("Transfer-Encoding"));
+    headers.push_back(Tools::toLower("Tk"));
+    headers.push_back(Tools::toLower("Upgrade"));
+    headers.push_back(Tools::toLower("Vary"));
+    headers.push_back(Tools::toLower("Via"));
+    headers.push_back(Tools::toLower("Warning"));
+    headers.push_back(Tools::toLower("WWW-Authenticate"));
+    headers.push_back(Tools::toLower("X-Frame-Options"));
+    headers.push_back(Tools::toLower("X-WebKit-CSP"));
+    headers.push_back(Tools::toLower("Expect-CT"));
+    headers.push_back(Tools::toLower("NEL"));
+    headers.push_back(Tools::toLower("Permissions-Policy"));
+    headers.push_back(Tools::toLower("Refresh"));
+    headers.push_back(Tools::toLower("Report-To"));
+    headers.push_back(Tools::toLower("Status"));
+    headers.push_back(Tools::toLower("Timing-Allow-Origin"));
+    headers.push_back(Tools::toLower("X-Content-Duration"));
+    headers.push_back(Tools::toLower("X-Content-Type-Options"));
+    headers.push_back(Tools::toLower("X-Powered-By"));
+    headers.push_back(Tools::toLower("X-Redirect-By"));
+    headers.push_back(Tools::toLower("X-Request-ID"));
+    headers.push_back(Tools::toLower("X-UA-Compatible"));
+    headers.push_back(Tools::toLower("X-XSS-Protection"));
+    if (std::find(headers.begin(), headers.end(), Tools::toLower(key)) != headers.end())
+    {
+        return 1;
+    }
+    return 0;
+}
