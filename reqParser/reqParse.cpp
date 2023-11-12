@@ -164,6 +164,7 @@ void    reqParser(Client & request, int sock, std::vector<Server>& serv) {
 //        exit(444);
         amount = read(sock, request.buf, BUFF_SIZE);
         if (amount == 0) {
+			std::cout << "hello" << std::endl;
 			request.state = CLOSE;
 			throw 200;
 		}
@@ -187,6 +188,7 @@ void    reqParser(Client & request, int sock, std::vector<Server>& serv) {
 		request.statusCode = status;
 		std::cout << "status code : " << status << std::endl;
         request.outfile->close();
-		request.state = DONE;
+		if (request.state != CLOSE)
+			request.state = DONE;
 	}
 }
