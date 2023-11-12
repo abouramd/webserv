@@ -4,7 +4,7 @@
 std::string get_page(Client &client, int n)
 {
     client.method = "GET";
-    if (!is_dir(client.error_page[n]))
+    if (!is_dir(client.error_page[n]) && n != 201)
         return (client.error_page[n]);
     return (client.error_page_dfl[n]);
 }
