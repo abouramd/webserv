@@ -32,7 +32,7 @@
 #define NON 404
 
 struct Client {
-    Client(int fd, std::ifstream* i, std::ofstream* o);
+    Client(int fd, std::ifstream* i, std::ofstream* o, std::map<int, std::string> e, std::map<int, std::string> ed);
 
     std::map<int, std::string> error_page;
     std::map<int, std::string> error_page_dfl;

@@ -175,7 +175,7 @@ int main(int ac, char **av)
         int fd = accept(it_s->getFd(), NULL, NULL);
         map_files[fd] = make_pair(new std::ifstream, new std::ofstream);
         FD_SET(fd, &sread);
-        it_s->client.push_back(Client(fd, map_files[fd].first, map_files[fd].second));
+        it_s->client.push_back(Client(fd, map_files[fd].first, map_files[fd].second, it_s->serv[0].error_page, it_s->serv[0].error_page_dfl));
         std::cout << YELLOW << get_time() << " accept a client " << fd << DFL << std::endl;
       }
     }
