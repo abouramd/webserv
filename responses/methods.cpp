@@ -52,12 +52,6 @@ void get(Client &client)
             }
         }
     }
-    else
-    {
-        std::cout << "404" << std::endl;
-        s_header(client.fd, "404 Page Not Found", "text/html");
-        client.is->open("error_pages/404.html");
-    }
 }
 
 int delete_dir(std::string name)

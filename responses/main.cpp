@@ -6,8 +6,9 @@ void responses(Client &client)
     if (!client.is->is_open())
     {
         client.state_string = "200 OK";
-        error_handling(client);
-        if (client.method == "GET")
+        if (error_handling(client))
+            get(client);
+        else if (client.method == "GET")
         {
             if (client.location->second.redirect.empty())
                 get(client);

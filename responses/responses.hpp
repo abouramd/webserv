@@ -36,4 +36,4 @@ int auto_index(Client &client);
 void cgi(Client &client);
 void redirect(Client &client, std::string target);
 void ft_delete(Client &client);
-void error_handling(Client &client);
+int error_handling(Client &client);

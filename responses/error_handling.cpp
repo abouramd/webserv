@@ -1,70 +1,69 @@
 #include "responses.hpp"
 
 
-// 413 501 403
-void error_handling(Client &client)
+std::string get_page(Client &client, int n)
+{
+    client.method = "GET";
+    if (!is_dir(client.error_page_dfl[n]))
+        return (client.error_page_dfl[n]);
+    return (client.error_page[n]);
+}
+
+int error_handling(Client &client)
 {
     if (client.statusCode == 403)
     {
-        client.fullPath = "error_pages/403.html";
+        client.fullPath = get_page(client, 403);
         client.state_string = "403 Forbidden";
-        client.method = "GET";
-        return;
+        return 1;
     }
     if (client.statusCode == 404)
     {
-        client.fullPath = "error_pages/404.html";
+        client.fullPath = get_page(client, 404);
         client.state_string = "404 Not Found";
-        client.method = "GET";
-        return;
+        return 1;
     }
     if (client.statusCode == 501)
     {
-        client.fullPath = "error_pages/501.html";
+        client.fullPath = get_page(client, 501);
         client.state_string = "501 Not Implemented";
-        client.method = "GET";
-        return;
+        return 1;
     }
     if (client.statusCode == 413)
     {
-        client.fullPath = "error_pages/413.html";
+        client.fullPath = get_page(client, 413);
         client.state_string = "413 Request Entity Too Large";
-        client.method = "GET";
-        return;
+        return 1;
     }
     if (client.statusCode == 405)
     {
-        client.fullPath = "error_pages/405.html";
+        client.fullPath = get_page(client, 405);
         client.state_string = "405  Method Not Allowed";
-        client.method = "GET";
-        return;
+        return 1;
     }
     if (client.statusCode == 400)
     {
-        client.fullPath = "error_pages/400.html";
+        client.fullPath = get_page(client, 400);
         client.state_string = "400  Bad Request";
-        client.method = "GET";
-        return;
+        return 1;
     }
     if (client.statusCode == 505)
     {
-        client.fullPath = "error_pages/505.html";
+        client.fullPath = get_page(client, 505);
         client.state_string = "505 HTTP Version Not Supported";
-        client.method = "GET";
-        return;
+        return 1;
     }
     if (client.statusCode == 415)
     {
-        client.fullPath = "error_pages/415.html";
+        client.fullPath = get_page(client, 415);
         client.state_string = "415 Unsupported Media Type";
-        client.method = "GET";
-        return;
+        return 1;
     }
     if (client.statusCode == 201)
     {
-        client.fullPath = "error_pages/201.html";
+        client.fullPath = get_page(client, 201);
         client.state_string = "201 created";
-        client.method = "GET";
-        return;
+        return 1;
     }
+    return 0;
 }

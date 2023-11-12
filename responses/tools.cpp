@@ -107,8 +107,9 @@ int get_index(Client &client)
     while(i < (int)client.location->second.index.size())
     {
         index = client.fullPath + "/" + client.location->second.index[i];
-        if (access(index.c_str(), F_OK | R_OK) == 0)
+        if (!access(index.c_str(), F_OK | R_OK) && !is_dir(index))
         {
+            std::cout << "Here: "<< index << std::endl;
             client.fullPath = index;
             return 1;
         }
