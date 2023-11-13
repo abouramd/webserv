@@ -40,7 +40,7 @@ void responses(Client &client)
                         {
                             client.checked = 5;
                             client.is->close();
-                            client.is->open(client.method.c_str());
+                            client.is->open(client.cgiFileName.c_str());
                             break;
                         }
                     }
@@ -68,7 +68,7 @@ void responses(Client &client)
                 client.is->close();
                 client.state = CLOSE;
                 if (client.is_cgi == 4 || client.is_cgi == 5)
-                    remove(client.method.c_str());
+                    remove(client.cgiFileName.c_str());
             }
         }
         if (client.is_cgi == 5)

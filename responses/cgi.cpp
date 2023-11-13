@@ -69,7 +69,7 @@ void cgi(Client &client)
     {
         client.currentTime = time(NULL);
         client.is_cgi = 5;
-        client.method = filename;
+        client.cgiFileName = filename;
         client.is->open(filename.c_str());
     }
 }

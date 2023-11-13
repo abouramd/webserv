@@ -44,7 +44,7 @@ std::string FileType::getContentType(const std::string & ext)
   for (std::map<std::string, std::string>::iterator it = fileTypes.begin(); it != fileTypes.end(); it++)
     if (it->first == ext)
       return it->second;
-  return "application/octet-stream";
+  return "text/plain";
 }
 
 // int main()
