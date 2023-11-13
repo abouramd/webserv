@@ -106,7 +106,8 @@ int main(int ac, char **av)
     FD_SET(it_s->getFd(), &sread);
   while (1)
   {
-    fd_set tmp_read = sread, tmp_write = swrite;
+    fd_set tmp_read = sread, tmp_write = swrite, tmp_err;
+    FD_ZERO(&tmp_err);
     timeval timeout;
     timeout.tv_sec = 60;
     timeout.tv_usec = 0;
@@ -122,7 +123,20 @@ int main(int ac, char **av)
     {
       for (int i = it_s->client.size() - 1; i >= 0; i--)
       {
-        if (FD_ISSET(it_s->client[i].fd, &tmp_write))
+        if (FD_ISSET(it_s->client[i].fd, &tmp_err))
+        {
+          if (it_s->client[i].state == DONE)
+            FD_CLR(it_s->client[i].fd, &sread);
+          else
+            FD_CLR(it_s->client[i].fd, &swrite);
+          close(it_s->client[i].fd);
+          delete map_files[it_s->client[i].fd].first;
+          delete map_files[it_s->client[i].fd].second;
+          map_files.erase(it_s->client[i].fd);
+          std::cout << PURPLE << get_time() << " remove a client after 1 min timeout " << it_s->client[i].fd << DFL << std::endl;
+          it_s->client.erase(it_s->client.begin() + i); 
+        }
+        else if (FD_ISSET(it_s->client[i].fd, &tmp_write))
         {
           it_s->client[i].request_time = std::time(NULL);
           responses(it_s->client[i]);          
