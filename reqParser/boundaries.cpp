@@ -81,5 +81,4 @@ void    unBound(Client & request) {
         else if (request.boundState == HEAD)
             headS(request);
     }
-    request.position = 0;
 }

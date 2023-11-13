@@ -10,8 +10,11 @@ Client::Client(int fd, std::ifstream *i, std::ofstream *o, std::map<int, std::st
 	this->isBound = false;
     this->beenThere = false;
     this->boundState = HEAD;
+	this->pState = METHOD;
+    this->chState = SIZE;
     this->position = 0;
-    this->chunkSize = 0;
+    this->contentLength = 0;
+    this->chunkSizeNum = 0;
     this->state = NOT_DONE;
     this->request_time = std::time(NULL);
 }
@@ -23,8 +26,6 @@ void	Client::reset() {
 	this->target.clear();
 	this->version.clear();
 	this->host.clear();
-	this->sizeDept.clear();
-	this->headersBuf.clear();
 	this->headers.clear();
 	this->outfile->close();
 	this->isCgi = false;

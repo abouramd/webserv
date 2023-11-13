@@ -28,8 +28,23 @@
 #define BOUND 43
 #define HEAD 44
 #define BOD 45
-#define CRLF 46
-#define NON 404
+
+enum parseState {
+    SPACE,
+    CRLF,
+    METHOD,
+    TARGET,
+    VERSION,
+    HEADER,
+    BODY,
+    CHECK_ERROR
+};
+
+enum chunkState {
+    SIZE,
+    CRLF_CH,
+    CHUNK,
+};
 
 struct Client {
     Client(int fd, std::ifstream* i, std::ofstream* o, std::map<int, std::string> e, std::map<int, std::string> ed);
@@ -39,10 +54,12 @@ struct Client {
 	void	reset();
     unsigned long                               contentLength, maxBodySize;
     int                                         fd, statusCode;
-    size_t                                      lastState, boundState, state, chunkSize, buffSize, position;
+    parseState                                  pState, pNext;
+    chunkState                                  chState, chNext;
+    size_t                                      lastState, boundState, state, chunkSizeNum, buffSize, position;
     String                                      boundBuf, contentType;
     char                                        buf[BUFF_SIZE + 1];
-    std::string                                 method, target, version, host, sizeDept, headersBuf, boundary;
+    std::string                                 chunkSizeStr, header, crlf, method, target, version, host, boundary;
     std::map<std::string, std::string>          headers;
     std::ifstream                               *is;
     std::ofstream                               *outfile;
@@ -61,7 +78,8 @@ void                                        moveBuf( Client & request, int amoun
 void                                        bodyParser(Client & req);
 void                                        reqParser(Client & request, int sock, std::vector<Server> &serv);
 void                                        unBound(Client & request);
+void                                        handleChunked(Client & request);
 
-void  findServ(Client &client, std::vector<Server>& serv, const std::string &host, const std::string &url);
+void                                        findServ(Client &client, std::vector<Server>& serv, const std::string &host, const std::string &url);
 
 void										postHandler(Client & request);
