@@ -109,13 +109,14 @@ int main(int ac, char **av)
     fd_set tmp_read = sread, tmp_write = swrite, tmp_err;
     FD_ZERO(&tmp_err);
     timeval timeout;
-    timeout.tv_sec = 60;
+    timeout.tv_sec = 1;
     timeout.tv_usec = 0;
     int ready = select(get_max_fd(my_s), &tmp_read, &tmp_write, NULL, &timeout);
     // std::cout << "pass select" << std::endl;
-    if (ready == -1)
+    if (ready <= 0)
     {
-      std::cerr << "select failed" << std::endl;
+      if (ready == -1)
+        std::cerr << "select failed" << std::endl;
       continue;
     }
 
@@ -123,26 +124,18 @@ int main(int ac, char **av)
     {
       for (int i = it_s->client.size() - 1; i >= 0; i--)
       {
-        if (FD_ISSET(it_s->client[i].fd, &tmp_err))
+        if (FD_ISSET(it_s->client[i].fd, &tmp_write))
         {
-          if (it_s->client[i].state == DONE)
-            FD_CLR(it_s->client[i].fd, &sread);
-          else
-            FD_CLR(it_s->client[i].fd, &swrite);
-          close(it_s->client[i].fd);
-          delete map_files[it_s->client[i].fd].first;
-          delete map_files[it_s->client[i].fd].second;
-          map_files.erase(it_s->client[i].fd);
-          std::cout << PURPLE << get_time() << " remove a client after 1 min timeout " << it_s->client[i].fd << DFL << std::endl;
-          it_s->client.erase(it_s->client.begin() + i); 
-        }
-        else if (FD_ISSET(it_s->client[i].fd, &tmp_write))
-        {
+          // std::cout << it_s->client[i].method <<  ": in res" << std::endl;
+          // if (it_s->client[i].method == "POST")
+            // std::exit(1);
           it_s->client[i].request_time = std::time(NULL);
           responses(it_s->client[i]);          
           if (it_s->client[i].state == CLOSE ) {
             FD_CLR(it_s->client[i].fd, &swrite);
             close(it_s->client[i].fd);
+            map_files[it_s->client[i].fd].first->close();
+            map_files[it_s->client[i].fd].second->close();
             delete map_files[it_s->client[i].fd].first;
             delete map_files[it_s->client[i].fd].second;
             map_files.erase(it_s->client[i].fd);
@@ -163,6 +156,8 @@ int main(int ac, char **av)
           else if (it_s->client[i].state == CLOSE ) {
             FD_CLR(it_s->client[i].fd, &sread);
             close(it_s->client[i].fd);
+            map_files[it_s->client[i].fd].first->close();
+            map_files[it_s->client[i].fd].second->close();
             delete map_files[it_s->client[i].fd].first;
             delete map_files[it_s->client[i].fd].second;
             map_files.erase(it_s->client[i].fd);
@@ -176,6 +171,8 @@ int main(int ac, char **av)
           else
             FD_CLR(it_s->client[i].fd, &swrite);
           close(it_s->client[i].fd);
+          map_files[it_s->client[i].fd].first->close();
+          map_files[it_s->client[i].fd].second->close();
           delete map_files[it_s->client[i].fd].first;
           delete map_files[it_s->client[i].fd].second;
           map_files.erase(it_s->client[i].fd);

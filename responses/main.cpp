@@ -2,7 +2,7 @@
 
 void responses(Client &client)
 {
-    char buffer[100];        
+    char buffer[1024];        
     if (!client.is->is_open())
     {
         client.state_string = "200 OK";

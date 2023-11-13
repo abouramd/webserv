@@ -1,4 +1,5 @@
 #include "Cgi.hpp"
+#include "reqParse.hpp"
 
 void	checkValidCharacters(const std::string & uri) {
     std::string validCharacters("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?# []@!$&'()*+,;=%");
@@ -244,6 +245,8 @@ void    reqParser(Client & request, int sock, std::vector<Server>& serv) {
 	}
 	catch (int status) {
 		std::cout << "status code : " << status << std::endl;
+    // if (request.method == "POST")
+    //   exit(444);
         if (request.method == "POST" && (status == 200 || status == 201) && request.isCgi) {
 			Cgi	cgi(request);
 
