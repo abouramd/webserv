@@ -17,7 +17,7 @@ if ($cgi->param('submit')) {
     # ...
     
     # Generate the HTML response
-    print $cgi->header;
+    # print $cgi->header;
     print $cgi->start_html('Form Submission');
     print $cgi->h1('Thank you for submitting the form!');
     print "<p>Name: $name</p>";
@@ -25,10 +25,10 @@ if ($cgi->param('submit')) {
     print $cgi->end_html;
 } else {
     # Generate the HTML form
-    print $cgi->header;
+    # print $cgi->header;
     print $cgi->start_html('Test Form');
     print $cgi->h1('Test Form');
-    print $cgi->start_form(-method => 'POST');
+    print $cgi->start_form(-method => 'POST', -action => '');
     print $cgi->label('Name:');
     print $cgi->textfield(-name => 'name', -required => 'true');
     print "<br><br>";

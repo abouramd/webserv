@@ -35,6 +35,7 @@ location / {
   cgi on
   cgi_path php /bin/php-cgi
   cgi_path py /bin/python3
+  cgi_path pl /bin/perl
 }
 
 location /upload/ {
