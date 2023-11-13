@@ -54,86 +54,81 @@ void	targetChecker( Client & request ) {
 }
 
 void    skipSpace(Client & request) {
-    if (request.pNext != HEADER && request.pNext != BODY && request.buf[request.position] != ' ')
-        throw 400;
-    while (request.position < request.buffSize && request.buf[request.position] == ' ')
-        request.position++;
-    if (request.position == request.buffSize)
-        return ;
-    if (!request.crlf.empty()) {
-        request.pState = request.pNext;
-        request.crlf.clear();
+    if (request.buf[request.position] != ' ') {
+        if (!request.crlf.empty()) {
+            request.pState = request.pNext;
+            request.crlf.clear();
+        }
+        else if (request.pNext == HEADER || request.pState == BODY)
+            request.pState = CRLF;
+        else
+            request.pState = request.pNext;
     }
-    else if (request.pNext == HEADER || request.pNext == BODY)
-        request.pState = CRLF;
     else
-        request.pState = request.pNext;
+        request.position++;
 }
 
 void    checkCrlf(Client & request) {
-    while (request.position < request.buffSize &&
-            request.buf[request.position] != ' ' &&
-            (request.buf[request.position] == '\r' ||
-            request.buf[request.position] == '\n') &&
-            request.crlf.size() < 4) {
-        request.crlf += request.buf[request.position];
-        request.position++;
-    }
     if (request.buf[request.position] == '\r' || request.buf[request.position] == '\n')
+        request.crlf += request.buf[request.position++];
+    if (request.crlf.size() > 4)
         throw 400;
-    if (request.crlf == "\r\n" || request.crlf == "\n")
-        request.pState = SPACE;
-    else if (request.crlf == "\r\n\r\n" || request.crlf == "\n\n") {
-        request.pState = CHECK_ERROR;
-        request.pNext = BODY;
+    if (request.buf[request.position] != '\r' && request.buf[request.position] != '\n'){
+        if (request.crlf == "\r\n" || request.crlf == "\n")
+            request.pState = SPACE;
+        else if (request.crlf == "\r\n\r\n" || request.crlf == "\n\n") {
+            if (request.method != "POST" && request.position < request.buffSize)
+                throw 400;
+            request.pState = CHECK_ERROR;
+            request.pNext = BODY;
+        }
+        else
+            throw 400;
     }
-    else
-        throw 400;
 }
 
 void    getMethod(Client & request) {
-    while (request.position < request.buffSize && request.method.size() < 6 && request.buf[request.position] != ' ') {
-        request.method += request.buf[request.position];
-        request.position++;
+    if (!std::isalpha(request.buf[request.position]) && request.buf[request.position] != ' ')
+        throw 400;
+    if (request.buf[request.position] == ' ') {
+        if (request.method != "GET" && request.method != "POST" && request.method != "DELETE")
+            throw 405;
+        request.pState = SPACE;
+        request.pNext = TARGET;
     }
-    if (request.position == request.buffSize)
-        return ;
-    std::cout << "method : " << request.method << std::endl;
-    if (request.method != "GET" && request.method != "POST" && request.method != "DELETE")
-        throw 405;
-    request.pState = SPACE;
-    request.pNext = TARGET;
+    else
+        request.method += request.buf[request.position++];
 }
 
 void    getTarget(Client & request) {
-    while (request.position < request.buffSize && request.target.size() < 1024 && request.buf[request.position] != ' ') {
-        request.target += request.buf[request.position];
-        request.position++;
+    if  (request.buf[request.position] == ' ' || request.buf[request.position] == '\r' || request.buf[request.position] == '\n') {
+        if (request.target.empty() || request.target[0] != '/')
+            throw 400;
+        checkValidCharacters(request.target);
+        Tools::decodeUri(request.target);
+        request.pState = SPACE;
+        request.pNext = VERSION;
     }
-    if (request.position == request.buffSize)
-        return ;
-    std::cout << "target : " << request.target << std::endl;
-    if (request.target.empty() || request.target[0] != '/')
-        throw 400;
-    checkValidCharacters(request.target);
-    Tools::decodeUri(request.target);
-    request.pState = SPACE;
-    request.pNext = VERSION;
+    else {
+        request.target += request.buf[request.position++];
+        if (request.target.size() > 1024)
+            throw 400;
+    }
 }
 
 void    getVersion(Client & request) {
-    while (request.position < request.buffSize && request.version.size() < 8 && request.buf[request.position] != ' ') {
-        request.version += request.buf[request.position];
-        request.position++;
+    if (request.buf[request.position] == ' ' || request.buf[request.position] == '\r' || request.buf[request.position] == '\n') {
+        if (request.version != "HTTP/1.1")
+            throw 505;
+        request.pState = SPACE;
+        request.pNext = HEADER;
     }
-    if (request.position == request.buffSize)
-        return ;
-    std::cout << "version : " << request.version << std::endl;
+    else {
+        request.version += request.buf[request.position++];
+        if (request.version.size() > 8)
+            throw 400;
+    }
 
-    if (request.version != "HTTP/1.1")
-        throw 505;
-    request.pState = SPACE;
-    request.pNext = HEADER;
 }
 
 void    checkHeader(Client & request) {
@@ -162,16 +157,14 @@ void    checkHeader(Client & request) {
 }
 
 void    getHeader(Client & request) {
-    while (request.position < request.buffSize && request.buf[request.position] != '\r' && request.buf[request.position] != '\n') {
-        request.header += request.buf[request.position];
-        request.position++;
+    if (request.buf[request.position] == '\r' || request.buf[request.position] == '\n') {
+        checkHeader(request);
+        request.header.clear();
+        request.pState = SPACE;
+        request.pNext = HEADER;
     }
-    if (request.position == request.buffSize)
-        return ;
-    checkHeader(request);
-    request.header.clear();
-    request.pState = SPACE;
-    request.pNext = HEADER;
+    else
+        request.header += request.buf[request.position++];
 }
 
 void    checkErrors(Client & request, std::vector<Server>& serv) {
