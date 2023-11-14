@@ -47,12 +47,19 @@ void    unChunk(Client & request) {
         request.chNext = SIZE;
     }
     else {
-        while (request.position < request.buffSize && request.chunkSizeNum > 0) {
-            *(request.outfile) << request.buf[request.position];
+        // while (request.position < request.buffSize && request.chunkSizeNum > 0) {
+        //     *(request.outfile) << request.buf[request.position];
+        //     request.outfile->flush();
+        //     request.position ++;
+        //     request.chunkSizeNum --;
+        // }
+            int size = request.chunkSizeNum;
+            if (request.chunkSizeNum > request.buffSize - request.position)
+              size = request.buffSize - request.position;
+            request.outfile->write(request.buf + request.position, size);
             request.outfile->flush();
-            request.position++;
-            request.chunkSizeNum--;
-        }
+            request.position += size;
+            request.chunkSizeNum -= size;
     }
 }
 
