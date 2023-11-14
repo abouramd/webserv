@@ -38,8 +38,8 @@
                     echo "<div class='message'>
                       <p>Wrong Username or Password</p>
                        </div> <br>";
-                   echo "<a href='index.php'><button class='btn'>Go Back</button>";
-         
+                    echo "<a href='register.php'><button style='width: 100%' class='btn'>Sign Up Now</button>";
+                   echo "<a href='index.php'><button style='width: 100%' class='btn'>Go Back</button>";
                 }
                 if(isset($_SESSION['valid'])){
                     header("Location: home.php");

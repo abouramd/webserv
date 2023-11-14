@@ -72,14 +72,18 @@ void send_chank(int fd, const char *content, const int size)
 int get_max_fd( std::vector<Socket> &my_s )
 {
   int max_fd = -1;
+  int cn = 0;
 
   for (std::vector<Socket>::iterator it_s = my_s.begin(); it_s != my_s.end(); it_s++)
   {
     for (std::vector<Client>::iterator it_c = it_s->client.begin(); it_c != it_s->client.end(); it_c++)
+    {
       max_fd = it_c->fd < max_fd ? max_fd : it_c->fd + 1;
+      cn++;
+    }
     max_fd = it_s->getFd() < max_fd ? max_fd : it_s->getFd() + 1;
   }
-  // std::cout << "max fd is " << max_fd << std::endl;
+  std::cout << "number of client is " << cn << std::endl;
   return max_fd;
 }
 

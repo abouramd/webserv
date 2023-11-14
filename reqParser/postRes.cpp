@@ -8,10 +8,19 @@ void bodyParser(Client &request) {
   else {
     if (request.contentLength == 0)
       throw 200;
-    *(request.outfile) << request.buf[request.position];
+
+    int size = request.contentLength;
+    if (request.contentLength > request.buffSize - request.position)
+        size = request.buffSize - request.position;
+    request.outfile->write(request.buf + request.position, size);
     request.outfile->flush();
-    request.contentLength--;
-    request.position++;
+    request.contentLength -= size;
+    request.position += size;
+    
+    // *(request.outfile) << request.buf[request.position];
+    // request.outfile->flush();
+    // request.contentLength--;
+    // request.position++;
     if (request.contentLength == 0) {
       if (request.position > request.buffSize)
         throw 413;
