@@ -68,7 +68,10 @@ void responses(Client &client)
                 client.is->close();
                 client.state = CLOSE;
                 if (client.is_cgi == 4 || client.is_cgi == 5)
+                {
+                    client.is->close();
                     remove(client.cgiFileName.c_str());
+                }
             }
         }
         if (client.is_cgi == 5)
@@ -80,7 +83,7 @@ void responses(Client &client)
                 client.is->close();
                 client.is->open("error_pages/408.html");
                 kill(client.pid, SIGINT);
-                remove(client.method.c_str());
+                remove(client.cgiFileName.c_str());
                 client.is_cgi = 4;
             }
         }
