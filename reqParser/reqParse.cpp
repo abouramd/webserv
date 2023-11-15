@@ -77,8 +77,6 @@ void    checkCrlf(Client & request) {
         if (request.crlf == "\r\n" || request.crlf == "\n")
             request.pState = SPACE;
         else if (request.crlf == "\r\n\r\n" || request.crlf == "\n\n") {
-            if (request.method != "POST" && request.position < request.buffSize)
-                throw 400;
             request.pState = CHECK_ERROR;
             request.pNext = BODY;
         }

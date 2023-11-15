@@ -22,12 +22,17 @@ Server::Server() {
     this->dup[i] = false;
 
   this->error_page_dfl[201] = "error_pages/201.html";
+  this->error_page_dfl[204] = "error_pages/204.html";
   this->error_page_dfl[400] = "error_pages/400.html";
   this->error_page_dfl[403] = "error_pages/403.html";
   this->error_page_dfl[404] = "error_pages/404.html";
   this->error_page_dfl[405] = "error_pages/405.html";
+  this->error_page_dfl[408] = "error_pages/408.html";
+  this->error_page_dfl[413] = "error_pages/413.html";
+  this->error_page_dfl[414] = "error_pages/414.html";
   this->error_page_dfl[415] = "error_pages/415.html";
   this->error_page_dfl[500] = "error_pages/500.html";
+  this->error_page_dfl[501] = "error_pages/501.html";
   this->error_page_dfl[505] = "error_pages/505.html";
 
   this->key[0] = "host";
