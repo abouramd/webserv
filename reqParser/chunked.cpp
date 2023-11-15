@@ -5,19 +5,14 @@ void    getSize(Client & request) {
 
 
     if (hex.find(request.buf[request.position]) == std::string::npos) {
-        std::cout << ",,,,," << request.buf[request.position] << std::endl;
-        if (request.chunkSizeStr.empty()) {
+        if (request.chunkSizeStr.empty())
             throw 400;
-        }
         request.chunkSizeNum = std::strtol(request.chunkSizeStr.c_str(), NULL, 16);
-        if (request.chunkSizeNum == 0) {
+        if (request.chunkSizeNum == 0)
             throw 201;
-        }
         request.contentLength += request.chunkSizeNum;
-        if (request.contentLength > request.maxBodySize) {
+        if (request.contentLength > request.maxBodySize)
             throw 413;
-        }
-        std::cout << "++++++" << request.chunkSizeNum << std::endl;
         request.chunkSizeStr.clear();
         request.chState = CRLF_CH;
         request.chNext = CHUNK;
@@ -42,25 +37,19 @@ void    checkCrlfCh(Client & request) {
 }
 
 void    unChunk(Client & request) {
-    if (request.chunkSizeNum == 0) {
-        request.chState = CRLF_CH;
-        request.chNext = SIZE;
+    if (request.chunkSizeNum > request.buffSize - request.position) {
+        request.outfile->write(request.buf + request.position, request.buffSize - request.position);
+        request.outfile->flush();
+        request.chunkSizeNum -= request.buffSize - request.position;
+        request.position = request.buffSize;
     }
     else {
-        // while (request.position < request.buffSize && request.chunkSizeNum > 0) {
-        //     *(request.outfile) << request.buf[request.position];
-        //     request.outfile->flush();
-        //     request.position ++;
-        //     request.chunkSizeNum --;
-        // }
-
-        int size = request.chunkSizeNum;
-        if (request.chunkSizeNum > request.buffSize - request.position)
-          size = request.buffSize - request.position;
-        request.outfile->write(request.buf + request.position, size);
+        request.outfile->write(request.buf + request.position, request.chunkSizeNum);
         request.outfile->flush();
-        request.position += size;
-        request.chunkSizeNum -= size;
+        request.position += request.chunkSizeNum;
+        request.chunkSizeNum = 0;
+        request.chState = CRLF_CH;
+        request.chNext = SIZE;
     }
 }
 

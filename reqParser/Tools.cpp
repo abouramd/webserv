@@ -83,3 +83,12 @@ std::string Tools::toLower(std::string key) {
         key[i] = std::tolower(key[i]);
     return key;
 }
+
+size_t      Tools::findBin(const char *buf, char element, size_t start, size_t size) {
+    while (start < size) {
+        if (buf[start] == element)
+            return start;
+        start++;
+    }
+    return std::string::npos;
+}

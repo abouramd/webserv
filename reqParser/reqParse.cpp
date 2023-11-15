@@ -1,5 +1,4 @@
 #include "Cgi.hpp"
-#include "reqParse.hpp"
 
 void	checkValidCharacters(const std::string & uri) {
     std::string validCharacters("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?# []@!$&'()*+,;=%");
@@ -179,7 +178,7 @@ void    checkErrors(Client & request, std::vector<Server>& serv) {
         throw 200;
     if (request.headers["content-type"].find("multipart/form-data; boundary=") == 0) {
         request.isBound = true;
-        request.boundary = request.headers["content-type"].substr(30);
+        request.boundary = "--" + request.headers["content-type"].substr(30);
         if (request.headers.find("transfer-encoding") != request.headers.end())
             throw 501;
     }
@@ -187,14 +186,14 @@ void    checkErrors(Client & request, std::vector<Server>& serv) {
         if (request.headers["transfer-encoding"] != "chunked")
             throw 501;
     }
+    else if (request.headers.find("content-length") == request.headers.end())
+        throw 400;
     if (request.headers.find("content-length") != request.headers.end()) {
         request.contentLength = std::strtol(request.headers["content-length"].c_str(), NULL, 10);
         std::cout << request.contentLength << ", " << request.maxBodySize << std::endl;
         if (request.contentLength > request.maxBodySize)
             throw 413;
     }
-    else
-        throw 400;
     request.crlf.clear();
     request.pState = BODY;
 }
@@ -245,8 +244,6 @@ void    reqParser(Client & request, int sock, std::vector<Server>& serv) {
 	}
 	catch (int status) {
 		std::cout << "status code : " << status << std::endl;
-    // if (request.method == "POST")
-    //   exit(444);
         if (request.method == "POST" && (status == 200 || status == 201) && request.isCgi) {
 			Cgi	cgi(request);
 

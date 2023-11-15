@@ -9,7 +9,7 @@ Client::Client(int fd, std::ifstream *i, std::ofstream *o, std::map<int, std::st
 	this->isDir = false;
 	this->isBound = false;
     this->beenThere = false;
-    this->boundState = HEAD;
+    this->boundState = AT_START;
 	this->pState = METHOD;
     this->chState = SIZE;
     this->position = 0;

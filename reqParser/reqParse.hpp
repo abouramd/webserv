@@ -25,6 +25,7 @@
 #define CLOSE 3
 #define BUFF_SIZE 1024
 
+#define AT_START 42
 #define BOUND 43
 #define HEAD 44
 #define BOD 45
@@ -56,10 +57,10 @@ struct Client {
     int                                         fd, statusCode;
     parseState                                  pState, pNext;
     chunkState                                  chState, chNext;
-    size_t                                      lastState, boundState, state, chunkSizeNum, buffSize, position;
+    size_t                                      boundState, state, chunkSizeNum, buffSize, position;
     String                                      boundBuf, contentType;
     char                                        buf[BUFF_SIZE + 1];
-    std::string                                 chunkSizeStr, header, crlf, method, target, version, host, boundary;
+    std::string                                 chunkSizeStr, header, crlf, method, target, version, host, boundary, endBoundary;
     std::map<std::string, std::string>          headers;
     std::ifstream                               *is;
     std::ofstream                               *outfile;
@@ -68,7 +69,7 @@ struct Client {
     std::time_t currentTime;
     std::string state_string;
     std::pair<std::string, Location>            location;
-	bool										isCgi, isDir, isBound, beenThere;
+	bool										atStart, isCgi, isDir, isBound, beenThere;
 	std::string									cgiFileName, cgiScript;
 	std::string 								path, query, fullPath;
     std::time_t request_time; 
