@@ -238,6 +238,7 @@ int check_header(std::string header)
     headers.push_back(Tools::toLower("X-Request-ID"));
     headers.push_back(Tools::toLower("X-UA-Compatible"));
     headers.push_back(Tools::toLower("X-XSS-Protection"));
+    std::cout << Tools::toLower(key) << std::endl;
     if (std::find(headers.begin(), headers.end(), Tools::toLower(key)) != headers.end())
     {
         return 1;

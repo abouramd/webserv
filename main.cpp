@@ -72,18 +72,18 @@ void send_chank(int fd, const char *content, const int size)
 int get_max_fd( std::vector<Socket> &my_s )
 {
   int max_fd = -1;
-  int cn = 0;
+  // int cn = 0;
 
   for (std::vector<Socket>::iterator it_s = my_s.begin(); it_s != my_s.end(); it_s++)
   {
     for (std::vector<Client>::iterator it_c = it_s->client.begin(); it_c != it_s->client.end(); it_c++)
     {
       max_fd = it_c->fd < max_fd ? max_fd : it_c->fd + 1;
-      cn++;
+      // cn++;
     }
     max_fd = it_s->getFd() < max_fd ? max_fd : it_s->getFd() + 1;
   }
-  std::cout << "number of client is " << cn << std::endl;
+  // std::cout << "number of client is " << cn << std::endl;
   return max_fd;
 }
 
@@ -115,7 +115,7 @@ int main(int ac, char **av)
     timeval timeout;
     timeout.tv_sec = 1;
     timeout.tv_usec = 0;
-    int ready = select(get_max_fd(my_s), &tmp_read, &tmp_write, NULL, &timeout);
+    int ready = select(get_max_fd(my_s), &tmp_read, &tmp_write, &tmp_err, &timeout);
     // std::cout << "pass select" << std::endl;
     if (ready <= 0)
     {
@@ -128,7 +128,22 @@ int main(int ac, char **av)
     {
       for (int i = it_s->client.size() - 1; i >= 0; i--)
       {
-        if (FD_ISSET(it_s->client[i].fd, &tmp_write))
+        if (FD_ISSET(it_s->client[i].fd, &tmp_err))
+        {
+          if (it_s->client[i].state == DONE)
+            FD_CLR(it_s->client[i].fd, &sread);
+          else
+            FD_CLR(it_s->client[i].fd, &swrite);
+          close(it_s->client[i].fd);
+          map_files[it_s->client[i].fd].first->close();
+          map_files[it_s->client[i].fd].second->close();
+          delete map_files[it_s->client[i].fd].first;
+          delete map_files[it_s->client[i].fd].second;
+          map_files.erase(it_s->client[i].fd);
+          std::cout << RED << get_time() << " remove a client after found it in error fd_set " << it_s->client[i].fd << DFL << std::endl;
+          it_s->client.erase(it_s->client.begin() + i);
+        }
+        else if (FD_ISSET(it_s->client[i].fd, &tmp_write))
         {
           // std::cout << it_s->client[i].method <<  ": in res" << std::endl;
           // if (it_s->client[i].method == "POST")
@@ -188,10 +203,13 @@ int main(int ac, char **av)
       if (FD_ISSET(it_s->getFd(), &tmp_read))
       {
         int fd = accept(it_s->getFd(), NULL, NULL);
+        if (fd > 0)
+        {
         map_files[fd] = make_pair(new std::ifstream, new std::ofstream);
         FD_SET(fd, &sread);
         it_s->client.push_back(Client(fd, map_files[fd].first, map_files[fd].second, it_s->serv[0].error_page, it_s->serv[0].error_page_dfl));
         std::cout << YELLOW << get_time() << " accept a client " << fd << DFL << std::endl;
+        }
       }
     }
   }
