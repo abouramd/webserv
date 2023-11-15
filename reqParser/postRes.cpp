@@ -25,9 +25,7 @@ void	createOutfile(Client & request) {
 		std::string										extension;
 
 		Tools::getExtension(request.fullPath, extension);
-        std::cout << BLUE << "EXT: " << extension << std::endl;
 		it = request.location.second.cgi.second.find(extension);
-        std::cout << request.location.second.cgi.second.find(extension)->second << std::endl;
 		if (it != request.location.second.cgi.second.end()) {
 			std::stringstream ss;
 

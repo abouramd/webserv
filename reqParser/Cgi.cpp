@@ -19,23 +19,16 @@ char	*Cgi::strDup(std::string src) {
 }
 
 void Cgi::setEnv() {
-	std::string	root(request.location.second.root.begin(), request.location.second.root.end() - 1);
+    int i = 0;
 
-	env = new char * [11];
-	env[0] = strDup("REQUEST_METHOD=" + request.method);
-	env[1] = strDup("CONTENT_TYPE=" + request.headers["content-type"]);
-	env[2] = strDup("CONTENT_LENGTH=" + request.headers["content-length"]);
-	env[3] = strDup("HTTP_USER_AGENT=" + request.headers["user-agent"]);
-	env[4] = strDup("SCRIPT_FILENAME=" + request.fullPath);
-	env[5] = strDup("QUERY_STRING=" + request.query);
-	env[6] = strDup("REDIRECT_STATUS=200");
-	env[7] = strDup("PATH_INFO=" + request.location.second.root + request.target);
-	env[8] = strDup("HTTP_COOKIE=" + request.headers["cookie"]);
-	env[9] = strDup("SCRIPT_NAME=" + request.path);
-	env[10] = NULL;
-  std::cout << RED << "--ENV--" << DFL << std::endl;
-  for (int i = 0; i < 10; i++)
-    std::cout << PURPLE << env[i] << DFL << std::endl;
+	this->env = new char * [request.env.size() + 1];
+    for (std::map<std::string, std::string>::iterator it; it != request.env.end(); it++) {
+        this->env[i] = strDup(it->first + "=" + it->second);
+        std::cout << PURPLE << env[i] << DFL << std::endl;
+        i++;
+    }
+    this->env[i] = NULL;
+    std::cout << RED << "--ENV--" << DFL << std::endl;
 }
 
 void  Cgi::executeCgi() {

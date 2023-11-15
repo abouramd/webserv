@@ -12,7 +12,7 @@ void    checkFirstBoundary(Client & request) {
 }
 
 void    boundS(Client & request) {
-    std::string newBoundary("\r\n" + request.boundary), lastTwo;
+    std::string newBoundary("\r\n" + request.boundary);
     size_t      startSize = request.boundBuf.size(), size = newBoundary.size() + 2;
     bool        breaked = false;
 
@@ -25,21 +25,26 @@ void    boundS(Client & request) {
             request.boundBuf += request.buf[request.position];
         }
         else
-            lastTwo += request.buf[request.position];
+            request.lastTwo += request.buf[request.position];
         request.position++;
         startSize++;
     }
-    if (lastTwo == "--")
+    if (request.lastTwo == "--") {
+        request.lastTwo.clear();
+        std::cout << "dooone" << std::endl;
         throw 201;
-    else if (lastTwo == "\r\n") {
+    }
+    else if (request.lastTwo == "\r\n") {
         request.boundBuf.clear();
         request.boundState = HEAD;
+        request.lastTwo.clear();
         request.outfile->close();
         return;
     }
-    else if (breaked || lastTwo.size() == 2) {
+    else if (breaked || request.lastTwo.size() == 2) {
         request.outfile->write(request.boundBuf.c_str(), request.boundBuf.size());
         request.boundState = BOD;
+        request.lastTwo.clear();
         request.boundBuf.clear();
     }
 }
@@ -47,7 +52,7 @@ void    boundS(Client & request) {
 void    bodS(Client & request) {
     size_t  posOfBound, size;
 
-    posOfBound = Tools::findBin(request.buf, '\r', request.position, request.buffSize - request.position);
+    posOfBound = Tools::findBin(request.buf, '\r', request.position, request.buffSize);
     if (posOfBound == std::string::npos)
         size = request.buffSize - request.position;
     else {

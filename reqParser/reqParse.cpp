@@ -166,6 +166,7 @@ void    getHeader(Client & request) {
 }
 
 void    checkErrors(Client & request, std::vector<Server>& serv) {
+    std::cout << "-------" << request.headers["content-type"] << std::endl;
     findServ(request, serv, request.host, request.target);
     if (std::find(request.location.second.allow_method.begin(), request.location.second.allow_method.end(), request.method) == request.location.second.allow_method.end())
         throw 405;
