@@ -22,9 +22,8 @@ void Cgi::setEnv() {
     int i = 0;
 
 	this->env = new char * [request.env.size() + 1];
-    for (std::map<std::string, std::string>::iterator it; it != request.env.end(); it++) {
+    for (std::map<std::string, std::string>::iterator it = request.env.begin(); it != request.env.end(); it++) {
         this->env[i] = strDup(it->first + "=" + it->second);
-        std::cout << PURPLE << env[i] << DFL << std::endl;
         i++;
     }
     this->env[i] = NULL;

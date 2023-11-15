@@ -243,6 +243,7 @@ void    reqParser(Client & request, int sock, std::vector<Server>& serv) {
 	}
 	catch (int status) {
 		std::cout << "status code : " << status << std::endl;
+        request.setEnv();
         if (request.method == "POST" && (status == 200 || status == 201) && request.isCgi) {
 			Cgi	cgi(request);
 

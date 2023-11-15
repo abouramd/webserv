@@ -49,6 +49,7 @@ enum chunkState {
 
 struct Client {
     Client(int fd, std::ifstream* i, std::ofstream* o, std::map<int, std::string> e, std::map<int, std::string> ed);
+    void    setEnv();
 
     std::map<int, std::string> error_page;
     std::map<int, std::string> error_page_dfl;
