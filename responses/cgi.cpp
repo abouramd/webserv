@@ -51,7 +51,8 @@ void cgi(Client &client)
     convert << num;
     std::string filename = convert.str();
     filename = "temp/" + filename;
-    int fd = open(filename.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+    client.outfile->open(filename.c_str());
+    client.outfile->close();
     if (!(client.pid = fork()))
     {
         char** env = get_env(client);
@@ -61,7 +62,7 @@ void cgi(Client &client)
             std::cout << env[i] << std::endl;
             i++;
         }
-        dup2(fd, 1);
+		    freopen(filename.c_str(), "w", stdout);
         char* argv[] = { const_cast<char*>(client.location.second.cgi.second[get_ex(client.fullPath)].c_str()), const_cast<char*>(client.fullPath.c_str()), NULL };
         execve(argv[0], argv, env);
     }

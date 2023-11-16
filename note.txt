@@ -6,4 +6,6 @@ with chrome probleme in fd inc
 /pla/cookies.py mochkilt Set-cookies mkoaynach f lheaders ymkn
 
 
+if execve faild 500
+
 
