@@ -13,7 +13,7 @@ void get(Client &client)
         std::string type = FileType::getContentType(get_ex(client.fullPath));
         if (!is_cgi(client))
         {
-            s_header(client.fd, client.state_string, type);
+            s_header(client, client.fd, client.state_string, type);
             client.is->open(client.fullPath.c_str());
         }
         else
@@ -33,7 +33,7 @@ void get(Client &client)
             std::string type = FileType::getContentType(get_ex(client.fullPath));
             if (!is_cgi(client))
             {
-                s_header(client.fd, client.state_string, type);
+                s_header(client, client.fd, client.state_string, type);
                 client.is->open(client.fullPath.c_str());
             }
             else
@@ -47,7 +47,7 @@ void get(Client &client)
             }
             else
             {
-                s_header(client.fd, "403 Forbidden", "text/html");
+                s_header(client, client.fd, "403 Forbidden", "text/html");
                 client.is->open(get_page(client, 403).c_str());
             }
         }
@@ -85,18 +85,18 @@ void ft_delete(Client &client)
     if (is_dir(client.fullPath) == 0)
     {
         remove(client.fullPath.c_str());
-        s_header(client.fd, "204 Deleted", "text/html");
+        s_header(client, client.fd, "204 Deleted", "text/html");
         client.is->open("error_pages/204.html");
     }
     else if (is_dir(client.fullPath) == 1)
     {
         delete_dir(client.fullPath);
-        s_header(client.fd, "204 Deleted", "text/html");
+        s_header(client, client.fd, "204 Deleted", "text/html");
         client.is->open("error_pages/204.html");
     }
     else
     {
-        s_header(client.fd, "404 Page Not Found", "text/html");
+        s_header(client, client.fd, "404 Page Not Found", "text/html");
         client.is->open("error_pages/404.html");
     }
 }

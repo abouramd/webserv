@@ -9,3 +9,18 @@ with chrome probleme in fd inc
 if execve faild 500
 
 
+
+
+
+chaeck -1 and 0 after read and write
+
+
+
+in the case of read if -1 or 0 close 
+
+
+in the case of write if -1 close the client if 0 or the amount of write diff the buffer size use seeg t omove the pointer of the file
+
+
+
+

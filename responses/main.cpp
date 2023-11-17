@@ -2,7 +2,6 @@
 
 void responses(Client &client)
 {
-    char buffer[1024];        
     if (!client.is->is_open())
     {
         client.state_string = "200 OK";
@@ -57,14 +56,14 @@ void responses(Client &client)
                 write(client.fd, header.c_str(), header.size());
                 client.is_cgi = 4;
             }
-            client.is->read(buffer, sizeof(buffer));
+            client.is->read(client.buf, 100);
             if (client.is->gcount())
             {
-                s_chank(client.fd, buffer, client.is->gcount());
+                s_chank(client, client.fd, client.buf, client.is->gcount());
             }
             else
             {
-                s_chank(client.fd, "", 0);
+                s_chank(client, client.fd, "", 0);
                 client.is->close();
                 client.state = CLOSE;
                 if (client.is_cgi == 4 || client.is_cgi == 5)
@@ -79,7 +78,7 @@ void responses(Client &client)
             std::time_t currentTime = time(NULL);
             if (currentTime - client.currentTime > 10)
             {
-                s_header(client.fd, "408 Timed out", "text/html");
+                s_header(client, client.fd, "408 Timed out", "text/html");
                 client.is->close();
                 client.is->open("error_pages/408.html");
                 kill(client.pid, SIGINT);

@@ -5,6 +5,7 @@
 #include "reqParser/reqParse.hpp"
 #include "responses/responses.hpp"
 // #include <bits/types/struct_timeval.h>
+#include <cstring>
 #include <sys/time.h>
 #include <cstdio>
 #include <fstream>
@@ -61,9 +62,12 @@ void send_chank(int fd, const char *content, const int size)
 	std::string count;
 	base_trans(count, size, 16);
 	count += "\r\n";
-	send(fd, count.c_str(), count.size(), 0);
-	send(fd, content, size, 0);
-	send(fd, "\r\n", 2, 0);
+  unsigned int new_size = count.size() + size + 2;
+  char s[new_size];
+  std::memcpy(s, count.c_str(), count.size());
+  std::memcpy(s + count.size(), content, size);
+  std::memcpy(s + new_size - 2, "\r\n", 2);
+	send(fd, s, new_size, 0);
 }
 
 /* end test multiplix */
@@ -96,9 +100,9 @@ int max_fd( std::vector<Socket> &my_s, fd_set& tmp_read, fd_set& tmp_write, fd_s
       max_fd = it_s->getFd() < max_fd ? max_fd : it_s->getFd() + 1;
     }
     else
-         std::cout << "error in fd client." << std::endl;
+         std::cout << "error in fd socket." << std::endl;
   }
-  std::cout << "number of client is " << cn << std::endl;
+  // std::cout << "number of client is " << cn << std::endl;
   FD_ZERO(&tmp_err);
   return max_fd;
 }
@@ -137,14 +141,15 @@ int main(int ac, char **av)
   }
   std::map<int, std::pair<std::ifstream*, std::ofstream*> > map_files;
   std::vector<Socket> &my_s = obj.get_socket();
-  fd_set sread , swrite;
-  FD_ZERO(&sread);
-  FD_ZERO(&swrite);
-  for (std::vector<Socket>::iterator it_s = my_s.begin(); it_s != my_s.end(); it_s++)
-    FD_SET(it_s->getFd(), &sread);
+  // fd_set sread , swrite;
+  // FD_ZERO(&sread);
+  // FD_ZERO(&swrite);
+  // for (std::vector<Socket>::iterator it_s = my_s.begin(); it_s != my_s.end(); it_s++)
+  //   FD_SET(it_s->getFd(), &sread);
+  fd_set tmp_read, tmp_write, tmp_err;
+  FD_ZERO(&tmp_err);
   while (1)
   {
-    fd_set tmp_read, tmp_write, tmp_err;
     // FD_ZERO(&tmp_err);
     timeval timeout;
     timeout.tv_sec = 1;
@@ -167,30 +172,28 @@ int main(int ac, char **av)
     {
       for (int i = it_s->client.size() - 1; i >= 0; i--)
       {
-        if (FD_ISSET(it_s->client[i].fd, &tmp_err))
+        // if (FD_ISSET(it_s->client[i].fd, &tmp_err))
+        // {
+        //   // if (it_s->client[i].state == DONE)
+        //   //   FD_CLR(it_s->client[i].fd, &sread);
+        //   // else
+        //   //   FD_CLR(it_s->client[i].fd, &swrite);
+        //   close(it_s->client[i].fd);
+        //   map_files[it_s->client[i].fd].first->close();
+        //   map_files[it_s->client[i].fd].second->close();
+        //   delete map_files[it_s->client[i].fd].first;
+        //   delete map_files[it_s->client[i].fd].second;
+        //   map_files.erase(it_s->client[i].fd);
+        //   std::cout << RED << get_time() << " remove a client after found it in error fd_set " << it_s->client[i].fd << DFL << std::endl;
+        //   it_s->client.erase(it_s->client.begin() + i);
+        // }
+        // else
+        if (FD_ISSET(it_s->client[i].fd, &tmp_write))
         {
-          if (it_s->client[i].state == DONE)
-            FD_CLR(it_s->client[i].fd, &sread);
-          else
-            FD_CLR(it_s->client[i].fd, &swrite);
-          close(it_s->client[i].fd);
-          map_files[it_s->client[i].fd].first->close();
-          map_files[it_s->client[i].fd].second->close();
-          delete map_files[it_s->client[i].fd].first;
-          delete map_files[it_s->client[i].fd].second;
-          map_files.erase(it_s->client[i].fd);
-          std::cout << RED << get_time() << " remove a client after found it in error fd_set " << it_s->client[i].fd << DFL << std::endl;
-          it_s->client.erase(it_s->client.begin() + i);
-        }
-        else if (FD_ISSET(it_s->client[i].fd, &tmp_write))
-        {
-          // std::cout << it_s->client[i].method <<  ": in res" << std::endl;
-          // if (it_s->client[i].method == "POST")
-            // std::exit(1);
           it_s->client[i].request_time = std::time(NULL);
           responses(it_s->client[i]);          
           if (it_s->client[i].state == CLOSE ) {
-            FD_CLR(it_s->client[i].fd, &swrite);
+            // FD_CLR(it_s->client[i].fd, &swrite);
             close(it_s->client[i].fd);
             map_files[it_s->client[i].fd].first->close();
             map_files[it_s->client[i].fd].second->close();
@@ -207,12 +210,12 @@ int main(int ac, char **av)
           reqParser(it_s->client[i], it_s->client[i].fd, it_s->serv);
           if ( it_s->client[i].state == DONE )
           {
-            FD_CLR(it_s->client[i].fd, &sread);
-            FD_SET(it_s->client[i].fd, &swrite);
+            // FD_CLR(it_s->client[i].fd, &sread);
+            // FD_SET(it_s->client[i].fd, &swrite);
             std::cout << BLUE << get_time() << " end of request and swap " << it_s->client[i].fd << " to responce." << DFL << std::endl;
           }
           else if (it_s->client[i].state == CLOSE ) {
-            FD_CLR(it_s->client[i].fd, &sread);
+            // FD_CLR(it_s->client[i].fd, &sread);
             close(it_s->client[i].fd);
             map_files[it_s->client[i].fd].first->close();
             map_files[it_s->client[i].fd].second->close();
@@ -224,10 +227,10 @@ int main(int ac, char **av)
           }
         }
         else if (it_s->client[i].request_time + 60 < std::time(NULL)) {
-          if (it_s->client[i].state == DONE)
-            FD_CLR(it_s->client[i].fd, &sread);
-          else
-            FD_CLR(it_s->client[i].fd, &swrite);
+          // if (it_s->client[i].state == DONE)
+            // FD_CLR(it_s->client[i].fd, &sread);
+          // else
+          //   FD_CLR(it_s->client[i].fd, &swrite);
           close(it_s->client[i].fd);
           map_files[it_s->client[i].fd].first->close();
           map_files[it_s->client[i].fd].second->close();
@@ -244,10 +247,10 @@ int main(int ac, char **av)
         int fd = accept(it_s->getFd(), NULL, NULL);
         if (fd > 0)
         {
-        map_files[fd] = make_pair(new std::ifstream, new std::ofstream);
-        FD_SET(fd, &sread);
-        it_s->client.push_back(Client(fd, map_files[fd].first, map_files[fd].second, it_s->serv[0].error_page, it_s->serv[0].error_page_dfl));
-        std::cout << YELLOW << get_time() << " accept a client " << fd << DFL << std::endl;
+          map_files[fd] = make_pair(new std::ifstream, new std::ofstream);
+        // FD_SET(fd, &sread);
+          it_s->client.push_back(Client(fd, map_files[fd].first, map_files[fd].second, it_s->serv[0].error_page, it_s->serv[0].error_page_dfl));
+          std::cout << YELLOW << get_time() << " accept a client " << fd << DFL << std::endl;
         }
       }
     }
