@@ -84,7 +84,10 @@ void    bodS(Client & request) {
 }
 
 void    headS(Client & request) {
+    if (request.boundBuf == NULL)
+      std::cout << "NULL happend" << std::endl;
     while (request.position < request.buffSize && request.buf[request.position] != '\n') {
+
         request.boundBuf += request.buf[request.position];
         request.position++;
     }

@@ -140,6 +140,11 @@ bool    String::operator==(const String& other) const {
 }
 
 bool    String::operator==( const char * str ) const {
+  if (str == NULL) {
+    if (data == NULL)
+      return true;
+    return false;
+  }
     return  (_size == strlen(str) &&
             ((data == NULL && str == NULL) ||
             (str != NULL && strncmp(data, str, _size) == 0)));

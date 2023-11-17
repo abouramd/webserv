@@ -68,24 +68,58 @@ void send_chank(int fd, const char *content, const int size)
 
 /* end test multiplix */
 
-
-int get_max_fd( std::vector<Socket> &my_s )
+int max_fd( std::vector<Socket> &my_s, fd_set& tmp_read, fd_set& tmp_write, fd_set& tmp_err)
 {
-  int max_fd = -1;
-  // int cn = 0;
-
+  int max_fd = 0;
+  int cn = 0;
+  FD_ZERO(&tmp_write);
+  FD_ZERO(&tmp_read);
   for (std::vector<Socket>::iterator it_s = my_s.begin(); it_s != my_s.end(); it_s++)
   {
     for (std::vector<Client>::iterator it_c = it_s->client.begin(); it_c != it_s->client.end(); it_c++)
     {
-      max_fd = it_c->fd < max_fd ? max_fd : it_c->fd + 1;
-      // cn++;
+      if (!FD_ISSET(it_c->fd, &tmp_err))
+      {
+        if (it_c->state == DONE)
+          FD_SET(it_c->fd, &tmp_write);
+        else
+          FD_SET(it_c->fd, &tmp_read);
+        max_fd = it_c->fd < max_fd ? max_fd : it_c->fd + 1;
+      }
+      else
+         std::cout << "error in fd client." << std::endl;
+      cn++;
     }
-    max_fd = it_s->getFd() < max_fd ? max_fd : it_s->getFd() + 1;
+    if (!FD_ISSET(it_s->getFd(), &tmp_err))
+    {
+      FD_SET(it_s->getFd(), &tmp_read);
+      max_fd = it_s->getFd() < max_fd ? max_fd : it_s->getFd() + 1;
+    }
+    else
+         std::cout << "error in fd client." << std::endl;
   }
-  // std::cout << "number of client is " << cn << std::endl;
+  std::cout << "number of client is " << cn << std::endl;
+  FD_ZERO(&tmp_err);
   return max_fd;
 }
+
+// int get_max_fd( std::vector<Socket> &my_s )
+// {
+//   int max_fd = -1;
+//   // int cn = 0;
+
+//   for (std::vector<Socket>::iterator it_s = my_s.begin(); it_s != my_s.end(); it_s++)
+//   {
+//     for (std::vector<Client>::iterator it_c = it_s->client.begin(); it_c != it_s->client.end(); it_c++)
+//     {
+//       max_fd = it_c->fd < max_fd ? max_fd : it_c->fd + 1;
+//       // cn++;
+//     }
+//     max_fd = it_s->getFd() < max_fd ? max_fd : it_s->getFd() + 1;
+//   }
+//   // std::cout << "number of client is " << cn << std::endl;
+//   return max_fd;
+// }
 
 int main(int ac, char **av)
 {
@@ -110,17 +144,22 @@ int main(int ac, char **av)
     FD_SET(it_s->getFd(), &sread);
   while (1)
   {
-    fd_set tmp_read = sread, tmp_write = swrite, tmp_err;
-    FD_ZERO(&tmp_err);
+    fd_set tmp_read, tmp_write, tmp_err;
+    // FD_ZERO(&tmp_err);
     timeval timeout;
     timeout.tv_sec = 1;
     timeout.tv_usec = 0;
-    int ready = select(get_max_fd(my_s), &tmp_read, &tmp_write, &tmp_err, &timeout);
+    int ready = select(max_fd(my_s, tmp_read, tmp_write, tmp_err), &tmp_read, &tmp_write, &tmp_err, &timeout);
     // std::cout << "pass select" << std::endl;
-    if (ready <= 0)
+    if (ready == -1)
     {
-      if (ready == -1)
-        std::cerr << "select failed" << std::endl;
+      std::cerr << "select failed" << std::endl;
+      // clear_fd(my_s, sread, swrite, tmp_err);
+      continue;
+    }
+    if (ready == 0)
+    {
+      std::cout << "no fd set" << std::endl;
       continue;
     }
 
