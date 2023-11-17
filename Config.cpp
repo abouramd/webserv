@@ -8,59 +8,65 @@
 #include <sstream>
 #include <string>
 #ifndef __APPLE__
-  #include <endian.h>
+#include <endian.h>
 #endif // !__APPLE__
+#include <cstring>
 #include <sys/socket.h>
 #include <vector>
-#include <cstring>
 
-Config::Config()
-{
-
+Config::Config() {
+  FD_ZERO(&this->err_fd);
+  FD_ZERO(&this->read_fd);
+  FD_ZERO(&this->write_fd);
 }
 
-// Config::Config(const Config& obj)
-// {
-//   (void) obj;
-// }
-//
-// Config& Config::operator=(const Config& obj)
-// {
-//   (void) obj;
-//   return *this;
-// }
-//
-Config::~Config()
-{
+Config::~Config() {}
 
+int Config::add_client(Socket &sock) {
+  int fd = accept(sock.getFd(), NULL, NULL);
+  if (fd < 0)
+    return -1;
+  map_files[fd] = make_pair(new std::ifstream, new std::ofstream);
+  sock.client.push_back(Client(fd, map_files[fd].first, map_files[fd].second, sock.serv[0].error_page, sock.serv[0].error_page_dfl));
+  return 0;
 }
 
-void Config::pars(int ac, char **av)
+void Config::rm_client(Socket& sock, int index)
 {
+  if (index >= 0 && index < (int)sock.client.size())
+  {
+    close(sock.client[index].fd);
+    map_files[sock.client[index].fd].first->close();
+    map_files[sock.client[index].fd].second->close();
+    delete map_files[sock.client[index].fd].first;
+    delete map_files[sock.client[index].fd].second;
+    map_files.erase(sock.client[index].fd);
+    sock.client.erase(sock.client.begin() + index);
+  }
+}
+
+void Config::pars(int ac, char **av) {
   this->init_data(ac, av);
   this->read_data();
   this->creat_socket();
 }
 
-
-void Config::init_data(int ac, char **av)
-{
+void Config::init_data(int ac, char **av) {
   if (ac != 2)
-    throw std::string("Error: number of args (the programe should take ane param).");
-  
+    throw std::string(
+        "Error: number of args (the programe should take ane param).");
+
   this->filename = av[1];
-  
+
   this->file.open(av[1]);
   if (!this->file.is_open())
     throw "Error" + std::string(strerror(errno)) + " (" + this->filename + ").";
 }
 
-void Config::read_data()
-{
+void Config::read_data() {
   std::string buffer;
 
-  while (ft_read(this->file, buffer))
-  {
+  while (ft_read(this->file, buffer)) {
     Server serv;
     if (buffer == "server {")
       serv.init_data(this->file);
@@ -68,32 +74,30 @@ void Config::read_data()
       throw "Error: " + buffer;
     serv.check();
     this->servers.push_back(serv);
-    
+
     // std::cout << "=> " << this->servers[0].getPort().size() << std::endl;
-     // std::cout << "port " <<  serv.getPort().size() << std::endl;
+    // std::cout << "port " <<  serv.getPort().size() << std::endl;
   }
   this->file.close();
 }
 
-void Config::creat_socket()
-{
+void Config::creat_socket() {
   std::vector<Server>::iterator it_sev = this->servers.begin();
-  while (it_sev != this->servers.end())
-  {
+  while (it_sev != this->servers.end()) {
     sockaddr_in addr;
     inet_aton(it_sev->getHost().c_str(), &addr.sin_addr);
     std::vector<std::string> ports = it_sev->getPort();
-    // std::cout << "number of servers is " << this->servers.size() << " " << it_sev->getPort().size() << std::endl;
+    // std::cout << "number of servers is " << this->servers.size() << " " <<
+    // it_sev->getPort().size() << std::endl;
     std::vector<std::string>::iterator it_port = ports.begin();
-    while (it_port != ports.end())
-    {
+    while (it_port != ports.end()) {
       std::stringstream str;
       int p;
 
       str << *it_port;
       str >> p;
 
-      addr.sin_port = htons(p); 
+      addr.sin_port = htons(p);
 
       this->add_socket(addr, *it_sev, p);
 
@@ -102,8 +106,6 @@ void Config::creat_socket()
     it_sev++;
   }
 }
-
-
 
 void Config::add_socket(sockaddr_in &addr, Server &sev, int &port) {
   std::vector<Socket>::iterator it = this->socket.begin();
@@ -132,9 +134,4 @@ void Config::add_socket(sockaddr_in &addr, Server &sev, int &port) {
   this->socket.push_back(obj);
 }
 
-std::vector<Socket>& Config::get_socket()
-{
-  return this->socket;
-}
-
-
+std::vector<Socket> &Config::get_socket() { return this->socket; }

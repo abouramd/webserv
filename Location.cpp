@@ -265,7 +265,6 @@ void Location::set_cgi_path(const std::string &str)
     this->cgi.second[vec[1]] = vec[2];
   else 
     throw std::string("Error: CGI Path `" + vec[2] + "` is not exec (" + str + ")");
-
 }
 
 void Location::check()

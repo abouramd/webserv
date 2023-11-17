@@ -72,38 +72,46 @@ void send_chank(int fd, const char *content, const int size)
 
 /* end test multiplix */
 
-int max_fd( std::vector<Socket> &my_s, fd_set& tmp_read, fd_set& tmp_write, fd_set& tmp_err)
+int max_fd( Config &obj )
 {
   int max_fd = 0;
-  int cn = 0;
-  FD_ZERO(&tmp_write);
-  FD_ZERO(&tmp_read);
-  for (std::vector<Socket>::iterator it_s = my_s.begin(); it_s != my_s.end(); it_s++)
+  std::time_t ttime = std::time(NULL);
+
+  // int cn = 0;
+  FD_ZERO(&obj.write_fd);
+  FD_ZERO(&obj.read_fd);
+  obj.timeout.tv_sec = 1;
+  obj.timeout.tv_usec = 0;
+  for (std::vector<Socket>::iterator it_s = obj.socket.begin(); it_s != obj.socket.end(); it_s++)
   {
-    for (std::vector<Client>::iterator it_c = it_s->client.begin(); it_c != it_s->client.end(); it_c++)
+    // std::cout << it_s->client.size() << std::endl;
+    for (int i = it_s->client.size() - 1; i >= 0 ; i--)
     {
-      if (!FD_ISSET(it_c->fd, &tmp_err))
+      if (!FD_ISSET(it_s->client[i].fd, &obj.err_fd) && it_s->client[i].state != CLOSE && it_s->client[i].request_time + 60 > ttime)
       {
-        if (it_c->state == DONE)
-          FD_SET(it_c->fd, &tmp_write);
+        if (it_s->client[i].state == DONE)
+          FD_SET(it_s->client[i].fd, &obj.write_fd);
         else
-          FD_SET(it_c->fd, &tmp_read);
-        max_fd = it_c->fd < max_fd ? max_fd : it_c->fd + 1;
+          FD_SET(it_s->client[i].fd, &obj.read_fd);
+        max_fd = it_s->client[i].fd < max_fd ? max_fd : it_s->client[i].fd + 1;
       }
       else
-         std::cout << "error in fd client." << std::endl;
-      cn++;
+      {
+        std::cout << RED << get_time() << " remove client fd " << it_s->client[i].fd << DFL << std::endl;
+        obj.rm_client(*it_s, i);
+      }
+      // cn++;
     }
-    if (!FD_ISSET(it_s->getFd(), &tmp_err))
+    if (!FD_ISSET(it_s->getFd(), &obj.err_fd))
     {
-      FD_SET(it_s->getFd(), &tmp_read);
+      FD_SET(it_s->getFd(), &obj.read_fd);
       max_fd = it_s->getFd() < max_fd ? max_fd : it_s->getFd() + 1;
     }
     else
          std::cout << "error in fd socket." << std::endl;
   }
   // std::cout << "number of client is " << cn << std::endl;
-  FD_ZERO(&tmp_err);
+  FD_ZERO(&obj.err_fd);
   return max_fd;
 }
 
@@ -139,119 +147,33 @@ int main(int ac, char **av)
     std::cerr << RED << err << DFL << std::endl;
     return 1;
   }
-  std::map<int, std::pair<std::ifstream*, std::ofstream*> > map_files;
-  std::vector<Socket> &my_s = obj.get_socket();
-  // fd_set sread , swrite;
-  // FD_ZERO(&sread);
-  // FD_ZERO(&swrite);
-  // for (std::vector<Socket>::iterator it_s = my_s.begin(); it_s != my_s.end(); it_s++)
-  //   FD_SET(it_s->getFd(), &sread);
-  fd_set tmp_read, tmp_write, tmp_err;
-  FD_ZERO(&tmp_err);
-  while (1)
-  {
-    // FD_ZERO(&tmp_err);
-    timeval timeout;
-    timeout.tv_sec = 1;
-    timeout.tv_usec = 0;
-    int ready = select(max_fd(my_s, tmp_read, tmp_write, tmp_err), &tmp_read, &tmp_write, &tmp_err, &timeout);
-    // std::cout << "pass select" << std::endl;
-    if (ready == -1)
-    {
-      std::cerr << "select failed" << std::endl;
-      // clear_fd(my_s, sread, swrite, tmp_err);
-      continue;
-    }
-    if (ready == 0)
-    {
-      std::cout << "no fd set" << std::endl;
-      continue;
-    }
 
-    for (std::vector<Socket>::iterator it_s = my_s.begin(); it_s != my_s.end(); it_s++)
+  while ( true )
+  {
+    if (select(max_fd(obj), &obj.read_fd, &obj.write_fd, &obj.err_fd, &obj.timeout) <= 0)
+      continue;
+    // std::cout << "hello" << std::endl;
+    for (std::vector<Socket>::iterator it_s = obj.socket.begin(); it_s != obj.socket.end(); it_s++)
     {
       for (int i = it_s->client.size() - 1; i >= 0; i--)
       {
-        // if (FD_ISSET(it_s->client[i].fd, &tmp_err))
-        // {
-        //   // if (it_s->client[i].state == DONE)
-        //   //   FD_CLR(it_s->client[i].fd, &sread);
-        //   // else
-        //   //   FD_CLR(it_s->client[i].fd, &swrite);
-        //   close(it_s->client[i].fd);
-        //   map_files[it_s->client[i].fd].first->close();
-        //   map_files[it_s->client[i].fd].second->close();
-        //   delete map_files[it_s->client[i].fd].first;
-        //   delete map_files[it_s->client[i].fd].second;
-        //   map_files.erase(it_s->client[i].fd);
-        //   std::cout << RED << get_time() << " remove a client after found it in error fd_set " << it_s->client[i].fd << DFL << std::endl;
-        //   it_s->client.erase(it_s->client.begin() + i);
-        // }
-        // else
-        if (FD_ISSET(it_s->client[i].fd, &tmp_write))
+        if (FD_ISSET(it_s->client[i].fd, &obj.write_fd))
         {
           it_s->client[i].request_time = std::time(NULL);
           responses(it_s->client[i]);          
-          if (it_s->client[i].state == CLOSE ) {
-            // FD_CLR(it_s->client[i].fd, &swrite);
-            close(it_s->client[i].fd);
-            map_files[it_s->client[i].fd].first->close();
-            map_files[it_s->client[i].fd].second->close();
-            delete map_files[it_s->client[i].fd].first;
-            delete map_files[it_s->client[i].fd].second;
-            map_files.erase(it_s->client[i].fd);
-            std::cout << PURPLE << get_time() << " remove a client " << it_s->client[i].fd << DFL << std::endl;
-            it_s->client.erase(it_s->client.begin() + i); 
-          }
         }
-        else if (FD_ISSET(it_s->client[i].fd, &tmp_read))
+        else if (FD_ISSET(it_s->client[i].fd, &obj.read_fd))
         {
           it_s->client[i].request_time = std::time(NULL);
           reqParser(it_s->client[i], it_s->client[i].fd, it_s->serv);
           if ( it_s->client[i].state == DONE )
-          {
-            // FD_CLR(it_s->client[i].fd, &sread);
-            // FD_SET(it_s->client[i].fd, &swrite);
             std::cout << BLUE << get_time() << " end of request and swap " << it_s->client[i].fd << " to responce." << DFL << std::endl;
-          }
-          else if (it_s->client[i].state == CLOSE ) {
-            // FD_CLR(it_s->client[i].fd, &sread);
-            close(it_s->client[i].fd);
-            map_files[it_s->client[i].fd].first->close();
-            map_files[it_s->client[i].fd].second->close();
-            delete map_files[it_s->client[i].fd].first;
-            delete map_files[it_s->client[i].fd].second;
-            map_files.erase(it_s->client[i].fd);
-            std::cout << PURPLE << get_time() << " remove a client " << it_s->client[i].fd << DFL << std::endl;
-            it_s->client.erase(it_s->client.begin() + i); 
-          }
         }
-        else if (it_s->client[i].request_time + 60 < std::time(NULL)) {
-          // if (it_s->client[i].state == DONE)
-            // FD_CLR(it_s->client[i].fd, &sread);
-          // else
-          //   FD_CLR(it_s->client[i].fd, &swrite);
-          close(it_s->client[i].fd);
-          map_files[it_s->client[i].fd].first->close();
-          map_files[it_s->client[i].fd].second->close();
-          delete map_files[it_s->client[i].fd].first;
-          delete map_files[it_s->client[i].fd].second;
-          map_files.erase(it_s->client[i].fd);
-          std::cout << PURPLE << get_time() << " remove a client after 1 min timeout " << it_s->client[i].fd << DFL << std::endl;
-          it_s->client.erase(it_s->client.begin() + i); 
-        }
-
       }
-      if (FD_ISSET(it_s->getFd(), &tmp_read))
+      if (FD_ISSET(it_s->getFd(), &obj.read_fd))
       {
-        int fd = accept(it_s->getFd(), NULL, NULL);
-        if (fd > 0)
-        {
-          map_files[fd] = make_pair(new std::ifstream, new std::ofstream);
-        // FD_SET(fd, &sread);
-          it_s->client.push_back(Client(fd, map_files[fd].first, map_files[fd].second, it_s->serv[0].error_page, it_s->serv[0].error_page_dfl));
-          std::cout << YELLOW << get_time() << " accept a client " << fd << DFL << std::endl;
-        }
+        if (obj.add_client(*it_s) != -1)
+          std::cout << GREEN << get_time() << " new client fd " << it_s->client.back().fd << DFL << std::endl;
       }
     }
   }

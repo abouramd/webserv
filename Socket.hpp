@@ -36,8 +36,8 @@ public:
     int getPort() const;
 
     void connectASocket();
-  
-    void check_server_name(std::vector<std::string> &ports);
+    
+    void check_server_name(std::vector<std::string> &ports); 
     
     std::vector<Client> client;
     std::vector<Server> serv;
