@@ -47,7 +47,7 @@ void  Cgi::executeCgi() {
 	request.outfile->close();
   request.cgiInFileName = request.cgiFileName;
   request.cgiFileName = ss.str();
-	request.outfile->open(request.cgiFileName);
+	request.outfile->open(request.cgiFileName.c_str());
 	request.outfile->close();
 	pid = fork();
 	if (!pid) {
