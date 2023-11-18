@@ -4,6 +4,8 @@ void    strNcpy(char *dest, const char *src, size_t n)
 {
    size_t i;
 
+   if (dest == NULL || src == NULL || n == 0)
+       return ;
    for (i = 0; i < n ; i++)
        dest[i] = src[i];
 }
@@ -14,6 +16,7 @@ String::String() : data(NULL), _size(0) {
 }
 
 String::String(const char* str, const size_t & size) {
+    _size = 0;
     if (str) {
         _size = size;
         data = new char[size + 1];
@@ -87,7 +90,7 @@ size_t  String::size() const {
 size_t  String::match(const char *str) const {
     size_t  i = 0;
 
-    if (strlen(str) > _size)
+    if (!str || strlen(str) > _size)
         return std::string::npos;
     while (i < strlen(str)) {
         if (static_cast<char>(std::tolower(data[i])) != str[i])
@@ -119,12 +122,20 @@ String String::operator+ (const String& other) const {
 void    String::operator+= (const char c) {
     String result;
 
-    result._size = _size + 1;
-    result.data = new char[result._size + 1];
-    strNcpy(result.data, data, _size);
-    result.data[_size] = c;
-    result.data[result._size] = '\0';
-    *this = result;
+    if (data == NULL) {
+        data = new char[2];
+        data[0] = c;
+        data[1] = 0;
+        _size = 1;
+    }
+    else {
+        result._size = _size + 1;
+        result.data = new char[result._size + 1];
+        strNcpy(result.data, data, _size);
+        result.data[_size] = c;
+        result.data[result._size] = '\0';
+        *this = result;
+    }
 }
 
 char    String::operator[] (const size_t idx) const {
@@ -145,9 +156,9 @@ bool    String::operator==( const char * str ) const {
       return true;
     return false;
   }
-    return  (_size == strlen(str) &&
-            ((data == NULL && str == NULL) ||
-            (str != NULL && strncmp(data, str, _size) == 0)));
+  else if (data == NULL)
+      return false;
+  return  (_size == strlen(str) && strncmp(data, str, _size) == 0);
 }
 
 bool    String::operator!=(const String& other) const {

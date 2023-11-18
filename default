@@ -26,28 +26,31 @@
 server {
 host 127.0.0.1
 listen 5000
-
+server_name localhost:5000
+max_body_size 100000000000
 
 location / {
-  root ./www/
-  allow_method GET POST
+  root ./
+  allow_method POST GET
   auto_index on
+  uploade on /
   cgi on
   cgi_path php /bin/php-cgi
   cgi_path py /bin/python3
   cgi_path pl /bin/perl
 }
 
-location /upload/ {
+location /upload {
   root ./www/upload/
-  allow_method GET POST
+  allow_method POST
   auto_index on
   uploade on /
 }
 
 location /test {
- return http://google.com
-  root /
+  allow_method GET
+  root ./www/
+  auto_index on
 }
 }
 

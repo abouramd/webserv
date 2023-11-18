@@ -76,7 +76,7 @@ void    checkCrlf(Client & request) {
     if (request.buf[request.position] != '\r' && request.buf[request.position] != '\n'){
         if (request.crlf == "\r\n" || request.crlf == "\n")
             request.pState = SPACE;
-        else if (request.crlf == "\r\n\r\n" || request.crlf == "\n\n") {
+        else if (request.crlf == "\r\n\r\n" || request.crlf == "\n\n" || request.crlf == "\r\n\n" || request.crlf == "\n\r\n") {
             request.pState = CHECK_ERROR;
             request.pNext = BODY;
         }
@@ -232,7 +232,7 @@ void    reqParser(Client & request, int sock, std::vector<Server>& serv) {
 
         amount = read(sock, request.buf, BUFF_SIZE);
         request.position = 0;
-        if (amount == 0) {
+        if (amount == 0 || amount == -1) {
 			request.state = CLOSE;
 			throw 200;
 		}
