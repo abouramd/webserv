@@ -23,7 +23,7 @@
 typedef struct Client Client;
 void responses(Client &client);
 std::string cur_time();
-void s_header(Client& client, int client_socket, std::string status, std::string type);
+int s_header(Client& client, int client_socket, std::string status, std::string type);
 void c_base(std::string& str, int n, const int &base);
 void s_chank(Client& client, int fd, const char *content, const int size);
 int is_dir(std::string& str);

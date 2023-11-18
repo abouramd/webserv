@@ -2,6 +2,7 @@
 
 void responses(Client &client)
 {
+    int n;
     if (!client.is->is_open())
     {
         client.state_string = "200 OK";
@@ -22,10 +23,16 @@ void responses(Client &client)
     }
     else
     {
-        if (client.is_cgi != 5 || waitpid(client.pid, NULL, WNOHANG))
+        if (client.is_cgi != 5 || waitpid(client.pid, &client.pro_state, WNOHANG))
         {
             if (client.is_cgi == 5)
             {
+                if (WEXITSTATUS(client.pro_state) == 500)
+                {
+                    client.statusCode = 500;
+                    client.is->close();
+                    return;
+                }
                 std::string header;// = "HTTP/1.1 200 OK\r\n";
                 std::string head;
                 bool ct(true);
@@ -53,7 +60,15 @@ void responses(Client &client)
                     header += "Content-type: text/html\r\n";
                 header += "Transfer-Encoding: chunked\r\n";
                 header +="\r\n";
-                write(client.fd, header.c_str(), header.size());
+                n = write(client.fd, header.c_str(), header.size());
+                if (n == - 1)
+                {
+                    client.is->close();
+                    remove(client.cgiFileName.c_str());
+                    client.state = CLOSE;
+                }
+                if (!n)
+                    return;
                 client.is_cgi = 4;
             }
             client.is->read(client.buf, 100);
@@ -67,10 +82,7 @@ void responses(Client &client)
                 client.is->close();
                 client.state = CLOSE;
                 if (client.is_cgi == 4 || client.is_cgi == 5)
-                {
-                    client.is->close();
                     remove(client.cgiFileName.c_str());
-                }
             }
         }
         if (client.is_cgi == 5)
@@ -78,7 +90,8 @@ void responses(Client &client)
             std::time_t currentTime = time(NULL);
             if (currentTime - client.currentTime > 10)
             {
-                s_header(client, client.fd, "408 Timed out", "text/html");
+                if (s_header(client, client.fd, "408 Timed out", "text/html"))
+                    return;
                 client.is->close();
                 client.is->open("error_pages/408.html");
                 kill(client.pid, SIGINT);

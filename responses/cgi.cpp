@@ -65,6 +65,7 @@ void cgi(Client &client)
 		    freopen(filename.c_str(), "w", stdout);
         char* argv[] = { const_cast<char*>(client.location.second.cgi.second[get_ex(client.fullPath)].c_str()), const_cast<char*>(client.fullPath.c_str()), NULL };
         execve(argv[0], argv, env);
+        exit(500);
     }
     else
     {

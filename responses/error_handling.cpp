@@ -17,6 +17,12 @@ int error_handling(Client &client)
         client.state_string = "403 Forbidden";
         return 1;
     }
+    if (client.statusCode == 500)
+    {
+        client.fullPath = get_page(client, 500);
+        client.state_string = "500 Internal Server Error";
+        return 1;
+    }
     if (client.statusCode == 404)
     {
         client.fullPath = get_page(client, 404);
