@@ -16,8 +16,9 @@ std::string cur_time() {
 }
 
 
-void s_header(Client& client, int client_socket, std::string status, std::string type)
+int s_header(Client& client, int client_socket, std::string status, std::string type)
 {
+    int n;
 	std::string head = "HTTP/1.1 " + status + "\r\n";
 	head += cur_time() + "\r\n";
 	head += "Server: webserver (abouramd)\r\n";
@@ -25,13 +26,17 @@ void s_header(Client& client, int client_socket, std::string status, std::string
 	head += "Cache-Control: no-store, no-cache, must-revalidate\r\n";
 	head += "Transfer-Encoding: chunked\r\n";	
 	// head += "Connection: keep-alive\r\n";	
-  head += "\r\n";
+    head += "\r\n";
 	// std::cout << head << std::endl;
-	if (write(client_socket, (char *)head.c_str(), head.size()) == -1)
-  {
-    client.state = CLOSE;
-    std::cout << strerror(errno) << "errrrrrrrrrrrrr" << std::endl;
-  }
+    n = write(client_socket, (char *)head.c_str(), head.size());
+	if (n == -1)
+    {
+        client.state = CLOSE;
+        std::cout << strerror(errno) << "errrrrrrrrrrrrr" << std::endl;
+    }
+    if (!n)
+        return 1;
+    return 0;
     // write(1, (char *)head.c_str(), head.size());
 }
 
@@ -45,19 +50,21 @@ void c_base( std::string& str, int n, const int &base)
 
 void s_chank(Client& client, int fd, const char *content, const int size)
 {
-  std::string count;
+    int n;
+    std::string count;
 	c_base(count, size, 16);
 	count += "\r\n";
-  unsigned int new_size = count.size() + size + 2;
-  char s[new_size];
-  std::memcpy(s, count.c_str(), count.size());
-  std::memcpy(s + count.size(), content, size);
-  std::memcpy(s + new_size - 2, "\r\n", 2);
-	if (write(fd, s, new_size) == -1)
-  {
-    client.state = CLOSE;
-    std::cout << strerror(errno) << "errrrrrrrrrrrrr" << std::endl;
-  }
+    unsigned int new_size = count.size() + size + 2;
+    char s[new_size];
+    std::memcpy(s, count.c_str(), count.size());
+    std::memcpy(s + count.size(), content, size);
+    std::memcpy(s + new_size - 2, "\r\n", 2);
+    n = write(fd, s, new_size);
+	if (n == -1)
+    {
+        client.state = CLOSE;
+        std::cout << strerror(errno) << "errrrrrrrrrrrrr" << std::endl;
+    }
 }
 
 int is_dir(std::string& str)
@@ -119,7 +126,6 @@ int get_index(Client &client)
         index = client.fullPath + "/" + client.location.second.index[i];
         if (!access(index.c_str(), F_OK | R_OK) && !is_dir(index))
         {
-            std::cout << "Here: "<< index << std::endl;
             client.fullPath = index;
             return 1;
         }
@@ -132,7 +138,8 @@ int auto_index(Client &client)
 {
     if (client.opened != 5)
     {
-        s_header(client, client.fd, "200 OK", "text/html");
+        if (s_header(client, client.fd, "200 OK", "text/html"))
+            return 0;
         std::string head = "<!DOCTYPE html><html><head><title>Index of "+client.path+"</title><style>body,ul{padding:20px}a,li strong{font-weight:700}body,ul{margin:0}body{background-color:#f8f8f8;font-family:Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh}h1{background-color:#333;border:2px solid #3498db;border-radius:10px;color:#fff;padding:10px;text-align:center;font-size:24px}ul{background-color:#fff;border:2px solid #3498db;border-radius:10px;box-shadow:0 0 15px rgba(0,0,0,.2);width:80%;list-style-type:none}li{margin-bottom:10px;padding:8px;border:1px solid #ccc;border-radius:5px;background-color:#f2f2f2}li strong{color:#e74c3c}a{text-decoration:none;color:#3498db;opacity:1;transition:opacity 1s}a:hover{text-decoration:underline;color:#4ce73c;opacity:.6}</style></head><body><h1>Index of "+client.path+"</h1><ul>";
         s_chank(client, client.fd, head.c_str(), head.size());
         client.dir = opendir(client.fullPath.c_str());
@@ -161,7 +168,13 @@ int auto_index(Client &client)
             }
         }
         else{
-            s_header(client, client.fd, "403 Forbidden", "text/html");
+            if (s_header(client, client.fd, "403 Forbidden", "text/html"))
+            {
+                client.fullPath = get_page(client, 403);
+                client.state_string = "403 Forbidden";
+                client.method = "GET";
+                return 0;
+            }
             client.is->open("error_pages/403.html");
         }
     }

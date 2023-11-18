@@ -13,7 +13,8 @@ void get(Client &client)
         std::string type = FileType::getContentType(get_ex(client.fullPath));
         if (!is_cgi(client))
         {
-            s_header(client, client.fd, client.state_string, type);
+            if (s_header(client, client.fd, client.state_string, type))
+                return;
             client.is->open(client.fullPath.c_str());
         }
         else
@@ -33,7 +34,8 @@ void get(Client &client)
             std::string type = FileType::getContentType(get_ex(client.fullPath));
             if (!is_cgi(client))
             {
-                s_header(client, client.fd, client.state_string, type);
+                if(s_header(client, client.fd, client.state_string, type))
+                    return;
                 client.is->open(client.fullPath.c_str());
             }
             else
@@ -47,7 +49,8 @@ void get(Client &client)
             }
             else
             {
-                s_header(client, client.fd, "403 Forbidden", "text/html");
+                if (s_header(client, client.fd, "403 Forbidden", "text/html"))
+                    return;
                 client.is->open(get_page(client, 403).c_str());
             }
         }
@@ -83,20 +86,24 @@ int delete_dir(std::string name)
 void ft_delete(Client &client)
 {
     if (is_dir(client.fullPath) == 0)
-    {
         remove(client.fullPath.c_str());
-        s_header(client, client.fd, "204 Deleted", "text/html");
-        client.is->open("error_pages/204.html");
-    }
     else if (is_dir(client.fullPath) == 1)
-    {
         delete_dir(client.fullPath);
-        s_header(client, client.fd, "204 Deleted", "text/html");
-        client.is->open("error_pages/204.html");
-    }
     else
     {
-        s_header(client, client.fd, "404 Page Not Found", "text/html");
+        if (s_header(client, client.fd, "404 Page Not Found", "text/html"))
+        {
+            client.fullPath = get_page(client, 404);
+            client.state_string = "404 Page Not Found";
+            client.method = "GET";
+        }
         client.is->open("error_pages/404.html");
     }
+    if (s_header(client, client.fd, "204 Deleted", "text/html"))
+    {
+        client.fullPath = get_page(client, 204);
+        client.state_string = "204 Deleted";
+        client.method = "GET";
+    }
+    client.is->open("error_pages/204.html");
 }
