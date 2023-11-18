@@ -5,8 +5,10 @@
 #include <iostream>
 #include <netinet/in.h>
 #include <string>
-#include <sys/_endian.h>
 
+#ifdef __APPLE__
+#include <sys/_endian.h>
+#endif // !__APPLE__
 #ifndef __APPLE__
 #include <endian.h>
 #endif // !__APPLE__
