@@ -72,12 +72,23 @@ void    skipSpace(Client & request) {
         request.position++;
 }
 
+bool    isEnd(Client & request) {     
+    if (request.crlf == "\r\n\r\n" || request.crlf == "\n\n" || request.crlf == "\r\n\n" || request.crlf == "\n\r\n")
+        return true;
+    return false;
+}
+
 void    checkCrlf(Client & request) {
     if (request.buf[request.position] == '\r' || request.buf[request.position] == '\n')
         request.crlf += request.buf[request.position++];
+    std::cout << request.buffSize << "position >>: " << request.position << std::endl;
+    if (!isEnd(request) && request.position == request.buffSize)
+        return;
     if (request.crlf.size() > 4)
         throw 400;
     if (request.buf[request.position] != '\r' && request.buf[request.position] != '\n'){
+        std::cout << request.crlf.size() << " ::::" << std::endl;
+        
         if (request.crlf == "\r\n" || request.crlf == "\n")
             request.pState = SPACE;
         else if (request.crlf == "\r\n\r\n" || request.crlf == "\n\n" || request.crlf == "\r\n\n" || request.crlf == "\n\r\n") {
@@ -193,7 +204,6 @@ void    checkErrors(Client & request, std::vector<Server>& serv) {
         throw 400;
     if (request.headers.find("content-length") != request.headers.end()) {
         request.contentLength = std::strtol(request.headers["content-length"].c_str(), NULL, 10);
-        std::cout << request.contentLength << ", " << request.maxBodySize << std::endl;
         if (request.contentLength > request.maxBodySize)
             throw 413;
     }
@@ -235,6 +245,7 @@ void    reqParser(Client & request, int sock, std::vector<Server>& serv) {
 		int amount = 1024;
 
         amount = read(sock, request.buf, BUFF_SIZE);
+        std::cout << "amount ::  ," << amount << std::endl; 
         request.position = 0;
         if (amount == 0 || amount == -1) {
 			request.state = CLOSE;
@@ -242,8 +253,9 @@ void    reqParser(Client & request, int sock, std::vector<Server>& serv) {
 		}
 		request.buffSize = amount;
 		request.buf[request.buffSize] = 0;
-        while (request.position < request.buffSize || request.pState == CHECK_ERROR)
+        while (request.position < request.buffSize || request.pState == CHECK_ERROR) {
             hunting(request, serv);
+        }
 	}
 	catch (int status) {
 		std::cout << "status code : " << status << std::endl;
