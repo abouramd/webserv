@@ -33,7 +33,6 @@ public:
   void rm_client(Socket& sock, int index);
 
   void pars(int ac, char **av);
-  std::vector<Socket> &get_socket();
 };
 
 #endif

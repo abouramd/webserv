@@ -52,11 +52,13 @@ void Config::pars(int ac, char **av) {
 }
 
 void Config::init_data(int ac, char **av) {
-  if (ac != 2)
-    throw std::string(
-        "Error: number of args (the programe should take ane param).");
+  if (ac == 1)
+    this->filename = "default";
+  else if (ac == 2)
+    this->filename = av[1];
+  else
+    throw std::string("Error: number of args (the programe should take ane param).");
 
-  this->filename = av[1];
 
   this->file.open(av[1]);
   if (!this->file.is_open())
@@ -134,4 +136,3 @@ void Config::add_socket(sockaddr_in &addr, Server &sev, int &port) {
   this->socket.push_back(obj);
 }
 
-std::vector<Socket> &Config::get_socket() { return this->socket; }
