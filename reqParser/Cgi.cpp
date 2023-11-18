@@ -55,7 +55,7 @@ void  Cgi::executeCgi() {
 		std::cerr << args[0] << ", " << args[1] << std::endl;
 		execve(args[0], args, env);
 		std::cerr << "execve fails!" << std::endl;
-		exit (404);
+		exit (500);
 	}
 	else {
 		request.pid = pid;
