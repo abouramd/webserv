@@ -36,6 +36,8 @@ void Config::rm_client(Socket& sock, int index)
   if (index >= 0 && index < (int)sock.client.size())
   {
     close(sock.client[index].fd);
+    if (sock.client[index].cgiFileName != "")
+      std::remove(sock.client[index].cgiFileName.c_str());
     map_files[sock.client[index].fd].first->close();
     map_files[sock.client[index].fd].second->close();
     delete map_files[sock.client[index].fd].first;
@@ -48,6 +50,8 @@ void Config::rm_client(Socket& sock, int index)
 void Config::pars(int ac, char **av) {
   this->init_data(ac, av);
   this->read_data();
+  if (this->servers.empty())
+    throw std::string("Error: empthy file, no servers founded in the config file.");
   this->creat_socket();
 }
 
@@ -58,7 +62,6 @@ void Config::init_data(int ac, char **av) {
     this->filename = av[1];
   else
     throw std::string("Error: number of args (the programe should take ane param).");
-
 
   this->file.open(av[1]);
   if (!this->file.is_open())
