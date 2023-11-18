@@ -31,8 +31,10 @@ listen 8080
 location / {
   # index index.php
   root ./www/
-  # allow_method GET
+  allow_method GET POST
   auto_index on
+  cgi on
+  cgi_path py /usr/bin/python
 }
 
 }

@@ -8,15 +8,14 @@ bool	Tools::pathExists(const char* filename, bool & isDir, bool & r, bool & w) {
 
 	if (stat(filename, &fileState) == 0) {
 		if (S_ISDIR(fileState.st_mode))
-			isDir = true;
-	std::cout << "path >> " << filename << ", " << isDir << std::endl;
-	
+			isDir = true;	
     if (!access(filename, R_OK))
       r = true;
     if (!access(filename, W_OK))
       w = true;
 		return true;
 	}
+	std::cout << "path >> " << filename << ", " << isDir << std::endl;
 	return false;
 }
 
@@ -25,8 +24,11 @@ void	Tools::getAndCheckPath(std::string & uploadPath, std::string & extension) {
 	bool				isDir(false), r(false), w(false);
 
 	if (!Tools::pathExists(uploadPath.c_str(), isDir, r, w))
-		throw 404;
-	if (!isDir || !w)
+  {
+    std::cout << "hello2" << std::endl;
+    throw 404;
+  }
+  if (!isDir || !w)
 		throw 403;
 	ss << uploadPath + "/" << rand() << "_file." << extension;
 	uploadPath = ss.str();
@@ -92,3 +94,4 @@ size_t      Tools::findBin(const char *buf, char element, size_t start, size_t s
     }
     return std::string::npos;
 }
+

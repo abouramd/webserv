@@ -38,6 +38,8 @@ void Config::rm_client(Socket& sock, int index)
     close(sock.client[index].fd);
     if (sock.client[index].cgiFileName != "")
       std::remove(sock.client[index].cgiFileName.c_str());
+    if (sock.client[index].cgiInFileName != "")
+      std::remove(sock.client[index].cgiInFileName.c_str());
     map_files[sock.client[index].fd].first->close();
     map_files[sock.client[index].fd].second->close();
     delete map_files[sock.client[index].fd].first;
@@ -131,7 +133,6 @@ void Config::add_socket(sockaddr_in &addr, Server &sev, int &port) {
   }
   Socket obj;
   obj.check_server_name(sev.server_name);
-  std::cout << "add a socket" << std::endl;
   obj.setHost(sev.getHost());
   obj.setPort(port);
   obj.connectASocket();

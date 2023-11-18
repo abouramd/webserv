@@ -13,8 +13,7 @@ email = form.getvalue('email')
 # ... Perform necessary actions based on the user's input
 
 # Generate the response
-print("Content-type: text/html")
-print()
+print("Content-type: text/html\n")
 print("<html>")
 print("<head>")
 print("<title>CGI Script</title>")

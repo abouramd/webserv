@@ -18,7 +18,7 @@ std::map<std::string, Location>::iterator   findLoca(Server& serv, const std::st
     }
   }
   std::cout << BLUE << "didn't found the location" << DFL << std::endl;
-  throw 404;
+  throw 403;
 }
 
 void   findServ(Client &client, std::vector<Server>& serv, const std::string &host, const std::string &url)

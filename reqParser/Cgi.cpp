@@ -45,13 +45,14 @@ void  Cgi::executeCgi() {
 	strcpy(args[1], request.fullPath.c_str());
 	args[2] = NULL;
 	request.outfile->close();
-	std::string _tmp(ss.str());
-	request.outfile->open(_tmp.c_str());
+  request.cgiInFileName = request.cgiFileName;
+  request.cgiFileName = ss.str();
+	request.outfile->open(request.cgiFileName);
 	request.outfile->close();
 	pid = fork();
 	if (!pid) {
-		freopen(request.cgiFileName.c_str(), "r", stdin);
-		freopen(std::string(ss.str()).c_str(), "w", stdout);
+		freopen(request.cgiInFileName.c_str(), "r", stdin);
+		freopen(request.cgiFileName.c_str(), "w", stdout);
 		std::cerr << args[0] << ", " << args[1] << std::endl;
 		execve(args[0], args, env);
 		std::cerr << "execve fails!" << std::endl;
@@ -60,7 +61,6 @@ void  Cgi::executeCgi() {
 	else {
 		request.pid = pid;
 		request.is_cgi = 5;
-		request.cgiFileName = _tmp;
 		request.currentTime = std::time(NULL);
 		request.is->open(request.cgiFileName.c_str());
 	}

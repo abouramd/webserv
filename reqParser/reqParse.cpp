@@ -32,7 +32,10 @@ void	targetChecker( Client & request ) {
 	request.query = query;
 	request.fullPath = request.location.second.root + path;
 	if (!Tools::pathExists(request.fullPath.c_str(), request.isDir, r, w))
-		throw 404;
+  {
+    std::cout << "hello1" <<  request.fullPath.c_str() << std::endl;
+    throw 404;
+  }
 	if (!r)
 		throw 403;
 	if (request.method == "POST" && request.isDir && request.location.second.index.size()) {
@@ -249,9 +252,9 @@ void    reqParser(Client & request, int sock, std::vector<Server>& serv) {
 
 			cgi.executeCgi();
 		}
-        else if (!request.isDir)
-            request.method = "GET";
-		request.statusCode = status;
+        // else if (!request.isDir)
+            // request.method = "GET";
+		    request.statusCode = status;
         request.outfile->close();
         if (request.state != CLOSE)
 		    request.state = DONE;
