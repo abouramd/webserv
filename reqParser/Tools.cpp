@@ -6,6 +6,7 @@
 bool	Tools::pathExists(const char* filename, bool & isDir, bool & r, bool & w) {
 	struct stat fileState;
 
+	std::cout << "path >> " << filename << ", " << isDir << std::endl;
 	if (stat(filename, &fileState) == 0) {
 		if (S_ISDIR(fileState.st_mode))
 			isDir = true;	
@@ -15,7 +16,6 @@ bool	Tools::pathExists(const char* filename, bool & isDir, bool & r, bool & w) {
       w = true;
 		return true;
 	}
-	std::cout << "path >> " << filename << ", " << isDir << std::endl;
 	return false;
 }
 

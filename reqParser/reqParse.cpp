@@ -11,7 +11,7 @@ void	checkValidCharacters(const std::string & uri) {
 
 void	parseUri( Client & request, std::string & path, std::string & query ) {
 	size_t		pos;
-	std::string	target(request.target.substr(request.location.first.size() - 1));
+	std::string	target(request.target.substr(request.location.first.size()));
 
     pos = target.find('?');
 	if (pos != std::string::npos) {
@@ -21,6 +21,7 @@ void	parseUri( Client & request, std::string & path, std::string & query ) {
 	}
 	else
 		path = target;
+  path = "/" + path;
 }
 
 void	targetChecker( Client & request ) {

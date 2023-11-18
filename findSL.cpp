@@ -14,6 +14,8 @@ std::map<std::string, Location>::iterator   findLoca(Server& serv, const std::st
     if (!url.compare(0, it->first.length(), it->first))
     {
       std::cout << GREEN << "Root of location : " << it->second.root << DFL << std::endl;
+      std::cout << GREEN << "name of location : " << it->first << DFL << std::endl;
+      std::cout << GREEN << "url : " << url << DFL << std::endl;
       return it;
     }
   }
