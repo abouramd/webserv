@@ -30,7 +30,7 @@ void	Tools::getAndCheckPath(std::string & uploadPath, std::string & extension) {
   }
   if (!isDir || !w)
 		throw 403;
-	ss << uploadPath + "/" << rand() << "_file." << extension;
+	ss << uploadPath + "/file_" << rand() << "." << extension;
 	uploadPath = ss.str();
 }
 

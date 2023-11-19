@@ -71,7 +71,7 @@ void responses(Client &client)
                     return;
                 client.is_cgi = 4;
             }
-            client.is->read(client.buf, 100);
+            client.is->read(client.buf, 1024);
             if (client.is->gcount())
             {
                 s_chank(client, client.fd, client.buf, client.is->gcount());

@@ -24,7 +24,7 @@
 #Example:
 
 server {
-host 127.0.0.1
+host 10.13.1.6
 listen 9999
 max_body_size 10
 
@@ -38,7 +38,7 @@ location / {
 }
 
 server {
-host 127.0.0.1
+host 10.13.1.6
 listen 8080
 max_body_size 100
 
@@ -80,7 +80,7 @@ location /directory {
 }
 
 server {
-host 127.0.0.1
+host 10.13.1.6
 listen 8081 
 max_body_size 10000000000
 

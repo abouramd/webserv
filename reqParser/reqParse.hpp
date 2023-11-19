@@ -53,7 +53,8 @@ struct Client {
 
     std::map<int, std::string> error_page;
     std::map<int, std::string> error_page_dfl;
-	void	reset();
+    std::string server_host, server_port, client_host, client_port;
+	  void	reset();
     unsigned long                               contentLength, maxBodySize;
     int                                         fd, statusCode;
     parseState                                  pState, pNext;
