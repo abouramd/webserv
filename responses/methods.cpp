@@ -26,7 +26,7 @@ void get(Client &client)
     {
         if (client.path[client.path.length() - 1] != '/' && client.opened != 5)
         {
-            redirect(client, client.target + "/");
+            redirect(client, client.path + "/");
             return;
         }
         if (get_index(client))

@@ -11,17 +11,15 @@ void	checkValidCharacters(const std::string & uri) {
 
 void	parseUri( Client & request, std::string & path, std::string & query ) {
 	size_t		pos;
-	std::string	target(request.target.substr(request.location.first.size()));
 
-    pos = target.find('?');
+    pos = request.target.find('?');
 	if (pos != std::string::npos) {
-		path = target.substr(0, pos);
-		query = target.substr(pos + 1);
+		path = request.target.substr(0, pos);
+		query = request.target.substr(pos + 1);
 		Tools::decodeUri(path);
 	}
 	else
-		path = target;
-  path = "/" + path;
+		path = request.target;
 }
 
 void	targetChecker( Client & request ) {
@@ -31,12 +29,12 @@ void	targetChecker( Client & request ) {
 	parseUri(request, path, query);
 	request.path = path;
 	request.query = query;
-	request.fullPath = request.location.second.root + path;
-	if (!Tools::pathExists(request.fullPath.c_str(), request.isDir, r, w))
-  {
-    std::cout << "hello1" <<  request.fullPath.c_str() << std::endl;
-    throw 404;
-  }
+	request.fullPath = request.location.second.root + path.substr(request.location.first.size());
+    if (!Tools::pathExists(request.fullPath.c_str(), request.isDir, r, w))
+    {
+        std::cout << "hello1" <<  request.fullPath.c_str() << std::endl;
+        throw 404;
+    }
 	if (!r)
 		throw 403;
 	if (request.method == "POST" && request.isDir && request.location.second.index.size()) {
@@ -259,6 +257,7 @@ void    reqParser(Client & request, int sock, std::vector<Server>& serv) {
 	}
 	catch (int status) {
 		std::cout << "status code : " << status << std::endl;
+        std::cout << request.target << ",  ," << request.path << ",  ," << request.fullPath << std::endl;
         request.setEnv();
         if (request.method == "POST" && (status == 200 || status == 201) && request.isCgi) {
 			Cgi	cgi(request);
