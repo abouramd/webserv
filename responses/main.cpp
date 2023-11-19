@@ -27,7 +27,7 @@ void responses(Client &client)
         {
             if (client.is_cgi == 5)
             {
-                if (WEXITSTATUS(client.pro_state) == 500)
+                if (WEXITSTATUS(client.pro_state) == 244)
                 {
                     client.statusCode = 500;
                     client.is->close();
@@ -71,7 +71,10 @@ void responses(Client &client)
                     return;
                 client.is_cgi = 4;
             }
-            client.is->read(client.buf, 1024);
+            if (client.write_f != 5)
+                client.is->read(client.buf, 1024);
+            else
+                client.write_f = 0;
             if (client.is->gcount())
             {
                 s_chank(client, client.fd, client.buf, client.is->gcount());

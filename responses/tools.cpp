@@ -65,6 +65,8 @@ void s_chank(Client& client, int fd, const char *content, const int size)
         client.state = CLOSE;
         std::cout << strerror(errno) << "errrrrrrrrrrrrr" << std::endl;
     }
+    else if(!n)
+        client.write_f = 5;
 }
 
 int is_dir(std::string& str)
