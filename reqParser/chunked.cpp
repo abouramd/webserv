@@ -11,8 +11,10 @@ void    getSize(Client & request) {
         if (request.chunkSizeNum == 0)
             throw 201;
         request.contentLength += request.chunkSizeNum;
-        if (request.contentLength > request.maxBodySize)
+        if (request.contentLength > request.maxBodySize) {
+            std::remove(request.uploadFile.c_str());
             throw 413;
+        }
         request.chunkSizeStr.clear();
         request.chState = CRLF_CH;
         request.chNext = CHUNK;

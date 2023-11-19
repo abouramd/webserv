@@ -42,6 +42,11 @@ void    boundS(Client & request) {
         return;
     }
     else if (breaked || request.lastTwo.size() == 2) {
+        request.contentLength += request.boundBuf.size();
+        if (request.contentLength > request.maxBodySize) {
+            std::remove(request.uploadFile.c_str());
+            throw 413;
+        }
         request.outfile->write(request.boundBuf.c_str(), request.boundBuf.size());
         request.boundState = BOD;
         request.lastTwo.clear();
@@ -66,18 +71,25 @@ void    bodS(Client & request) {
         if (request.contentType.size())
             extension = FileType::getExt(std::string(request.contentType.c_str()));
         Tools::getAndCheckPath(uploadPath, extension);
+        request.uploadFile = uploadPath;
         if (request.contentType.size())
             request.outfile->open(uploadPath.c_str());
         else {
             std::stringstream   ss;
 
             ss << request.location.second.root + request.location.second.uplode.second + "/" << rand() << ".file";
-            extension = ss.str();
-            request.outfile->open(extension.c_str());
+            request.uploadFile = ss.str();
+
+            request.outfile->open(request.uploadFile.c_str());
             ss.str("");
             ss.clear();
         }
         request.contentType.clear();
+    }
+    request.contentLength += size;
+    if (request.contentLength > request.maxBodySize) {
+        std::remove(request.uploadFile.c_str());
+        throw 413;
     }
     request.outfile->write(&request.buf[request.position], size);
     request.position = posOfBound != std::string::npos ? posOfBound : request.buffSize;

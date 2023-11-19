@@ -31,11 +31,8 @@ void	targetChecker( Client & request ) {
 	request.query = query;
 	request.fullPath = request.location.second.root + path.substr(request.location.first.size());
     if (!Tools::pathExists(request.fullPath.c_str(), request.isDir, r, w))
-    {
-        std::cout << "hello1" <<  request.fullPath.c_str() << std::endl;
         throw 404;
-    }
-	if (!r)
+	else if (!r)
 		throw 403;
 	if (request.method == "POST" && request.isDir && request.location.second.index.size()) {
 		std::string	newPath;
@@ -79,14 +76,11 @@ bool    isEnd(Client & request) {
 void    checkCrlf(Client & request) {
     if (request.buf[request.position] == '\r' || request.buf[request.position] == '\n')
         request.crlf += request.buf[request.position++];
-    std::cout << request.buffSize << "position >>: " << request.position << std::endl;
     if (!isEnd(request) && request.position == request.buffSize)
         return;
     if (request.crlf.size() > 4)
         throw 400;
     if (request.buf[request.position] != '\r' && request.buf[request.position] != '\n'){
-        std::cout << request.crlf.size() << " ::::" << std::endl;
-        
         if (request.crlf == "\r\n" || request.crlf == "\n")
             request.pState = SPACE;
         else if (request.crlf == "\r\n\r\n" || request.crlf == "\n\n" || request.crlf == "\r\n\n" || request.crlf == "\n\r\n") {
@@ -179,7 +173,6 @@ void    getHeader(Client & request) {
 }
 
 void    checkErrors(Client & request, std::vector<Server>& serv) {
-    std::cout << "-------" << request.headers["content-type"] << std::endl;
     findServ(request, serv, request.host, request.target);
     if (std::find(request.location.second.allow_method.begin(), request.location.second.allow_method.end(), request.method) == request.location.second.allow_method.end())
         throw 405;
@@ -200,7 +193,7 @@ void    checkErrors(Client & request, std::vector<Server>& serv) {
     }
     else if (request.headers.find("content-length") == request.headers.end())
         throw 400;
-    if (request.headers.find("content-length") != request.headers.end()) {
+    else {
         request.contentLength = std::strtol(request.headers["content-length"].c_str(), NULL, 10);
         if (request.contentLength > request.maxBodySize)
             throw 413;
@@ -243,7 +236,6 @@ void    reqParser(Client & request, int sock, std::vector<Server>& serv) {
 		int amount = 1024;
 
         amount = read(sock, request.buf, BUFF_SIZE);
-        std::cout << "amount ::  ," << amount << std::endl; 
         request.position = 0;
         if (amount == 0 || amount == -1) {
 			request.state = CLOSE;

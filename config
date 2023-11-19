@@ -25,6 +25,20 @@
 
 server {
 host 127.0.0.1
+listen 9999
+max_body_size 10
+
+location / {
+  # index index.php
+  root ./
+  allow_method GET POST
+  auto_index on
+  uploade on /
+}
+}
+
+server {
+host 127.0.0.1
 listen 8080
 max_body_size 100
 

@@ -71,7 +71,7 @@ struct Client {
     std::string state_string;
     std::pair<std::string, Location>            location;
 	bool										atStart, isCgi, isDir, isBound, beenThere;
-	std::string									cgiFileName, cgiInFileName, cgiScript;
+	std::string									uploadFile, cgiFileName, cgiInFileName, cgiScript;
 	std::string 								path, query, fullPath;
     std::time_t request_time; 
 };
