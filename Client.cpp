@@ -25,7 +25,7 @@ void    Client::setEnv() {
     env["PATH_INFO"] = target;
     env["PATH_TRANSLATED"] = fullPath;
     env["QUERY_STRING"] = query;
-    env["REMOTE_HOST"] = "null";
+    env["REMOTE_HOST"] = getValue(headers, "host") != "" ? getValue(headers, "host") : "null";
     env["REMOTE_USER"] = getValue(headers, "authorization") != "" ? getValue(headers, "authorization") : "null";
     env["REQUEST_METHOD"] = method;
     env["SCRIPT_NAME"] = fullPath;
@@ -33,8 +33,8 @@ void    Client::setEnv() {
     env["SERVER_PROTOCOL"] = version;
     env["SERVER_SOFTWARE"] = "webserver v0.1";
     env["HTTP_COOKIE"] = getValue(headers, "cookies");
-//    env["REMOTE_ADDR"] = ipADD;
-//    env["SERVER_PORT"] = port;
+    env["REMOTE_ADDR"] = client_host;
+    env["SERVER_PORT"] = server_port;
 //    env["NCHOME"] = "#/path/to/netcdf";
 }
 

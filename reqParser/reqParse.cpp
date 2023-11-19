@@ -8,11 +8,25 @@ void	checkValidCharacters(const std::string & uri) {
             throw 400;
     }
 }
+void    checkPath(std::string & path) {
+    std::string part;
+
+    for (size_t i = 0; i < path.size(); i++) {
+        std::cout << path << ", " << path[i] << std::endl;
+        if (path[i] != '/')
+            part += path[i];
+        if (path[i] == '/' || i == path.size() - 1) {
+            if (part == "..")
+                throw 400;
+            part.clear();
+        }
+    }
+}
 
 void	parseUri( Client & request, std::string & path, std::string & query ) {
 	size_t		pos;
 
-    pos = request.target.find('?');
+  pos = request.target.find('?');
 	if (pos != std::string::npos) {
 		path = request.target.substr(0, pos);
 		query = request.target.substr(pos + 1);
@@ -20,6 +34,7 @@ void	parseUri( Client & request, std::string & path, std::string & query ) {
 	}
 	else
 		path = request.target;
+  checkPath(path);
 }
 
 void	targetChecker( Client & request ) {
