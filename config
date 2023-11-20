@@ -24,63 +24,103 @@
 #Example:
 
 server {
-host 10.13.1.6
+host 0.0.0.0
 listen 9999
 max_body_size 10
 
-location / {
+  location / {
   # index index.php
   root ./
   allow_method GET POST
   auto_index on
   uploade on /
-}
+  }
 }
 
+
+# simple-php-website
+
 server {
-host 10.13.1.6
+host 0.0.0.0
 listen 8080
-max_body_size 100
 
 location / {
-  # index index.php
-  root ./
+  index index.php
+  root ./www/simple-php-website/
   allow_method GET
-  auto_index on
-  # cgi on
-  # cgi_path py /usr/bin/python
-}
-location /put_test/ {
-  # index index.php
-  root ./
-  allow_method POST
-  uploade on /www/
-  auto_index on
   cgi on
-  cgi_path bla ./ubuntu_cgi_tester
-}
-location /post_body {
-  # index index.php
-  root ./
-  allow_method POST
-  uploade on /www/
-  auto_index on
-  # cgi on
-  # cgi_path bla ./cgi_tester
-}
-location /directory {
-  index youpi.bad_extension
-  root ./YoupiBanane/
-  allow_method GET
-  # uploade on /www/
-  # auto_index on
-  # cgi on
-  # cgi_path bla ./cgi_tester
-}
+  cgi_path php /bin/php-cgi
+  }
 }
 
+
+# simple-php-system
+
 server {
-host 10.13.1.6
+host 0.0.0.0
+listen 8090
+
+location / {
+  index index.php
+  root ./www/simple_php_system/
+  allow_method GET POST
+  cgi on
+  cgi_path php /bin/php-cgi
+  }
+}
+
+# cookies test
+
+server {
+host 0.0.0.0
+listen 8070
+
+location / {
+  root ./www/cgi-cookies/
+  allow_method GET
+  auto_index on
+  }
+
+location /p/ {
+  root ./www/cgi-cookies/php/
+  allow_method GET POST
+  auto_index on
+  cgi on
+  cgi_path php /bin/php-cgi
+  }
+
+location /l/ {
+  root ./www/cgi-cookies/perl/
+  allow_method GET POST
+  auto_index on
+  cgi on
+  cgi_path pl /bin/perl
+  }
+
+location /r/ {
+  root ./www/cgi-cookies/ruby/
+  allow_method GET POST
+  auto_index on
+  cgi on
+  cgi_path rb /bin/ruby
+  }
+
+location /n/ {
+  root ./www/cgi-cookies/python/
+  allow_method GET POST
+  auto_index on
+  cgi on
+  cgi_path py /bin/python3
+  }
+
+
+
+
+}
+
+
+server {
+host 0.0.0.0
 listen 8081 
 max_body_size 10000000000
 

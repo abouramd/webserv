@@ -35,6 +35,7 @@ void  Cgi::executeCgi() {
 	char          *args[3];
 	std::stringstream	ss;
 
+  std::cout << "this is cgi" << std::endl;
 	setEnv();
 	ss << "temp/" << rand() << "_cgi_out.tmp";
 	args[0] = new char[request.cgiScript.size() + 1];

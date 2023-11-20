@@ -32,8 +32,8 @@ void    Client::setEnv() {
     env["SERVER_NAME"] = host;
     env["SERVER_PROTOCOL"] = version;
     env["SERVER_SOFTWARE"] = "webserver v0.1";
-    env["HTTP_COOKIE"] = getValue(headers, "cookies");
-    env["REMOTE_ADDR"] = client_host;
+    env["HTTP_COOKIE"] = getValue(headers, "cookie");
+    env["REMOTE_ADDR"] = getValue(headers, "remote address");
     env["SERVER_PORT"] = server_port;
 //    env["NCHOME"] = "#/path/to/netcdf";
 }

@@ -39,7 +39,7 @@ int Config::add_client(Socket &sock) {
   sock.client.back().server_host = sock.getHost(); 
   ss << sock.getPort();
   ss >> sock.client.back().server_port;
-  std::cout << PURPLE <<inet_ntoa(c.sin_addr) << " : " << ntohs(c.sin_port) << std::endl;
+  std::cout << PURPLE << sock.client.back().server_host << " : " << sock.client.back().server_port << std::endl;
   std::cout << sock.getHost() << " : " << sock.getPort() << DFL << std::endl;
   return 0;
 }

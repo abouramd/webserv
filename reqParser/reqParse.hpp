@@ -37,7 +37,6 @@ enum parseState {
     TARGET,
     VERSION,
     HEADER,
-    BODY,
     CHECK_ERROR
 };
 

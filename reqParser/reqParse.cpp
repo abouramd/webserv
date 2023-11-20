@@ -1,4 +1,5 @@
 #include "Cgi.hpp"
+#include "reqParse.hpp"
 
 void	checkValidCharacters(const std::string & uri) {
     std::string validCharacters("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?# []@!$&'()*+,;=%");
@@ -12,7 +13,7 @@ void    checkPath(std::string & path) {
     std::string part;
 
     for (size_t i = 0; i < path.size(); i++) {
-        std::cout << path << ", " << path[i] << std::endl;
+        // std::cout << path << ", " << path[i] << std::endl;
         if (path[i] != '/')
             part += path[i];
         if (path[i] == '/' || i == path.size() - 1) {
@@ -73,7 +74,7 @@ void    skipSpace(Client & request) {
             request.pState = request.pNext;
             request.crlf.clear();
         }
-        else if (request.pNext == HEADER || request.pState == BODY)
+        else if (request.pNext == HEADER)
             request.pState = CRLF;
         else
             request.pState = request.pNext;
@@ -98,10 +99,8 @@ void    checkCrlf(Client & request) {
     if (request.buf[request.position] != '\r' && request.buf[request.position] != '\n'){
         if (request.crlf == "\r\n" || request.crlf == "\n")
             request.pState = SPACE;
-        else if (request.crlf == "\r\n\r\n" || request.crlf == "\n\n" || request.crlf == "\r\n\n" || request.crlf == "\n\r\n") {
+        else if (request.crlf == "\r\n\r\n" || request.crlf == "\n\n" || request.crlf == "\r\n\n" || request.crlf == "\n\r\n")
             request.pState = CHECK_ERROR;
-            request.pNext = BODY;
-        }
         else
             throw 400;
     }
@@ -194,6 +193,7 @@ void    checkErrors(Client & request, std::vector<Server>& serv) {
     if (request.host.empty())
         throw 400;
     targetChecker(request);
+
     if (request.method != "POST")
         throw 200;
     if (request.headers["content-type"].find("multipart/form-data; boundary=") == 0) {
@@ -214,7 +214,7 @@ void    checkErrors(Client & request, std::vector<Server>& serv) {
             throw 413;
     }
     request.crlf.clear();
-    request.pState = BODY;
+    postHandler(request);
 }
 
 void    hunting(Client & request, std::vector<Server>& serv) {
@@ -240,9 +240,6 @@ void    hunting(Client & request, std::vector<Server>& serv) {
         case CHECK_ERROR:
             checkErrors(request, serv);
             break;
-        case BODY:
-            postHandler(request);
-            break;
     }
 }
 
@@ -251,6 +248,7 @@ void    reqParser(Client & request, int sock, std::vector<Server>& serv) {
 		int amount = 1024;
 
         amount = read(sock, request.buf, BUFF_SIZE);
+    std::cout << "amount : " << amount << std::endl;
         request.position = 0;
         if (amount == 0 || amount == -1) {
 			request.state = CLOSE;
@@ -258,9 +256,9 @@ void    reqParser(Client & request, int sock, std::vector<Server>& serv) {
 		}
 		request.buffSize = amount;
 		request.buf[request.buffSize] = 0;
-        while (request.position < request.buffSize || request.pState == CHECK_ERROR) {
-            hunting(request, serv);
-        }
+    while (request.position < request.buffSize || request.pState == CHECK_ERROR) {
+      hunting(request, serv);
+    }
 	}
 	catch (int status) {
 		std::cout << "status code : " << status << std::endl;
