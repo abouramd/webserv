@@ -32,15 +32,21 @@ int Config::add_client(Socket &sock) {
     return -1;
   map_files[fd] = make_pair(new std::ifstream, new std::ofstream);
   sock.client.push_back(Client(fd, map_files[fd].first, map_files[fd].second, sock.serv[0].error_page, sock.serv[0].error_page_dfl));
-  std::stringstream ss;
+  
   sock.client.back().client_host = inet_ntoa(c.sin_addr); 
-  ss << ntohs(c.sin_port);
-  ss >> sock.client.back().client_port;
-  sock.client.back().server_host = sock.getHost(); 
-  ss << sock.getPort();
-  ss >> sock.client.back().server_port;
+  sock.client.back().server_host = sock.getHost();
+  {
+    std::stringstream ss;
+    ss << ntohs(c.sin_port);
+    ss >> sock.client.back().client_port;
+  }
+  {
+    std::stringstream ss;
+    ss << sock.getPort();
+    ss >> sock.client.back().server_port;
+  }
+  std::cout << PURPLE << sock.client.back().client_host << " : " << sock.client.back().client_port << std::endl;
   std::cout << PURPLE << sock.client.back().server_host << " : " << sock.client.back().server_port << std::endl;
-  std::cout << sock.getHost() << " : " << sock.getPort() << DFL << std::endl;
   return 0;
 }
 

@@ -9,6 +9,9 @@ std::string getValue(const std::map<std::string, std::string> & headers, const s
 }
 
 void    Client::setEnv() {
+    size_t  pos = fullPath.find_last_of("/");
+    std::string script_name = pos != std::string::npos ? fullPath.substr(pos + 1) : fullPath;
+
     env["AUTH_TYPE"] = "null";
     env["REDIRECT_STATUS"] = "200";
     env["CONTENT_LENGTH"] = getValue(headers, "content-length");
@@ -22,13 +25,13 @@ void    Client::setEnv() {
     env["HTTP_HOST"] = host;
     env["HTTP_PROXY_AUTHORIZATION"] = getValue(headers, "proxy-authorization");
     env["HTTP_USER_AGENT"] = getValue(headers, "user-agent");
-    env["PATH_INFO"] = target;
+    env["PATH_INFO"] = fullPath;
     env["PATH_TRANSLATED"] = fullPath;
     env["QUERY_STRING"] = query;
     env["REMOTE_HOST"] = getValue(headers, "host") != "" ? getValue(headers, "host") : "null";
     env["REMOTE_USER"] = getValue(headers, "authorization") != "" ? getValue(headers, "authorization") : "null";
     env["REQUEST_METHOD"] = method;
-    env["SCRIPT_NAME"] = fullPath;
+    env["SCRIPT_NAME"] = script_name;
     env["SERVER_NAME"] = host;
     env["SERVER_PROTOCOL"] = version;
     env["SERVER_SOFTWARE"] = "webserver v0.1";
@@ -39,7 +42,8 @@ void    Client::setEnv() {
 }
 
 Client::Client(int fd, std::ifstream *i, std::ofstream *o, std::map<int, std::string> e, std::map<int, std::string> ed)  : is(i), outfile(o) {
-    this->error_page = e;
+  this->write_f = 0;  
+  this->error_page = e;
 	this->error_page_dfl = ed;
 	this->fd = fd;
 	this->isCgi = false;

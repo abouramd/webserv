@@ -27,35 +27,37 @@ void responses(Client &client)
         {
             if (client.is_cgi == 5)
             {
-                if (WEXITSTATUS(client.pro_state) == 244)
+                if (WEXITSTATUS(client.pro_state) == 100)
                 {
                     client.statusCode = 500;
+                    client.is_cgi = 4;
                     client.is->close();
                     return;
                 }
                 std::string header;// = "HTTP/1.1 200 OK\r\n";
                 std::string head;
                 bool ct(true);
-                while (client.checked != 5 && std::getline(*client.is, head) && head != "\r" && head != "")
+                while (std::getline(*client.is, head) && head != "\r" && head != "")
                 {
-                    if (!head.compare(0, std::strlen("Status: "), "Status: "))
+                    if (!Tools::toLower(head).compare(0, std::strlen("status: "), "status: "))
                       head = "HTTP/1.1 " + head.substr(7);
                     else if (header.empty()) {
                       header += "HTTP/1.1 200 OK\r\n";
-                        if (!check_header(head) && client.checked != 5)
+                        if (head.empty() || !check_header(head))
                         {
-                            client.checked = 5;
                             client.is->close();
                             client.is->open(client.cgiFileName.c_str());
                             break;
                         }
                     }
                     
-                    if (head.compare(0, std::strlen("Content-type: "), "Content-type: "))
+                    if (Tools::toLower(head).compare(0, std::strlen("content-type: "), "content-type: "))
                         ct = false;
                     header += head;
                     header += "\n";
                 }
+                if (header.empty())
+                  header += "HTTP/1.1 200 OK\r\n";
                 if (ct)
                     header += "Content-type: text/html\r\n";
                 header += "Transfer-Encoding: chunked\r\n";
@@ -72,12 +74,15 @@ void responses(Client &client)
                 client.is_cgi = 4;
             }
             if (client.write_f != 5)
+            {
                 client.is->read(client.buf, 1024);
+                client.buffSize = client.is->gcount();
+            }
             else
                 client.write_f = 0;
-            if (client.is->gcount())
+            if (client.buffSize)
             {
-                s_chank(client, client.fd, client.buf, client.is->gcount());
+                s_chank(client, client.fd, client.buf, client.buffSize);
             }
             else
             {
