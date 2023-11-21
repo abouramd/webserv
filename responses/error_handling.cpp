@@ -17,6 +17,12 @@ int error_handling(Client &client)
         client.state_string = "403 Forbidden";
         return 1;
     }
+    if (client.statusCode == 408)
+    {
+        client.fullPath = get_page(client, 408);
+        client.state_string = "408 Request Timeout";
+        return 1;
+    }
     if (client.statusCode == 500)
     {
         client.fullPath = get_page(client, 500);

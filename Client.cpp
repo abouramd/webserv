@@ -58,6 +58,7 @@ Client::Client(int fd, std::ifstream *i, std::ofstream *o, std::map<int, std::st
     this->chunkSizeNum = 0;
     this->state = NOT_DONE;
     this->request_time = std::time(NULL);
+    this->check_cgi = 0;
 }
 
 void	Client::reset() {

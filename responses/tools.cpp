@@ -25,8 +25,8 @@ int s_header(Client& client, int client_socket, std::string status, std::string 
 	head += "Content-Type: " + type + "\r\n";
 	head += "Cache-Control: no-store, no-cache, must-revalidate\r\n";
 	head += "Transfer-Encoding: chunked\r\n";	
-	// head += "Connection: keep-alive\r\n";	
-    head += "\r\n";
+	head += "Connection: close\r\n";	
+  head += "\r\n";
 	// std::cout << head << std::endl;
     n = write(client_socket, (char *)head.c_str(), head.size());
 	if (n == -1)
