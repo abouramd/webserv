@@ -84,7 +84,7 @@ void Config::init_data(int ac, char **av) {
   else
     throw std::string("Error: number of args (the programe should take ane param).");
 
-  this->file.open(av[1]);
+  this->file.open(this->filename.c_str());
   if (!this->file.is_open())
     throw "Error" + std::string(strerror(errno)) + " (" + this->filename + ").";
 }
