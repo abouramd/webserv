@@ -1,31 +1,33 @@
 <html>
+
 <head>
-<title> pick color </title>
+  <title> pick color </title>
 
-<?php
+  <?php
 
-if (isset($_COOKIE["back"]))
+  if (isset($_COOKIE["back"]))
     echo "<style> body {background-color:" . $_COOKIE["back"] . "} </style>";
 
-if ($_SERVER["REQUEST_METHOD"] == "GET")
-{
-  if (isset($_GET["bg"]))
-  {
-    setcookie("back", $_GET["bg"]);
+  if ($_SERVER["REQUEST_METHOD"] == "GET") {
+    if (isset($_GET["bg"])) {
+      setcookie("back", $_GET["bg"]);
+    }
   }
-}
 
-?>
-  </head>
+  ?>
+</head>
+
 <body>
 
 
 
 
-<form  method="GET" action="">
-    <input type="color" name="bg">
+  <form method="GET" action="">
+    <?php
+    echo '<input type="color" name="bg" value=' . $_COOKIE["back"] . '>'
+    ?>
     <input type="submit" value="pick color">
-</form>
+  </form>
 </body>
-</html>
 
+</html>

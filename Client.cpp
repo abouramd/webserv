@@ -26,7 +26,7 @@ void    Client::setEnv() {
     env["HTTP_PROXY_AUTHORIZATION"] = getValue(headers, "proxy-authorization");
     env["HTTP_USER_AGENT"] = getValue(headers, "user-agent");
     env["PATH_INFO"] = fullPath;
-    env["PATH_TRANSLATED"] = fullPath;
+    env["PATH_TRANSLATED"] = script_name;
     env["QUERY_STRING"] = query;
     env["REMOTE_HOST"] = getValue(headers, "host") != "" ? getValue(headers, "host") : "null";
     env["REMOTE_USER"] = getValue(headers, "authorization") != "" ? getValue(headers, "authorization") : "null";
