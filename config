@@ -121,6 +121,65 @@ location /n/ {
 }
 
 
+
+# html web site topic-listing
+server {
+host 0.0.0.0
+listen 8060
+
+location / {
+  index index.html
+  root ./www/topic-listing/
+  allow_method GET POST
+  auto_index on
+  uploade on /
+  # cgi on
+  # cgi_path php /bin/php-cgi
+  # cgi_path py /bin/python3
+  
+}
+
+}
+
+# php web site food
+server {
+host 0.0.0.0
+listen 8040
+
+location / {
+  index home.php
+  root ./www/food-website-php/
+  allow_method GET POST
+  auto_index on
+  uploade on /uploaded_img/
+  cgi on
+  cgi_path php /bin/php-cgi
+  # cgi_path py /bin/python3
+  
+}
+
+}
+
+# html web site marvel
+server {
+host 0.0.0.0
+listen 8050
+
+location / {
+  index index.html
+  root ./www/marvel/
+  allow_method GET POST
+  auto_index on
+  uploade on /
+  # cgi on
+  # cgi_path php /bin/php-cgi
+  # cgi_path py /bin/python3
+  
+}
+
+}
+
+
 server {
 host 0.0.0.0
 listen 8081 

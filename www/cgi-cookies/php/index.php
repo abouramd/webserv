@@ -3,7 +3,6 @@
 <head>
     <title>Set and Expire Cookies</title>
     <link rel="stylesheet" type="text/css" href="style.css">
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -33,26 +32,23 @@
         </form>
 
         <div class="cookies" id="cookies-container">
-            <script>
-                // Function to update the content inside the cookies div
-function updateCookies() {
-    // Fetch the updated content from the server (cookies.php)
-    $.ajax({
-        url: 'show_cookies.php',
-        method: 'GET',
-        success: function (cookiesContent) {
-            // Update the HTML element with the new content
-            $('#cookies-container').html(cookiesContent);
-        }
-    });
+            <?php
+// Check if cookies are set
+if (isset($_COOKIE['name']) && isset($_COOKIE['email']) && isset($_COOKIE['age']) && isset($_COOKIE['time'])) {
+    $name = $_COOKIE['name'];
+    $email = $_COOKIE['email'];
+    $age = $_COOKIE['age'];
+    $expiryTime = $_COOKIE['time'] - time();
+
+    echo "<h2>Cookies:</h2>";
+    echo "<p><strong>Name:</strong> $name</p>";
+    echo "<p><strong>Email:</strong> $email</p>";
+    echo "<p><strong>Age:</strong> $age</p>";
+    echo "<p><strong>Expire in:</strong> $expiryTime seconds</p>";
+} else {
+    echo "<p>No cookies set</p>";
 }
-
-// Update the content every second
-setInterval(updateCookies, 1000);
-
-// Initial update when the page loads
-updateCookies();
-</script>
+?>
         </div>
 
         <form method="POST" action="expire_cookies.php">

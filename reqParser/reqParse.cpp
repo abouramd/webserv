@@ -1,5 +1,7 @@
 #include "Cgi.hpp"
 #include "reqParse.hpp"
+#include <algorithm>
+#include <string>
 
 void	checkValidCharacters(const std::string & uri) {
     std::string validCharacters("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?# []@!$&'()*+,;=%");
@@ -177,6 +179,7 @@ void    checkHeader(Client & request) {
 
 void    getHeader(Client & request) {
     if (request.buf[request.position] == '\r' || request.buf[request.position] == '\n') {
+        // std::cout << request.header << std::endl;
         checkHeader(request);
         request.header.clear();
         request.pState = SPACE;
@@ -200,11 +203,21 @@ void    checkErrors(Client & request, std::vector<Server>& serv) {
         request.isBound = true;
         request.boundary = "--" + request.headers["content-type"].substr(30);
         if (request.headers.find("transfer-encoding") != request.headers.end())
-            throw 501;
-    }
+    {
+      // std::cout << "hello1" << request.headers["transfer-encoding"] << std::endl;
+        throw 501;
+      }
+  }
     else if (request.headers.find("transfer-encoding") != request.headers.end()) {
         if (request.headers["transfer-encoding"] != "chunked")
-            throw 501;
+    {
+      std::cout << "hello2" << std::endl;
+      // for (std::map<std::string, std::string>::iterator it = request.headers.begin(); it != request.headers.end(); it++)
+      // {
+      //      std::cout << "key: " << it->first << " , " << it->second << std::endl;
+      // }
+      throw 501;
+      }
     }
     else if (request.headers.find("content-length") == request.headers.end())
         throw 400;
@@ -214,6 +227,7 @@ void    checkErrors(Client & request, std::vector<Server>& serv) {
             throw 413;
     }
     request.crlf.clear();
+    request.pState = BODY;
     postHandler(request);
 }
 
@@ -240,6 +254,9 @@ void    hunting(Client & request, std::vector<Server>& serv) {
         case CHECK_ERROR:
             checkErrors(request, serv);
             break;
+        case BODY:
+            postHandler(request);
+            break;
     }
 }
 
@@ -248,7 +265,7 @@ void    reqParser(Client & request, int sock, std::vector<Server>& serv) {
 		int amount = 1024;
 
         amount = read(sock, request.buf, BUFF_SIZE);
-    std::cout << "amount : " << amount << std::endl;
+    // std::cout << "amount : " << amount << std::endl;
         request.position = 0;
         if (amount == 0 || amount == -1) {
 			request.state = CLOSE;

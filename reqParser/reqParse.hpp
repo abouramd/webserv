@@ -37,7 +37,8 @@ enum parseState {
     TARGET,
     VERSION,
     HEADER,
-    CHECK_ERROR
+    CHECK_ERROR,
+    BODY
 };
 
 enum chunkState {
