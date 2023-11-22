@@ -59,6 +59,8 @@ void Config::rm_client(Socket& sock, int index)
       std::remove(sock.client[index].cgiFileName.c_str());
     if (sock.client[index].cgiInFileName != "")
       std::remove(sock.client[index].cgiInFileName.c_str());
+    if (sock.client[index].tmp_error != "")
+      std::remove(sock.client[index].tmp_error.c_str());
     map_files[sock.client[index].fd].first->close();
     map_files[sock.client[index].fd].second->close();
     delete map_files[sock.client[index].fd].first;

@@ -279,17 +279,18 @@ void    reqParser(Client & request, int sock, std::vector<Server>& serv) {
     }
 	}
 	catch (int status) {
-		std::cout << "status code : " << status << std::endl;
+		    request.statusCode = status;
         std::cout << request.target << ",  ," << request.path << ",  ," << request.fullPath << std::endl;
         request.setEnv();
         if (request.method == "POST" && (status == 200 || status == 201) && request.isCgi) {
 			Cgi	cgi(request);
 
 			cgi.executeCgi();
+      request.statusCode = 200;
 		}
+		std::cout << "status code : " << status << std::endl;
         // else if (!request.isDir)
             // request.method = "GET";
-		    request.statusCode = status;
         request.outfile->close();
         if (request.state != CLOSE)
 		    request.state = DONE;

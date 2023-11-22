@@ -78,8 +78,6 @@ void responses(Client &client) {
           remove(client.cgiFileName.c_str());
       }
     }
-    else
-      client.check_cgi++;
     if (client.is_cgi == 5) {
       std::time_t currentTime = time(NULL);
       if (currentTime - client.currentTime > 5) {

@@ -37,7 +37,7 @@ void	createOutfile(Client & request) {
 			request.cgiScript = it->second;
 			request.isCgi = true;
 			ss << rand();
-			request.cgiFileName = "temp/" + ss.str() + "_cgi_in.tmp";
+			request.cgiFileName = ss.str() + "_cgi_in.tmp";
 			request.outfile->open(request.cgiFileName.c_str());
 		}
 	}

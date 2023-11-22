@@ -24,7 +24,6 @@ void cgi(Client &client) {
   std::ostringstream convert;
   convert << num;
   std::string filename = convert.str();
-  filename = "temp/" + filename;
   client.outfile->open(filename.c_str());
   client.outfile->close();
   if (!(client.pid = fork())) {
