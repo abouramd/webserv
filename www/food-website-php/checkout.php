@@ -36,9 +36,9 @@ if(isset($_POST['submit'])){
       }else{
          
          $insert_order = $conn->prepare("INSERT INTO `orders`(user_id, name, number, email, method, address, total_products, total_price) VALUES(?,?,?,?,?,?,?,?)");
-         $insert_order->execute([$user_id, $name, $number, $email, $method, $address, $total_products, $total_price]);
+         $insert_order->execute([$user_id, $name, $number, $email, $method, $address, $total_products, $total_price])  or die("Error Occurred: " . implode(" ", $insert_order->errorInfo()));
 
-         $delete_cart = $conn->prepare("DELETE FROM `cart` WHERE user_id = ?");
+         $delete_cart = $conn->prepare("DELETE FROM `cart` WHERE user_id = ?")  or die("Error Occurred: " . implode(" ", $insert_user->errorInfo()));
          $delete_cart->execute([$user_id]);
 
          $message[] = 'order placed successfully!';

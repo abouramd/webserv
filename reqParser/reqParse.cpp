@@ -221,7 +221,8 @@ void    checkErrors(Client & request, std::vector<Server>& serv) {
     }
     else if (request.headers.find("content-length") == request.headers.end())
         throw 400;
-    else {
+    if (request.headers.find("content-length") != request.headers.end()) {
+        std::cout << "content-length: " << request.headers["request.contentLength"] << std::endl; 
         request.contentLength = std::strtol(request.headers["content-length"].c_str(), NULL, 10);
         if (request.contentLength > request.maxBodySize)
             throw 413;

@@ -34,7 +34,8 @@ if(isset($_POST['submit'])){
          $message[] = 'confirm password not matched!';
       }else{
          $insert_user = $conn->prepare("INSERT INTO `users`(name, email, number, password) VALUES(?,?,?,?)");
-         $insert_user->execute([$name, $email, $number, $cpass]);
+         $insert_user->execute([$name, $email, $number, $pass]) or die("Error Occurred: " . implode(" ", $insert_user->errorInfo()));
+
          $select_user = $conn->prepare("SELECT * FROM `users` WHERE email = ? AND password = ?");
          $select_user->execute([$email, $pass]);
          $row = $select_user->fetch(PDO::FETCH_ASSOC);
