@@ -33,7 +33,7 @@ int Config::add_client(Socket &sock) {
   map_files[fd] = make_pair(new std::ifstream, new std::ofstream);
   sock.client.push_back(Client(fd, map_files[fd].first, map_files[fd].second, sock.serv[0].error_page, sock.serv[0].error_page_dfl));
   
-  sock.client.back().client_host = inet_ntoa(c.sin_addr); 
+  sock.client.back().client_host = bintoip(c.sin_addr); 
   sock.client.back().server_host = sock.getHost();
   {
     std::stringstream ss;
@@ -113,7 +113,7 @@ void Config::creat_socket() {
   std::vector<Server>::iterator it_sev = this->servers.begin();
   while (it_sev != this->servers.end()) {
     sockaddr_in addr;
-    inet_aton(it_sev->getHost().c_str(), &addr.sin_addr);
+    iptorin(it_sev->getHost().c_str(), &addr.sin_addr);
     std::vector<std::string> ports = it_sev->getPort();
     // std::cout << "number of servers is " << this->servers.size() << " " <<
     // it_sev->getPort().size() << std::endl;
@@ -143,8 +143,8 @@ void Config::add_socket(sockaddr_in &addr, Server &sev, int &port) {
       if (it->getSinAddr().s_addr != addr.sin_addr.s_addr) {
         ss << port;
         throw std::string("Error: this port " + ss.str() + " is used with " +
-                          inet_ntoa(it->getSinAddr()) + " and " +
-                          inet_ntoa(addr.sin_addr));
+                          bintoip(it->getSinAddr()) + " and " +
+                          bintoip(addr.sin_addr));
       }
       it->check_server_name(sev.server_name);
       it->serv.push_back(sev);

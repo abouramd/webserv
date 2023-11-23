@@ -114,7 +114,7 @@ void Server::set_host(const std::string &str) {
   if (vec.size() != 2)
     throw std::string("Error: number of args (" + str + ")");
 
-  if (inet_aton(vec[1].c_str(), &addr) == 0)
+  if (iptorin(vec[1].c_str(), &addr) == 0)
     throw std::string("Error: invalid Ip address (" + str + ")");
 
   this->host = vec[1];

@@ -70,5 +70,7 @@ class Location
 
 int  ft_read(std::ifstream &file, std::string &buff);
 std::vector<std::string> my_split(const std::string str);
+int iptorin(const std::string str, in_addr *addr);
+std::string bintoip(in_addr addr);
 
 #endif

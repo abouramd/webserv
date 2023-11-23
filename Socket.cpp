@@ -23,21 +23,13 @@ Socket::Socket() {
 
 Socket::~Socket() {}
 
-
-// void  Socket::setFd(const int fd)
-// {
-//   if (fd != -1)
-//     throw std::string("fd socket");
-//   this->Socket_fd = fd;
-// }
-//
 int Socket::getFd() const { return this->Socket_fd; }
 
 void Socket::setHost(const std::string h) {
   if (!this->host.empty())
     throw std::string("host socket");
   this->host = h;
-  inet_aton(h.c_str(), &this->server.sin_addr);
+  iptorin(h.c_str(), &this->server.sin_addr);
 }
 
 std::string Socket::getHost() const { return this->host; }
@@ -75,7 +67,7 @@ void Socket::connectASocket() {
     throw std::string("Error: falid to listen a socket to a port.");
   
   this->port = ntohs(this->server.sin_port);
-  this->host = inet_ntoa(this->server.sin_addr);
+  this->host = bintoip(this->server.sin_addr);
   std::cout << GREEN << this->host << ":" << this->port << DFL << " Socket fd is " << BLUE << this->Socket_fd << DFL << std::endl;
 }
 
