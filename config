@@ -24,6 +24,21 @@
 #Example:
 
 server {
+host 127.0.0.0
+listen 5000
+
+  location / {
+  index index.php
+  root ./www/E-learning-Website/
+  allow_method GET DELETE
+  auto_index on
+  # uploade on /
+  # cgi on
+  # cgi_path py /bin/python3
+  }
+}
+
+server {
 host 0.0.0.0
 listen 9999
 max_body_size 10
