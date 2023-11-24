@@ -32,7 +32,7 @@ $(NAME):$(OBJ)
 	@$(CXX) $(CXXFLAGS) $(OBJ) -o $(NAME) $(INC)
 	@echo "\033[1;32m ✅ webserv done.\033[0m"
 
-%.o:%.cpp
+.cpp.o:
 	@$(CXX) $(CXXFLAGS) -o $@ -c $< $(INC)
 	@echo "\033[1;34m - creat $@ from $<.\033[0m"
 
