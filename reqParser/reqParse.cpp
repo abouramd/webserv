@@ -133,7 +133,7 @@ void    getTarget(Client & request) {
     else {
         request.target += request.buf[request.position++];
         if (request.target.size() > 1024)
-            throw 400;
+            throw 414;
     }
 }
 
