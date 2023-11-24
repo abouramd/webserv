@@ -6,7 +6,6 @@
 bool	Tools::pathExists(const char* filename, bool & isDir, bool & r, bool & w) {
 	struct stat fileState;
 
-	std::cout << "path >> " << filename << ", " << isDir << std::endl;
 	if (stat(filename, &fileState) == 0) {
 		if (S_ISDIR(fileState.st_mode))
 			isDir = true;	
@@ -25,7 +24,6 @@ void	Tools::getAndCheckPath(std::string & uploadPath, std::string & extension) {
 
 	if (!Tools::pathExists(uploadPath.c_str(), isDir, r, w))
   {
-    std::cout << "hello2" << std::endl;
     throw 404;
   }
   if (!isDir || !w)
@@ -47,7 +45,6 @@ void	Tools::decode(std::string &str) {
   int tmp;
   unHex >> std::hex >> tmp;
   str = std::string(1, tmp);
-  std::cout <<  "|" + str + "|" << " : " << tmp << std::endl;
 }
 
 void Tools::decodeUri(std::string &uri) {
@@ -67,7 +64,6 @@ void Tools::decodeUri(std::string &uri) {
 			result += uri[i];
 	}
 	uri = result;
-  std::cout << "URL: " << uri << std::endl;
 }
 
 bool	Tools::getExtension(std::string & target, std::string & extension) {

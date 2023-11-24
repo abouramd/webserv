@@ -51,7 +51,7 @@ int max_fd( Config &obj )
       }
       else
       {
-        std::cout << RED << get_time() << " remove client fd " << it_s->client[i].fd << DFL << std::endl;
+        std::cout << RED << it_s->client[i].client_host << ":" << it_s->client[i].client_port << " remove client." << DFL << std::endl;
         obj.rm_client(*it_s, i);
       }
     }
@@ -60,8 +60,6 @@ int max_fd( Config &obj )
       FD_SET(it_s->getFd(), &obj.read_fd);
       max_fd = it_s->getFd() < max_fd ? max_fd : it_s->getFd() + 1;
     }
-    else
-         std::cout << "error in fd socket." << std::endl;
   }
   FD_ZERO(&obj.err_fd);
   return max_fd;
@@ -101,17 +99,13 @@ int main(int ac, char **av)
           it_s->client[i].request_time = std::time(NULL);
           reqParser(it_s->client[i], it_s->client[i].fd, it_s->serv);
           if ( it_s->client[i].state == DONE )
-          {
-            std::cout << it_s->client[i].method << " : " << it_s->client[i].target << " : " << it_s->client[i].version << std::endl;
-            std::cout << "status: " << it_s->client[i].statusCode << std::endl;
-            std::cout << BLUE << get_time() << " end of request and swap " << it_s->client[i].fd << " to responce." << DFL << std::endl;
-          }
+            std::cout << BLUE << it_s->client[i].client_host << ":" << it_s->client[i].client_port << " go response." << DFL << std::endl;
         }
       }
       if (FD_ISSET(it_s->getFd(), &obj.read_fd))
       {
         if (obj.add_client(*it_s) != -1)
-          std::cout << GREEN << get_time() << " new client fd " << it_s->client.back().fd << DFL << std::endl;
+          std::cout << GREEN << it_s->client.back().server_host << ":" << it_s->client.back().server_port << " new client " << it_s->client.back().client_host << ":" << it_s->client.back().client_port << DFL << std::endl;
       }
       if (FD_ISSET(it_s->getFd(), &obj.write_fd))
         continue;

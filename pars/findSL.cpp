@@ -13,13 +13,9 @@ std::map<std::string, Location>::iterator   findLoca(Server& serv, const std::st
   {
     if (!url.compare(0, it->first.length(), it->first))
     {
-      // std::cout << GREEN << "Root of location : " << it->second.root << DFL << std::endl;
-      // std::cout << GREEN << "name of location : " << it->first << DFL << std::endl;
-      // std::cout << GREEN << "url : " << url << DFL << std::endl;
       return it;
     }
   }
-  // std::cout << BLUE << "didn't found the location" << DFL << std::endl;
   throw 404;
 }
 
@@ -29,10 +25,8 @@ void   findServ(Client &client, std::vector<Server>& serv, const std::string &ho
   {
     for (std::vector<std::string>::iterator it_sn = it->server_name.begin(); it_sn != it->server_name.end(); it_sn++)
     {
-      std::cout << host << ", " << *it_sn << std::endl;
       if (host == *it_sn)
       {
-        std::cout << BLUE << "found the server" << DFL << std::endl;
         client.maxBodySize = it->max_body_size;
         client.error_page = it->error_page;
         client.error_page_dfl = it->error_page_dfl;
@@ -43,7 +37,6 @@ void   findServ(Client &client, std::vector<Server>& serv, const std::string &ho
       }
     }
   }
-  std::cout << BLUE << "didn't found the server" << DFL << std::endl; 
   client.maxBodySize = serv.begin()->max_body_size;
   client.error_page = serv.begin()->error_page;
   client.error_page_dfl = serv.begin()->error_page_dfl;

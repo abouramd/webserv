@@ -67,7 +67,7 @@ void Socket::connectASocket() {
   
   this->port = ntohs(this->server.sin_port);
   this->host = bintoip(this->server.sin_addr);
-  std::cout << GREEN << this->host << ":" << this->port << DFL << " Socket fd is " << BLUE << this->Socket_fd << DFL << std::endl;
+  std::cout << YELLOW << "Socket: " << GREEN << this->host << ":" << this->port<< DFL << std::endl;
 }
 
 void Socket::check_server_name(std::vector<std::string> &sn) {

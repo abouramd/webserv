@@ -30,11 +30,4 @@ std::vector<std::string> my_split(const std::string str)
   return my_split(str, " \t");
 }
 
-// int main()
-// {
-//     std::vector<std::string> v = my_split("hello     listen 90");
-//     for (const std::string &s:v)
-//         std::cout << "|" + s + "|" << std::endl;
-//     return 0;
-// }
 

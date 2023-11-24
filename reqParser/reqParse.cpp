@@ -15,7 +15,6 @@ void    checkPath(std::string & path) {
     std::string part;
 
     for (size_t i = 0; i < path.size(); i++) {
-        // std::cout << path << ", " << path[i] << std::endl;
         if (path[i] != '/')
             part += path[i];
         if (path[i] == '/' || i == path.size() - 1) {
@@ -179,7 +178,6 @@ void    checkHeader(Client & request) {
 
 void    getHeader(Client & request) {
     if (request.buf[request.position] == '\r' || request.buf[request.position] == '\n') {
-        // std::cout << request.header << std::endl;
         checkHeader(request);
         request.header.clear();
         request.pState = SPACE;
@@ -204,25 +202,18 @@ void    checkErrors(Client & request, std::vector<Server>& serv) {
         request.boundary = "--" + request.headers["content-type"].substr(30);
         if (request.headers.find("transfer-encoding") != request.headers.end())
     {
-      // std::cout << "hello1" << request.headers["transfer-encoding"] << std::endl;
         throw 501;
       }
   }
     else if (request.headers.find("transfer-encoding") != request.headers.end()) {
         if (request.headers["transfer-encoding"] != "chunked")
     {
-    //   std::cout << "hello2" << std::endl;
-      // for (std::map<std::string, std::string>::iterator it = request.headers.begin(); it != request.headers.end(); it++)
-      // {
-      //      std::cout << "key: " << it->first << " , " << it->second << std::endl;
-      // }
       throw 501;
       }
     }
     else if (request.headers.find("content-length") == request.headers.end())
         throw 400;
     if (request.headers.find("content-length") != request.headers.end()) {
-        // std::cout << "content-length: " << request.headers["request.contentLength"] << std::endl; 
         request.contentLength = std::strtol(request.headers["content-length"].c_str(), NULL, 10);
         if (request.contentLength > request.maxBodySize)
             throw 413;
@@ -266,7 +257,6 @@ void    reqParser(Client & request, int sock, std::vector<Server>& serv) {
 		int amount = 1024;
 
         amount = read(sock, request.buf, BUFF_SIZE);
-    // std::cout << "amount : " << amount << std::endl;
         request.position = 0;
         if (amount == 0 || amount == -1) {
 			request.state = CLOSE;
@@ -280,7 +270,6 @@ void    reqParser(Client & request, int sock, std::vector<Server>& serv) {
 	}
 	catch (int status) {
 		    request.statusCode = status;
-        // std::cout << request.target << ",  ," << request.path << ",  ," << request.fullPath << std::endl;
         request.setEnv();
         if (request.method == "POST" && (status == 200 || status == 201) && request.isCgi) {
 			Cgi	cgi(request);
@@ -288,9 +277,6 @@ void    reqParser(Client & request, int sock, std::vector<Server>& serv) {
 			cgi.executeCgi();
       request.statusCode = 200;
 		}
-		// std::cout << "status code : " << status << std::endl;
-        // else if (!request.isDir)
-            // request.method = "GET";
         request.outfile->close();
         if (request.state != CLOSE)
 		    request.state = DONE;

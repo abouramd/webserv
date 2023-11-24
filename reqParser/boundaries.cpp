@@ -31,7 +31,6 @@ void    boundS(Client & request) {
     }
     if (request.lastTwo == "--") {
         request.lastTwo.clear();
-        std::cout << "dooone" << std::endl;
         throw 201;
     }
     else if (request.lastTwo == "\r\n") {

@@ -67,14 +67,3 @@ std::string bintoip(in_addr addr) {
   }
   return ss.str();
 }
-
-// int main() {
-//   in_addr t1, t2;
-//   std::cout << iptobin("127.0.0.2", &t1) << std::endl;
-//   std::cout << inet_aton("127.000000000.0.2", &t2) << std::endl;
-//   std::cout << t1.s_addr << std::endl;
-//   std::cout << t2.s_addr << std::endl;
-//   std::cout << bintoip(t1) << std::endl;
-//   std::cout << bintoip(t2) << std::endl;
-//   return 0;
-// }

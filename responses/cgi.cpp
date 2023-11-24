@@ -27,11 +27,6 @@ void cgi(Client &client) {
   client.outfile->close();
   if (!(client.pid = fork())) {
     char **env = get_env(client);
-    int i = 0;
-    while (env[i]) {
-      std::cout << env[i] << std::endl;
-      i++;
-    }
     freopen(filename.c_str(), "w", stdout);
    size_t pos = client.fullPath.find_last_of("/");
     if (pos != std::string::npos)
@@ -44,7 +39,6 @@ void cgi(Client &client) {
             client.location.second.cgi.second[get_ex(client.fullPath)].c_str()),
         const_cast<char *>(client.fullPath.c_str()), NULL};
     execve(argv[0], argv, env);
-    // std::cerr << "execve  <<<<<>>>>>>>>><<<<<<>>>>> " << std::endl;
     exit(100);
   } else {
     client.currentTime = time(NULL);

@@ -29,15 +29,19 @@ OBJ:= $(SRC:.cpp=.o)
 all:$(NAME)
 
 $(NAME):$(OBJ)
-	$(CXX) $(CXXFLAGS) $(OBJ) -o $(NAME) $(INC)
+	@$(CXX) $(CXXFLAGS) $(OBJ) -o $(NAME) $(INC)
+	@echo "\033[1;32m ✅ webserv done.\033[0m"
 
 %.o:%.cpp
-	$(CXX) $(CXXFLAGS) -o $@ -c $< $(INC)
+	@$(CXX) $(CXXFLAGS) -o $@ -c $< $(INC)
+	@echo "\033[1;34m - creat $@ from $<.\033[0m"
 
 clean:
-	rm -rf $(OBJ)
+	@rm -rf $(OBJ)
+	@echo "\033[1;31m ❎ remove the object files of webserv.\033[0m"
 
 fclean:clean
-	rm -rf $(NAME)
+	@rm -rf $(NAME)
+	@echo "\033[1;31m ❎ remove the object files of webserv.\033[0m"
 
 re:fclean all

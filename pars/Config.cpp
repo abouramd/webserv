@@ -46,8 +46,6 @@ int Config::add_client(Socket &sock) {
     ss << sock.getPort();
     ss >> sock.client.back().server_port;
   }
-  // std::cout << PURPLE << sock.client.back().client_host << " : " << sock.client.back().client_port << std::endl;
-  // std::cout << PURPLE << sock.client.back().server_host << " : " << sock.client.back().server_port << std::endl;
   return 0;
 }
 
@@ -83,7 +81,7 @@ void Config::pars(int ac, char **av) {
 
 void Config::init_data(int ac, char **av) {
   if (ac == 1)
-    this->filename = "./config/default";
+    this->filename = "./config/default.conf";
   else if (ac == 2)
     this->filename = av[1];
   else
@@ -105,9 +103,6 @@ void Config::read_data() {
       throw "Error: " + buffer;
     serv.check();
     this->servers.push_back(serv);
-
-    // std::cout << "=> " << this->servers[0].getPort().size() << std::endl;
-    // std::cout << "port " <<  serv.getPort().size() << std::endl;
   }
   this->file.close();
 }
@@ -118,8 +113,6 @@ void Config::creat_socket() {
     sockaddr_in addr;
     iptorin(it_sev->getHost().c_str(), &addr.sin_addr);
     std::vector<std::string> ports = it_sev->getPort();
-    // std::cout << "number of servers is " << this->servers.size() << " " <<
-    // it_sev->getPort().size() << std::endl;
     std::vector<std::string>::iterator it_port = ports.begin();
     while (it_port != ports.end()) {
       std::stringstream str;
