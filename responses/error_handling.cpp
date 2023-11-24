@@ -16,7 +16,7 @@ std::string creat_rand_file(const std::string content, const std::string page, i
   out << "<link rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css\"></head><body>" << std::endl;
   out << "<h1><i class=\"bi bi-exclamation-triangle-fill\"></i> " + content + " <i class=\"bi bi-exclamation-triangle-fill\"></i></h1>" << std::endl;
   out << "<p>the default of this error page have some problemes this is just a back up.<br>" << std::endl;
-  out << "creat file in this path " + page + " to fix this</p>" << std::endl;
+  out << "fix " + page + " to fix this</p>" << std::endl;
   out << "</body></html>" << std::endl;
   out.close();
   return name;
@@ -25,7 +25,7 @@ std::string creat_rand_file(const std::string content, const std::string page, i
 std::string get_page(Client &client, int n)
 {
     client.method = "GET";
-    if (!is_dir(client.error_page[n]) && !access(client.error_page[n].c_str(), R_OK) && n != 201)
+    if (!is_dir(client.error_page[n]) && !access(client.error_page[n].c_str(), R_OK) && n > 204)
         return (client.error_page[n]);
     if (!is_dir(client.error_page_dfl[n]) && !access(client.error_page_dfl[n].c_str(), R_OK))
         return (client.error_page_dfl[n]);
@@ -99,6 +99,12 @@ int error_handling(Client &client)
     {
         client.state_string = "201 created";
         client.fullPath = get_page(client, 201);
+        return 1;
+    }
+    if (client.statusCode == 204)
+    {
+        client.state_string = "204 Deleted";
+        client.fullPath = get_page(client, 204);
         return 1;
     }
     return 0;

@@ -37,7 +37,7 @@ print $cgi->end_form;
 
 print "<h2> GET form for env </h2>";
 print $cgi->start_form(
-    -method => "post",
+    -method => "get",
     -action => "env.pl"
 );
 

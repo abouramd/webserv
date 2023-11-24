@@ -19,10 +19,9 @@ char **get_env(Client &client) {
 }
 
 void cgi(Client &client) {
-  srand((unsigned)time(NULL));
-  int num = rand();
+  srand(std::time(NULL));
   std::ostringstream convert;
-  convert << num;
+  convert << rand() << "cgi.tmp";
   std::string filename = convert.str();
   client.outfile->open(filename.c_str());
   client.outfile->close();
@@ -44,9 +43,8 @@ void cgi(Client &client) {
         const_cast<char *>(
             client.location.second.cgi.second[get_ex(client.fullPath)].c_str()),
         const_cast<char *>(client.fullPath.c_str()), NULL};
-    // strcpy(argv[1], client.fullPath.c_str());
     execve(argv[0], argv, env);
-    std::cerr << "execve  <<<<<>>>>>>>>><<<<<<>>>>> " << std::endl;
+    // std::cerr << "execve  <<<<<>>>>>>>>><<<<<<>>>>> " << std::endl;
     exit(100);
   } else {
     client.currentTime = time(NULL);

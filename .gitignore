@@ -22,3 +22,7 @@ temp/*
 *.jpeg
 *.pdf
 *.deb
+
+.DS_Store
+
+

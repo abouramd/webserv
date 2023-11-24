@@ -24,24 +24,20 @@ void responses(Client &client) {
           client.is->close();
           return;
         }
-        std::string header; // = "HTTP/1.1 200 OK\r\n";
+        std::string header;
         std::string head;
         bool ct(true);
         while (std::getline(*client.is, head) && head != "\r" && head != "") {
-          if (!Tools::toLower(head).compare(0, std::strlen("status: "),
-                                            "status: "))
+          if (!Tools::toLower(head).compare(0, std::strlen("status:"), "status:"))
             head = "HTTP/1.1 " + head.substr(7);
           else if (header.empty()) {
             header += "HTTP/1.1 200 OK\r\n";
             if (head.empty() || !check_header(head)) {
-              client.is->close();
-              client.is->open(client.cgiFileName.c_str());
+              client.is->seekg(0, client.is->beg);
               break;
             }
           }
-
-          if (Tools::toLower(head).compare(0, std::strlen("content-type: "),
-                                           "content-type: "))
+          if (!Tools::toLower(head).compare(0, std::strlen("content-type:"), "content-type:"))
             ct = false;
           header += head;
           header += "\n";
@@ -59,7 +55,10 @@ void responses(Client &client) {
           client.state = CLOSE;
         }
         if (!n)
+        {
+          client.is->seekg(0, client.is->beg);
           return;
+        }
         client.is_cgi = 4;
         return;
       }
@@ -74,8 +73,7 @@ void responses(Client &client) {
         s_chank(client, client.fd, "", 0);
         client.is->close();
         client.state = CLOSE;
-        if (client.is_cgi == 4 || client.is_cgi == 5)
-          remove(client.cgiFileName.c_str());
+        remove(client.cgiFileName.c_str());
       }
     }
     if (client.is_cgi == 5) {

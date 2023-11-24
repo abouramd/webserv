@@ -4,8 +4,8 @@ void get(Client &client)
 {
     if (!access(client.fullPath.c_str(), F_OK) && access(client.fullPath.c_str(), R_OK))
     {
-        client.fullPath = "error_pages/403.html";
-        client.state_string = "403 Forbidden";
+        client.statusCode = 403;
+        return;
     }
 
     if (is_dir(client.fullPath) == 0)
@@ -48,10 +48,9 @@ void get(Client &client)
                 auto_index(client);
             }
             else
-            {
-                if (s_header(client, client.fd, "403 Forbidden", "text/html"))
-                    return;
-                client.is->open(get_page(client, 403).c_str());
+            { 
+              client.statusCode = 403;
+              return;
             }
         }
     }

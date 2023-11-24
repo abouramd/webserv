@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <arpa/inet.h>
 #include <cstring>
+#include <dirent.h>
 #include <iostream>
 #include <netinet/in.h>
 #include <sstream>
@@ -61,6 +62,8 @@ void Config::rm_client(Socket& sock, int index)
       std::remove(sock.client[index].cgiInFileName.c_str());
     if (sock.client[index].tmp_error != "")
       std::remove(sock.client[index].tmp_error.c_str());
+    if (sock.client[index].dir)
+      closedir(sock.client[index].dir);
     map_files[sock.client[index].fd].first->close();
     map_files[sock.client[index].fd].second->close();
     delete map_files[sock.client[index].fd].first;

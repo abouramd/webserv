@@ -38,7 +38,6 @@ void    Client::setEnv() {
     env["HTTP_COOKIE"] = getValue(headers, "cookie");
     env["REMOTE_ADDR"] = getValue(headers, "remote address");
     env["SERVER_PORT"] = server_port;
-//    env["NCHOME"] = "#/path/to/netcdf";
 }
 
 Client::Client(int fd, std::ifstream *i, std::ofstream *o, std::map<int, std::string> e, std::map<int, std::string> ed)  : is(i), outfile(o) {
@@ -58,16 +57,8 @@ Client::Client(int fd, std::ifstream *i, std::ofstream *o, std::map<int, std::st
     this->chunkSizeNum = 0;
     this->state = NOT_DONE;
     this->request_time = std::time(NULL);
+    this->opened = 0;
+    this->dir = NULL;
 }
 
-void	Client::reset() {
-	this->contentLength = 0;
-	this->state = NOT_DONE;
-	this->method.clear();
-	this->target.clear();
-	this->version.clear();
-	this->host.clear();
-	this->headers.clear();
-	this->outfile->close();
-	this->isCgi = false;
-}
+
