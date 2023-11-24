@@ -31,7 +31,7 @@ int  ft_read(std::ifstream &file, std::string &buff)
     while (buff.empty())
     {
         std::getline(file, buff);
-        if (file.eof())
+        if (buff.empty() && file.eof())
           return 0;
         buff = remove_spc(buff);
     }
