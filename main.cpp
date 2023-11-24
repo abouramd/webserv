@@ -2,8 +2,8 @@
 #include "Config.hpp"
 #include "Location.hpp"
 #include "Socket.hpp"
-#include "reqParser/reqParse.hpp"
-#include "responses/responses.hpp"
+#include "reqParse.hpp"
+#include "responses.hpp"
 #include <cstring>
 #include <sys/time.h>
 #include <cstdio>
@@ -74,7 +74,7 @@ int main(int ac, char **av)
   Config obj;
   try{
     obj.pars(ac, av);
-    FileType::set_mime_type("./mime.types");
+    FileType::set_mime_type("./config/mime.types");
   }
   catch ( const std::string err)
   {

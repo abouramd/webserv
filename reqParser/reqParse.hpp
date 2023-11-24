@@ -15,7 +15,7 @@
 #include <vector>
 #include <string>
 #include <dirent.h>
-#include "../Server.hpp"
+#include "Server.hpp"
 #include <ctime>
 #include "String.hpp"
 

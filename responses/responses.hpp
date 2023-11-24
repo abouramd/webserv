@@ -5,8 +5,8 @@
 #include <map>
 #include <vector>
 #include <string>
-#include "../Client.hpp"
-#include "../FileType.hpp"
+#include "Client.hpp"
+#include "FileType.hpp"
 #include <sys/stat.h>
 #include <dirent.h>
 #include <cstdlib>

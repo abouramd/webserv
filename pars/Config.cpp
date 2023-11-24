@@ -83,7 +83,7 @@ void Config::pars(int ac, char **av) {
 
 void Config::init_data(int ac, char **av) {
   if (ac == 1)
-    this->filename = "default";
+    this->filename = "./config/default";
   else if (ac == 2)
     this->filename = av[1];
   else
