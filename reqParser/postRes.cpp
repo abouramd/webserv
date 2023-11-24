@@ -7,7 +7,7 @@ void    bodyParser(Client & request) {
 		handleChunked(request);
     else {
 		  if (request.contentLength == 0)
-			  throw 200;
+			  throw 201;
         if (request.contentLength < request.buffSize - request.position) {
             std::remove(request.uploadFile.c_str());
             throw 413;

@@ -29,7 +29,6 @@ void Cgi::setEnv() {
     i++;
   }
   this->env[i] = NULL;
-  std::cout << RED << "--ENV--" << DFL << std::endl;
 }
 
 void Cgi::executeCgi() {
@@ -37,7 +36,6 @@ void Cgi::executeCgi() {
   char *args[3];
   std::stringstream ss;
 
-  std::cout << "this is cgi" << std::endl;
   setEnv();
   ss << rand() << "_cgi_out.tmp";
   args[0] = new char[request.cgiScript.size() + 1];
@@ -63,7 +61,6 @@ void Cgi::executeCgi() {
     strcpy(args[1], request.fullPath.c_str());
     // std::cerr << args[0] << ", " << args[1] << std::endl;
     execve(args[0], args, env);
-    std::cerr << "execve fails!" << std::endl;
     exit(100);
   } else {
     request.pid = pid;

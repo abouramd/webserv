@@ -29,12 +29,12 @@ listen 5000
 
   location / {
   index index.php
-  root ./www/E-learning-Website/
+  root ./www/
   allow_method GET DELETE
   auto_index on
   # uploade on /
-  # cgi on
-  # cgi_path py /bin/python3
+  cgi on
+  cgi_path php /bin/python3
   }
 }
 
@@ -98,7 +98,7 @@ location / {
   auto_index on
   }
 
-location /p/ {
+location /php-cgi/ {
   root ./www/cgi-cookies/php/
   allow_method GET POST
   auto_index on
@@ -106,7 +106,7 @@ location /p/ {
   cgi_path php /bin/php-cgi
   }
 
-location /l/ {
+location /perl-cgi/ {
   root ./www/cgi-cookies/perl/
   allow_method GET POST
   auto_index on
@@ -114,7 +114,7 @@ location /l/ {
   cgi_path pl /bin/perl
   }
 
-location /r/ {
+location /ruby-cgi/ {
   root ./www/cgi-cookies/ruby/
   allow_method GET POST
   auto_index on
@@ -122,17 +122,17 @@ location /r/ {
   cgi_path rb /bin/ruby
   }
 
-location /n/ {
+location /python-cgi/ {
   root ./www/cgi-cookies/python/
   allow_method GET POST
   auto_index on
   cgi on
   cgi_path py /bin/python3
 }
-
-
-
-
+  location /red {
+  root /
+  return http://localhost:8080
+  }
 }
 
 

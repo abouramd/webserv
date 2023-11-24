@@ -94,7 +94,6 @@ void Server::init_data(std::ifstream &file) {
   this->file = &file;
   while (ft_read(file, buffer)) {
     if (buffer == "}") {
-      // std::cout << "port " <<  this->port.size() << std::endl;
       return;
     }
     this->find_key(buffer);

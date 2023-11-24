@@ -103,6 +103,7 @@ int main(int ac, char **av)
           if ( it_s->client[i].state == DONE )
           {
             std::cout << it_s->client[i].method << " : " << it_s->client[i].target << " : " << it_s->client[i].version << std::endl;
+            std::cout << "status: " << it_s->client[i].statusCode << std::endl;
             std::cout << BLUE << get_time() << " end of request and swap " << it_s->client[i].fd << " to responce." << DFL << std::endl;
           }
         }

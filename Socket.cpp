@@ -37,7 +37,6 @@ std::string Socket::getHost() const { return this->host; }
 in_addr Socket::getSinAddr() const { return this->server.sin_addr; }
 
 void Socket::setPort(const int p) {
-  // std::cout << "port -> " << p << std::endl;
   if (this->port != -1)
     throw std::string("port socket");
   this->port = p;
@@ -77,8 +76,7 @@ void Socket::check_server_name(std::vector<std::string> &sn) {
     for (std::vector<std::string>::iterator s = this->server_name.begin();
          s != this->server_name.end(); s++)
       if (*it == *s)
-        throw std::string("Error: `" + *s +
-                          "` in two server that have the same port and host.");
+        throw std::string("Error: `" + *s + "` in two server that have the same port and host.");
   }
   this->server_name.insert(this->server_name.begin(), sn.begin(), sn.end());
 }

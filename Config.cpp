@@ -46,8 +46,8 @@ int Config::add_client(Socket &sock) {
     ss << sock.getPort();
     ss >> sock.client.back().server_port;
   }
-  std::cout << PURPLE << sock.client.back().client_host << " : " << sock.client.back().client_port << std::endl;
-  std::cout << PURPLE << sock.client.back().server_host << " : " << sock.client.back().server_port << std::endl;
+  // std::cout << PURPLE << sock.client.back().client_host << " : " << sock.client.back().client_port << std::endl;
+  // std::cout << PURPLE << sock.client.back().server_host << " : " << sock.client.back().server_port << std::endl;
   return 0;
 }
 
@@ -135,7 +135,9 @@ void Config::creat_socket() {
       it_port++;
     }
     it_sev++;
-  }
+  } 
+  for (uint i = 0; i < this->socket.size(); i++)
+    this->socket[i].server_name.clear();
 }
 
 void Config::add_socket(sockaddr_in &addr, Server &sev, int &port) {
