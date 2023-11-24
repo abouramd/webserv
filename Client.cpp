@@ -48,17 +48,17 @@ Client::Client(int fd, std::ifstream *i, std::ofstream *o, std::map<int, std::st
 	this->isCgi = false;
 	this->isDir = false;
 	this->isBound = false;
-    this->beenThere = false;
-    this->boundState = AT_START;
+  this->beenThere = false;
+  this->boundState = AT_START;
 	this->pState = METHOD;
-    this->chState = SIZE;
-    this->position = 0;
-    this->contentLength = 0;
-    this->chunkSizeNum = 0;
-    this->state = NOT_DONE;
-    this->request_time = std::time(NULL);
-    this->opened = 0;
-    this->dir = NULL;
+  this->chState = SIZE;
+  this->position = 0;
+  this->contentLength = 0;
+  this->chunkSizeNum = 0;
+  this->state = NOT_DONE;
+  this->request_time = std::time(NULL);
+  this->opened = 0;
+  this->dir = NULL;
 }
 
 

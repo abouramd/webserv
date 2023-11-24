@@ -74,7 +74,7 @@ struct Client {
 	std::string									uploadFile, cgiFileName, cgiInFileName, cgiScript;
 	std::string 								path, query, fullPath;
     std::time_t request_time; 
-  std::string tmp_error;
+  std::string tmp_error, chank;
 };
 
 void                                        moveBuf( Client & request, int amount );
