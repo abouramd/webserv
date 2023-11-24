@@ -18,7 +18,7 @@
 Server::Server() {
   max_body_size = 1048576;
 
-  for (size_t i = 0; i < 5; i++)
+  for (size_t i = 0; i < 6; i++)
     this->dup[i] = false;
 
   this->error_page_dfl[201] = "error_pages/201.html";
@@ -212,6 +212,8 @@ void Server::set_port(const std::string &str) {
 void Server::set_server_name(const std::string &str) {
   std::vector<std::string> vec = my_split(str);
 
+  this->dup[5] = true;
+
   if (vec.size() < 2)
     throw std::string("Error: number of args (" + str + ")");
 
@@ -326,6 +328,9 @@ void Server::set_error_pages(const std::string &str) {
 void Server::check() {
   if (!this->dup[0])
     throw std::string("Error: The host should be in the server.");
+
+  if (!this->dup[5])
+    throw std::string("Error: The server_name should be in the server.");
 
   if (this->port.empty())
     throw std::string("Error: it should be at least one port or more in the server.");

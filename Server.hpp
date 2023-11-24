@@ -8,7 +8,7 @@
 class Server
 {
   private:
-    bool dup[5];
+    bool dup[6];
    
     std::string key[14];
     void (Server::*ptr[14])(const std::string&);
