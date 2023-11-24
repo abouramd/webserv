@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <fstream>
 #include <cstring>
+#include <string>
 
 // check duplicate 
 
@@ -220,9 +221,11 @@ void Location::set_uplode(const std::string &str)
 
   if (vec[2][0] != '/')
     throw std::string("Error: uplode Path should start with `/` (" + str + ")");
-  // if (!(stat(vec[1].c_str(), &sb) == 0 && S_ISDIR(sb.st_mode)))
-  //   throw std::string("Error: uplode Path (" + str + ")");
-  
+
+  unsigned long pos;
+  if ((pos = str.find("/..")) != std::string::npos && (pos + 3 >= str.size() || str[pos + 3] == '/'))
+    throw std::string("Error: uplode Path `..` (" + str + ")");
+
   this->uplode.second = vec[2];
 }
 
@@ -261,10 +264,7 @@ void Location::set_cgi_path(const std::string &str)
   if (this->cgi.second.find(vec[1]) != this->cgi.second.end())
     throw std::string("Error: CGI `" + vec[1] + "` is duplicated (" + str + ")");
 
-  if (sb.st_mode & S_IXUSR)
-    this->cgi.second[vec[1]] = vec[2];
-  else 
-    throw std::string("Error: CGI Path `" + vec[2] + "` is not exec (" + str + ")");
+  this->cgi.second[vec[1]] = vec[2];
 }
 
 void Location::check()
