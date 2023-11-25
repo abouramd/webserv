@@ -75,7 +75,7 @@ void Config::pars(int ac, char **av) {
   this->init_data(ac, av);
   this->read_data();
   if (this->servers.empty())
-    throw std::string("Error: empthy file, no servers founded in the config file.");
+    throw std::string("Error: empty file, no servers founded in the config file.");
   this->creat_socket();
 }
 
@@ -86,6 +86,10 @@ void Config::init_data(int ac, char **av) {
     this->filename = av[1];
   else
     throw std::string("Error: number of args (the programe should take ane param).");
+
+  struct stat sb;
+  if (!(stat(this->filename.c_str(), &sb) == 0 && S_ISREG(sb.st_mode)))
+    throw std::string("Error: there is a probleme in (" + this->filename + ")");
 
   this->file.open(this->filename.c_str());
   if (!this->file.is_open())
@@ -100,7 +104,7 @@ void Config::read_data() {
     if (buffer == "server {")
       serv.init_data(this->file);
     else
-      throw "Error: " + buffer;
+      throw std::string("Error: `server {` " + buffer);
     serv.check();
     this->servers.push_back(serv);
   }

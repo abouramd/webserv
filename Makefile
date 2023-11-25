@@ -42,6 +42,6 @@ clean:
 
 fclean:clean
 	@rm -rf $(NAME)
-	@echo "\033[1;31m ❎ remove the object files of webserv.\033[0m"
+	@echo "\033[1;31m ❎ remove webserv.\033[0m"
 
 re:fclean all
