@@ -3,6 +3,7 @@
 
 int delete_dir(std::string name, int *n) {
   DIR *dir;
+  int isdir;
   std::string path;
 
   dir = opendir(name.c_str());
@@ -13,9 +14,10 @@ int delete_dir(std::string name, int *n) {
           !std::string(entry->d_name).compare("."))
         continue;
       path = name + "/" + std::string(entry->d_name);
-      if (is_dir(path) == 1) {
+      isdir = is_dir(path);
+      if (isdir == 1) {
         delete_dir(path, n);
-      } else if (is_dir(path) == 0) {
+      } else if (isdir == 0) {
         if (remove(path.c_str()))
           *n = 0;
       }
@@ -36,7 +38,9 @@ void ft_delete(Client &client) {
     if (remove(client.fullPath.c_str()))
       n = 0;
   } else if (is_dir(client.fullPath) == 1)
+  {
     delete_dir(client.fullPath, &n);
+  }
   else {
     client.statusCode = 404;
     return;

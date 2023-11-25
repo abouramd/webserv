@@ -78,7 +78,7 @@ void responses(Client &client) {
     }
     if (client.is_cgi == 5) {
       std::time_t currentTime = time(NULL);
-      if (currentTime - client.currentTime > 5) {
+      if (currentTime - client.currentTime > 10) {
         client.statusCode = 408;
         client.is_cgi = 4;
         client.is->close();
