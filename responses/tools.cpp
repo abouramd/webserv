@@ -164,7 +164,7 @@ int auto_index(Client &client)
   {
     int i = 0;
     struct dirent* entry;
-    while (i < 3 && (entry = readdir(client.dir)))
+    while (i < 6 && (entry = readdir(client.dir)))
     {
       if (entry->d_name[0] != '.')
       {

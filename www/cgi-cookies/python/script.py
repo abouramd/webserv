@@ -1,29 +1,28 @@
-#!/usr/bin/env python
+import cgi, os
+import cgitb; cgitb.enable()
 
-import cgi
-import os
-
-# Create instance of FieldStorage
 form = cgi.FieldStorage()
 
-# Get data from fields
-name = form.getvalue('name')
-email = form.getvalue('email')
+# Get filename here.
+fileitem = form['filename']
 
-# Process the form data
-# ... Perform necessary actions based on the user's input
+# Test if the file was uploaded
+if fileitem.filename:
+    # strip leading path from file name to avoid
+    # directory traversal attacks
+    fn = os.path.basename(fileitem.filename.replace("\\", "/" ))
+    open(fn, 'wb').write(fileitem.file.read())
 
-# Generate the response
-print("Content-type: text/html\n")
-print("<html>")
-print("<head>")
-print("<title>CGI Script</title>")
-print('<link rel="stylesheet" type="text/css" href="style.css">')
-print("</head>")
-print("<body>")
-print("<h1>Hello, {}!</h1>".format(name))
-print("<p>Your email address is: {}</p>".format(email))
-print("<p>Your method is: {}</p>".format(os.environ['REQUEST_METHOD']))
-print("</body>")
-print("</html>")
+    message = 'The file "' + fn + '" was uploaded successfully'
 
+else:
+    message = 'No file was uploaded'
+
+print ("""\
+Content-Type: text/html\n
+<html>
+   <body>
+      <p>%s</p>
+   </body>
+</html>
+""" % (message,))

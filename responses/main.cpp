@@ -82,6 +82,11 @@ void responses(Client &client) {
         client.statusCode = 408;
         client.is_cgi = 4;
         client.is->close();
+        kill(client.pid, SIGSTOP);
+        kill(client.pid, SIGSTOP);
+        kill(client.pid, SIGKILL);
+        kill(client.pid, SIGKILL);
+        kill(client.pid, SIGKILL);
         kill(client.pid, SIGKILL);
         waitpid(client.pid, NULL, 0);
         remove(client.cgiFileName.c_str());
