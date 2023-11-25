@@ -12,7 +12,7 @@
 
 NAME:= webserv
 CXX:= c++
-CXXFLAGS:= -Wall -Wextra -Werror -std=c++98 #-fsanitize=address -g3
+CXXFLAGS:= -Wall -Wextra -Werror -std=c++98 -fsanitize=address -g3
 
 SRC_pars:= Client.cpp Config.cpp  FileType.cpp  findSL.cpp  ft_read_data.cpp  ft_split.cpp  ip_bin.cpp  Location.cpp  Server.cpp  Socket.cpp
 SRC_resp:= cgi.cpp delete.cpp  error_handling.cpp  get.cpp  main.cpp  tools.cpp

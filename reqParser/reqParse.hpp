@@ -59,9 +59,9 @@ struct Client {
     parseState                                  pState, pNext;
     chunkState                                  chState, chNext;
     size_t                                      boundState, state, chunkSizeNum, buffSize, position;
-    String                                      boundBuf, contentType;
+    std::vector<char>                           boundBuf;
     char                                        buf[BUFF_SIZE + 1];
-    std::string                                 chunkSizeStr, header, crlf, method, target, version, host, boundary, lastTwo;
+    std::string                                 contentType, chunkSizeStr, header, crlf, method, target, version, host, boundary, lastTwo;
     std::map<std::string, std::string>          headers, env;
     std::ifstream                               *is;
     std::ofstream                               *outfile;

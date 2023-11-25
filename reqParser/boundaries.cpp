@@ -5,7 +5,7 @@ void    checkFirstBoundary(Client & request) {
     while (request.position < request.buffSize && request.boundBuf.size() < request.boundary.size() + 2) {
         if (request.buf[request.position] != (request.boundary + "\r\n").c_str()[request.boundBuf.size()])
             throw 400;
-        request.boundBuf += request.buf[request.position];
+        request.boundBuf.push_back(request.buf[request.position]);
         request.position++;
     }
     if (request.boundBuf.size() == request.boundary.size() + 2)
@@ -13,49 +13,44 @@ void    checkFirstBoundary(Client & request) {
 }
 
 void    boundS(Client & request) {
-    std::string newBoundary("\r\n" + request.boundary);
-    size_t      startSize = request.boundBuf.size(), size = newBoundary.size() + 2;
-    bool        breaked = false;
+    size_t      size = request.boundary.size() + 4, save;
 
-    while (request.position < request.buffSize && startSize < size) {
-        if (startSize < size - 2) {
-            if (request.buf[request.position] != newBoundary[request.boundBuf.size()]) {
-                breaked = true;
-                break;
-            }
-            request.boundBuf += request.buf[request.position];
-        }
-        else
-            request.lastTwo += request.buf[request.position];
-        request.position++;
-        startSize++;
+    if (request.boundBuf.size() + request.buffSize - request.position >= size) {
+      save = size - request.boundBuf.size();
+      request.boundBuf.insert(request.boundBuf.end(), request.buf + request.position, request.buf + request.position + save);
+      request.position += save;
     }
-    if (request.lastTwo == "--") {
-        request.lastTwo.clear();
+    else {
+      request.boundBuf.insert(request.boundBuf.end(), request.buf + request.position, request.buf + request.buffSize);
+      request.position = request.buffSize;
+    }
+    if (request.boundBuf.size() == size) {
+      if (std::string(request.boundBuf.begin(), request.boundBuf.end()) == "\r\n" + request.boundary + "--") {
+        request.boundBuf.clear();
         throw 201;
-    }
-    else if (request.lastTwo == "\r\n") {
+      }
+      else if (std::string(request.boundBuf.begin(), request.boundBuf.end()) == "\r\n" +request.boundary + "\r\n") {
         request.boundBuf.clear();
         request.boundState = HEAD;
-        request.lastTwo.clear();
         request.outfile->close();
         return;
-    }
-    else if (breaked || request.lastTwo.size() == 2) {
+      }
+      else {
         request.contentLength += request.boundBuf.size();
         if (request.contentLength > request.maxBodySize) {
-            std::remove(request.uploadFile.c_str());
-            throw 413;
+          std::remove(request.uploadFile.c_str());
+          throw 413;
         }
-        request.outfile->write(request.boundBuf.c_str(), request.boundBuf.size());
+        request.outfile->write(&request.boundBuf[0], request.boundBuf.size());
         request.boundState = BOD;
-        request.lastTwo.clear();
         request.boundBuf.clear();
+      }
     }
 }
 
 void    bodS(Client & request) {
     size_t  posOfBound, size;
+
 
     posOfBound = Tools::findBin(request.buf, '\r', request.position, request.buffSize);
     if (posOfBound == std::string::npos)
@@ -96,20 +91,18 @@ void    bodS(Client & request) {
 }
 
 void    headS(Client & request) {
-    if (request.boundBuf == NULL)
     while (request.position < request.buffSize && request.buf[request.position] != '\n') {
-
-        request.boundBuf += request.buf[request.position];
+        request.boundBuf.push_back(request.buf[request.position]);
         request.position++;
     }
     if (request.position < request.buffSize) {
-        if (request.boundBuf == "\r")
-            request.boundState = BOD;
-        else {
-            size_t  pos = request.boundBuf.match("content-type");
+        std::string header(request.boundBuf.begin(), request.boundBuf.end());
 
-            if (pos != std::string::npos && request.boundBuf.size() > 15)
-                request.contentType = String(request.boundBuf.c_str(), 14, request.boundBuf.size() - 15);
+        if (header == "\r")
+            request.boundState = BOD;
+        else if (Tools::toLower(header).find("content-type:") != std::string::npos) {
+          std::stringstream ss(header);
+          ss >> request.contentType >> request.contentType;
         }
         request.position++;
         request.boundBuf.clear();
