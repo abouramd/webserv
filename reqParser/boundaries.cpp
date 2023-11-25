@@ -1,6 +1,7 @@
 #include "Tools.hpp"
 
 void    checkFirstBoundary(Client & request) {
+    request.contentLength = 0;
     while (request.position < request.buffSize && request.boundBuf.size() < request.boundary.size() + 2) {
         if (request.buf[request.position] != (request.boundary + "\r\n").c_str()[request.boundBuf.size()])
             throw 400;

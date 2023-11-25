@@ -292,6 +292,7 @@ void Server::set_max_body(const std::string &str) {
   if (nbr == -1)
     throw std::string("Error: invalid port `" + vec[1] + "` in (" + str + ").");
   this->max_body_size = nbr;
+  std::cout <<   this->max_body_size  << std::endl;
 }
 
 std::vector<std::string> Server::getPort() const { return this->port; }
