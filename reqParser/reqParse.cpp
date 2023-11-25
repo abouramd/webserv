@@ -259,6 +259,8 @@ void    reqParser(Client & request, int sock, std::vector<Server>& serv) {
         amount = read(sock, request.buf, BUFF_SIZE);
         request.position = 0;
         if (amount == 0 || amount == -1) {
+			if (!request.uploadFile.empty())
+				std::remove(request.uploadFile.c_str());
 			request.state = CLOSE;
 			throw 200;
 		}
