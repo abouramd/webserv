@@ -15,7 +15,7 @@ CXX:= c++
 CXXFLAGS:= -Wall -Wextra -Werror -std=c++98 -fsanitize=address -g3
 
 SRC_pars:= Client.cpp Config.cpp  FileType.cpp  findSL.cpp  ft_read_data.cpp  ft_split.cpp  ip_bin.cpp  Location.cpp  Server.cpp  Socket.cpp
-SRC_resp:= cgi.cpp delete.cpp  error_handling.cpp  get.cpp  main.cpp  tools.cpp
+SRC_resp:= cgi.cpp delete.cpp  error_handling.cpp  get.cpp  main.cpp  tools.cpp auto_index.cpp
 SRC_reqe:= boundaries.cpp  Cgi.cpp  chunked.cpp  postRes.cpp  reqParse.cpp  String.cpp  Tools.cpp
 
 HEAD:= reqParser/Client.hpp pars/FileType.hpp pars/Server.hpp reqParser/Cgi.hpp\

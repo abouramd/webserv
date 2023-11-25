@@ -21,11 +21,13 @@ int delete_dir(std::string name, int *n) {
         if (remove(path.c_str()))
           *n = 0;
       }
+      if (!*n)
+        break;
     }
     closedir(dir);
   } else
     *n = 0;
-  if (remove(name.c_str()))
+  if (*n && remove(name.c_str()))
     *n = 0;
   return 0;
 }
