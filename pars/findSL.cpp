@@ -21,6 +21,11 @@ std::map<std::string, Location>::iterator   findLoca(Server& serv, const std::st
 
 void   findServ(Client &client, std::vector<Server>& serv, const std::string &host, const std::string &url)
 {
+  std::string hostname = host;
+    if (host.find(':') != std::string::npos)
+        hostname = host.substr(0, host.find(':'));
+    std::cout << hostname << std::endl;
+
   for (std::vector<Server>::iterator it = serv.begin(); it != serv.end(); it++)
   {
     for (std::vector<std::string>::iterator it_sn = it->server_name.begin(); it_sn != it->server_name.end(); it_sn++)
@@ -44,5 +49,3 @@ void   findServ(Client &client, std::vector<Server>& serv, const std::string &ho
   client.location.first = t->first;
   client.location.second = t->second;
 }
-
-
