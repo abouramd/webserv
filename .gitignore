@@ -20,9 +20,7 @@ temp/*
 *.webm
 *.mp4
 *.jpeg
-*.pdf
+*/*.pdf
 *.deb
 
 .DS_Store
-
-
